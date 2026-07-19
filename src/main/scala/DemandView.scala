@@ -25,6 +25,7 @@ class DemandView(
 
   // Requests Table
   private val requestsTable = new TableView[FamilyRequest]:
+    val selfTable = this
     columnResizePolicy = TableView.ConstrainedResizePolicy
     style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No pending family requests.") { style = "-fx-text-fill: #64748b;" }
@@ -89,6 +90,12 @@ class DemandView(
 
     columns ++= Seq(idCol, nameCol, sizeCol, restrictionCol, categoryCol, statusCol)
     prefHeight = 300
+    clip = new scalafx.scene.shape.Rectangle {
+      arcWidth = 12
+      arcHeight = 12
+      width <== selfTable.width
+      height <== selfTable.height
+    }
 
   // Bind requests buffer
   requestsTable.items = requests

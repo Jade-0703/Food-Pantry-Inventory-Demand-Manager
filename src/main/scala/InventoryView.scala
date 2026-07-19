@@ -27,6 +27,7 @@ class InventoryView(
 
   // Inventory Table
   private val inventoryTable = new TableView[FoodItem]:
+    val selfTable = this
     columnResizePolicy = TableView.ConstrainedResizePolicy
     style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No items in inventory.") { style = "-fx-text-fill: #64748b;" }
@@ -98,6 +99,12 @@ class InventoryView(
 
     columns ++= Seq(idCol, nameCol, categoryCol, qtyCol, perishableCol, detailCol)
     prefHeight = 300
+    clip = new scalafx.scene.shape.Rectangle {
+      arcWidth = 12
+      arcHeight = 12
+      width <== selfTable.width
+      height <== selfTable.height
+    }
 
   // Bind repository items to the table
   inventoryTable.items = inventory

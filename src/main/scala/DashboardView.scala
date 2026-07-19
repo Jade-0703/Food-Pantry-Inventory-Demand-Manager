@@ -57,6 +57,7 @@ class DashboardView(
 
   // Critical items Table (perishables expiring within 3 days)
   private val criticalTable = new TableView[FoodItem]:
+    val selfTable = this
     columnResizePolicy = TableView.ConstrainedResizePolicy
     style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No critical expiring items.") { style = "-fx-text-fill: #64748b;" }
@@ -101,6 +102,12 @@ class DashboardView(
 
     columns ++= Seq(nameCol, categoryCol, qtyCol, statusCol)
     prefHeight = 250
+    clip = new scalafx.scene.shape.Rectangle {
+      arcWidth = 12
+      arcHeight = 12
+      width <== selfTable.width
+      height <== selfTable.height
+    }
 
   private val criticalSection = new VBox:
     spacing = 10

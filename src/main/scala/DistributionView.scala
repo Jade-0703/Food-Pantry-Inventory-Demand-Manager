@@ -27,6 +27,7 @@ class DistributionView(
 
   // Allocation Table
   private val allocationsTable = new TableView[Allocation]:
+    val selfTable = this
     columnResizePolicy = TableView.ConstrainedResizePolicy
     style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No distribution plan generated. Click 'Generate' below.") { style = "-fx-text-fill: #64748b;" }
@@ -53,6 +54,12 @@ class DistributionView(
 
     columns ++= Seq(idCol, familyCol, itemCol, categoryCol, qtyCol)
     prefHeight = 280
+    clip = new scalafx.scene.shape.Rectangle {
+      arcWidth = 12
+      arcHeight = 12
+      width <== selfTable.width
+      height <== selfTable.height
+    }
 
   // Local state for the generated proposed changes
   private val proposedAllocations = ObservableBuffer[Allocation]()
