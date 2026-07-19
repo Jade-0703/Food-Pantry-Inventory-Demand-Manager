@@ -65,7 +65,7 @@ object MainApp extends JFXApp3:
           left = new VBox:
             spacing = 10
             padding = Insets(20)
-            style = "-fx-background-color: #bde3f5ff; -fx-min-width: 220px;"
+            style = "-fx-background-color: #fbeed6ff; -fx-min-width: 220px;"
             
             val appTitle = new Label("Food Pantry"):
               style = "-fx-text-fill: #1e3a8a; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"
