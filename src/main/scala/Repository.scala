@@ -1,21 +1,51 @@
+/**
+ * ============================================================================
+ *                          PERSISTENCE & REPOSITORIES
+ * ============================================================================
+ * Defines generic data access traits and file-backed CSV serialization layers 
+ * for storing data safely in CSV formats on local storage.
+ *
+ * Implements:
+ *   - S1-9 (Parametric Polymorphism via generics [T])
+ *   - S1-10 (Encapsulation via private fields)
+ *   - S1-12 (Exception Handling via scala.util.Try)
+ * ============================================================================
+ */
 package foodpantry
 
 import java.io.{File, PrintWriter}
 import scala.io.Source
 import scala.util.Try
 
-// S1-9 Parametric polymorphism: Generic interface for data access
+// ============================================================================
+// 1. GENERIC ABSTRACTIONS
+// ============================================================================
+
+/**
+ * S1-9 Parametric Polymorphism.
+ * Interface defining serialization logic for an arbitrary type T.
+ */
 trait Serializer[T]:
   def serialize(value: T): String
   def deserialize(line: String): Try[T]
 
+/**
+ * S1-9 Parametric Polymorphism.
+ * Generic boundary interface for storing and retrieving lists of records.
+ */
 trait Repository[T]:
   def loadAll(): Try[List[T]]
   def saveAll(items: List[T]): Try[Unit]
 
+// ============================================================================
+// 2. CONCRETE PERSISTENCE LAYER
+// ============================================================================
+
 // ai-assisted: #3
 // why: Assisted with drafting the generic persistence repository interface pattern using serializers.
-// S1-9 Parametric polymorphism: Generic class implementing Repository
+/**
+ * Generic repository implementation backing persistence onto a plain text file.
+ */
 class FileRepository[T](
   filePathString: String,
   serializer: Serializer[T]
@@ -25,7 +55,10 @@ class FileRepository[T](
   // Rationale: Keep database filepath hidden to prevent raw file modification bypass
   private val dataFilePath: String = filePathString
 
-  // S1-12 Exception handling: Every IO or parsing operation is wrapped in scala.util.Try
+  /**
+   * S1-12 Exception Handling.
+   * Loads and deserializes all items from the encapsulated file source.
+   */
   override def loadAll(): Try[List[T]] = Try {
     val file = new File(dataFilePath)
     if !file.exists() then
@@ -42,6 +75,10 @@ class FileRepository[T](
         source.close()
   }
 
+  /**
+   * S1-12 Exception Handling.
+   * Writes all items to the encapsulated file.
+   */
   override def saveAll(items: List[T]): Try[Unit] = Try {
     val file = new File(dataFilePath)
     val writer = new PrintWriter(file)
@@ -53,6 +90,11 @@ class FileRepository[T](
       writer.close()
   }
 
+// ============================================================================
+// 3. MODEL SERIALIZERS
+// ============================================================================
+
+/** CSV Serializer implementation for FoodItems. */
 object FoodItemSerializer extends Serializer[FoodItem]:
   override def serialize(value: FoodItem): String = value match
     case PerishableItem(id, name, category, quantity, unit, expiryDate) =>
@@ -79,6 +121,7 @@ object FoodItemSerializer extends Serializer[FoodItem]:
         throw new IllegalArgumentException(s"Unknown item type: $itemType")
   }
 
+/** CSV Serializer implementation for FamilyRequests. */
 object FamilyRequestSerializer extends Serializer[FamilyRequest]:
   override def serialize(value: FamilyRequest): String =
     s"${value.id},${value.familyName},${value.householdSize},${value.dietaryRestriction.toString},${value.requestedCategory.toString},${value.status.toString}"
