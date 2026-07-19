@@ -204,8 +204,7 @@
 }
 
 /* 11. Chart styling */
-.chart-pie {
-    -fx-border-color: transparent;
+.chart {
     -fx-background-color: transparent;
 }
 .chart-pie-label {
