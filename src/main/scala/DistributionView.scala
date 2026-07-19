@@ -20,10 +20,10 @@ class DistributionView(
   padding = Insets(20)
   style = "-fx-background-color: #f1f5f9;"
 
-  // Header Title
   private val titleLabel = new Label("Daily Distribution Optimizer"):
     font = Font.font("System", FontWeight.Bold, 24)
     style = "-fx-text-fill: #1e293b;"
+    minWidth = 500
 
   // Allocation Table
   private val allocationsTable = new TableView[Allocation]:

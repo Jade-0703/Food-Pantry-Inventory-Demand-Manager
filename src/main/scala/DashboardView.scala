@@ -17,10 +17,10 @@ class DashboardView(
   padding = Insets(20)
   style = "-fx-background-color: #f1f5f9;"
 
-  // Header Title
   private val titleLabel = new Label("Dashboard & Pantry Analytics"):
     font = Font.font("System", FontWeight.Bold, 24)
     style = "-fx-text-fill: #1e293b;"
+    minWidth = 500
 
   // KPI Panels
   private val totalStockVal = new Label("0") { style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2563eb;" }

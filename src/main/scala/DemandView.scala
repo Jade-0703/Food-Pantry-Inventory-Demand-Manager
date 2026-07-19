@@ -18,10 +18,10 @@ class DemandView(
   padding = Insets(20)
   style = "-fx-background-color: #f1f5f9;"
 
-  // Header Title
   private val titleLabel = new Label("Family Demand & Requests Log"):
     font = Font.font("System", FontWeight.Bold, 24)
     style = "-fx-text-fill: #1e293b;"
+    minWidth = 500
 
   // Requests Table
   private val requestsTable = new TableView[FamilyRequest]:
@@ -152,7 +152,7 @@ class DemandView(
     padding = Insets(15)
     styleClass = Seq("form-card")
     children = Seq(
-      new Label("Log Family Request") { font = Font.font("System", FontWeight.Bold, 15); style = "-fx-text-fill: #1e293b;" },
+      new Label("Log Family Request") { font = Font.font("System", FontWeight.Bold, 15); style = "-fx-text-fill: #1e293b;"; minWidth = 500 },
       formGrid
     )
 

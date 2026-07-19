@@ -23,6 +23,7 @@ class InventoryView(
   private val titleLabel = new Label("Pantry Inventory Log"):
     font = Font.font("System", FontWeight.Bold, 24)
     style = "-fx-text-fill: #1e293b;"
+    minWidth = 500
 
   // Inventory Table
   private val inventoryTable = new TableView[FoodItem]:
@@ -210,7 +211,7 @@ class InventoryView(
     padding = Insets(15)
     styleClass = Seq("form-card")
     children = Seq(
-      new Label("Add Inventory Item") { font = Font.font("System", FontWeight.Bold, 15); style = "-fx-text-fill: #1e293b;" },
+      new Label("Add Inventory Item") { font = Font.font("System", FontWeight.Bold, 15); style = "-fx-text-fill: #1e293b;"; minWidth = 500 },
       formGrid
     )
 
