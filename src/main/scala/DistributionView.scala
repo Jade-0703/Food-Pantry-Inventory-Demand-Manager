@@ -63,11 +63,12 @@ class DistributionView(
   private val statusLabel = new Label { style = "-fx-font-weight: bold; -fx-font-size: 13px;" }
 
   private val generateButton = new Button("Generate Plan"):
-    style = "-fx-background-color: #2563eb; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 6px;"
+    styleClass = Seq("button", "button-primary")
     onAction = handle { performGeneratePlan() }
 
   private val dispatchButton = new Button("Confirm & Dispatch Plan"):
-    style = "-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 6px; -fx-opacity: 0.5;"
+    styleClass = Seq("button", "button-success")
+    opacity = 0.5
     disable = true
     onAction = handle { performDispatch() }
 
@@ -121,9 +122,8 @@ class DistributionView(
         statsLabel.text = s"Plan Details: Satisfied ${allocations.map(_.familyName).distinct.size} families. Allocated ${allocations.map(_.allocatedQuantity).sum} units of food. Waste Minimized (Perishables): $perishablesAllocated units."
         statusLabel.style = "-fx-text-fill: #16a34a;"
         statusLabel.text = "Plan successfully generated! Review above and click 'Confirm & Dispatch'."
-        
         dispatchButton.disable = false
-        dispatchButton.style = "-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 6px; -fx-opacity: 1.0;"
+        dispatchButton.opacity = 1.0
 
   private def performDispatch(): Unit =
     if proposedInventory.value.nonEmpty && proposedRequests.value.nonEmpty then
@@ -142,7 +142,7 @@ class DistributionView(
       statusLabel.style = "-fx-text-fill: #16a34a;"
       statusLabel.text = "Success: Daily plan dispatched! Inventory and request log updated and saved."
       dispatchButton.disable = true
-      dispatchButton.style = "-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 6px; -fx-opacity: 0.5;"
+      dispatchButton.opacity = 0.5
 
   private val statsPanel = new VBox:
     spacing = 5

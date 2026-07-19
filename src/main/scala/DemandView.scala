@@ -70,11 +70,11 @@ class DemandView(
     sizeField.onAction = handle { submitAction() }
 
   private val addButton = new Button("Add Request"):
-    style = "-fx-background-color: #2563eb; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 8px 16px; -fx-background-radius: 6px;"
+    styleClass = Seq("button", "button-primary")
     onAction = handle { performAddRequest() }
 
   private val deleteButton = new Button("Delete Selected"):
-    style = "-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 8px 16px; -fx-background-radius: 6px;"
+    styleClass = Seq("button", "button-danger")
     onAction = handle { performDeleteSelected() }
 
   private def performAddRequest(): Unit =

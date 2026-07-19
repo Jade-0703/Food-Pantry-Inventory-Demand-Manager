@@ -58,6 +58,7 @@ object MainApp extends JFXApp3:
       height = 750
       
       scene = new Scene:
+        stylesheets = Seq(getClass.getResource("/style.css").toExternalForm)
         root = new BorderPane:
           // Left Sidebar Navigation
           left = new VBox:
@@ -71,7 +72,7 @@ object MainApp extends JFXApp3:
             @annotation.nowarn("cat=deprecation")
             def createNavButton(text: String, view: scalafx.scene.Node): Button = 
               new Button(text):
-                style = "-fx-background-color: transparent; -fx-text-fill: #94a3b8; -fx-font-size: 14px; -fx-font-weight: bold; -fx-alignment: center-left; -fx-pref-width: 180px; -fx-padding: 10px;"
+                styleClass = Seq("sidebar-btn")
                 onAction = handle {
                   activeView.value = view
                 }
@@ -90,14 +91,14 @@ object MainApp extends JFXApp3:
                 (btnDist, distributionView)
               ).foreach { case (btn, viewInstance) =>
                 if newView == viewInstance then
-                  btn.style = "-fx-background-color: #3b82f6; -fx-text-fill: #ffffff; -fx-font-size: 14px; -fx-font-weight: bold; -fx-alignment: center-left; -fx-pref-width: 180px; -fx-padding: 10px; -fx-background-radius: 6px;"
+                  btn.styleClass = Seq("sidebar-btn-active")
                 else
-                  btn.style = "-fx-background-color: transparent; -fx-text-fill: #94a3b8; -fx-font-size: 14px; -fx-font-weight: bold; -fx-alignment: center-left; -fx-pref-width: 180px; -fx-padding: 10px;"
+                  btn.styleClass = Seq("sidebar-btn")
               }
             }
 
             // Set dashboard active by default
-            btnDash.style = "-fx-background-color: #3b82f6; -fx-text-fill: #ffffff; -fx-font-size: 14px; -fx-font-weight: bold; -fx-alignment: center-left; -fx-pref-width: 180px; -fx-padding: 10px; -fx-background-radius: 6px;"
+            btnDash.styleClass = Seq("sidebar-btn-active")
 
             children = Seq(appTitle, btnDash, btnInv, btnReq, btnDist)
           

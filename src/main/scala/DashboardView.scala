@@ -30,7 +30,8 @@ class DashboardView(
     new VBox:
       spacing = 5
       padding = Insets(15)
-      style = s"-fx-background-color: $bgStyle; -fx-background-radius: 8px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4); -fx-min-width: 180px; -fx-alignment: center;"
+      styleClass = Seq("kpi-card")
+      style = s"-fx-background-color: $bgStyle;"
       children = Seq(
         new Label(title) { style = "-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-font-weight: bold;" },
         valueLabel
