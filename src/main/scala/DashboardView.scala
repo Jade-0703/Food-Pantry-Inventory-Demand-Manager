@@ -52,7 +52,7 @@ class DashboardView(
   // Chart and Critical Inventory Table
   private val pieChart = new PieChart:
     title = "Inventory Categories"
-    style = "-fx-background-color: #ffffff; -fx-background-radius: 8px; -fx-padding: 10px;"
+    style = "-fx-background-color: #ffffff; -fx-background-radius: 12px; -fx-border-radius: 12px; -fx-border-color: #cbd5e1; -fx-border-width: 1px; -fx-padding: 10px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
     legendVisible = true
 
   // Critical items Table (perishables expiring within 3 days)
@@ -104,7 +104,7 @@ class DashboardView(
 
   private val criticalSection = new VBox:
     spacing = 10
-    style = "-fx-background-color: #ffffff; -fx-background-radius: 8px; -fx-padding: 15px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
+    style = "-fx-background-color: #ffffff; -fx-background-radius: 12px; -fx-border-radius: 12px; -fx-border-color: #cbd5e1; -fx-border-width: 1px; -fx-padding: 15px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
     hgrow = Priority.Always
     children = Seq(
       new Label("Urgently Expiring Stock") { style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" },

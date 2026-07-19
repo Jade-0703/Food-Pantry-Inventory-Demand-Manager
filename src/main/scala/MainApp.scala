@@ -65,10 +65,10 @@ object MainApp extends JFXApp3:
           left = new VBox:
             spacing = 10
             padding = Insets(20)
-            style = "-fx-background-color: #1e3a8a; -fx-min-width: 220px;"
+            style = "-fx-background-color: #ffffff; -fx-min-width: 220px; -fx-border-color: #e5e5e0; -fx-border-width: 0 1 0 0;"
             
             val appTitle = new Label("Food Pantry"):
-              style = "-fx-text-fill: #ffffff; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"
+              style = "-fx-text-fill: #111827; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"
             
             @annotation.nowarn("cat=deprecation")
             def createNavButton(text: String, view: scalafx.scene.Node): Button = 
