@@ -187,21 +187,21 @@
 /* 9. Side-bar Navigation styling */
 .sidebar-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #4b5563;
+    -fx-text-fill: #bfdbfe; /* Light blue contrast text on dark blue background */
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-alignment: center-left;
     -fx-pref-width: 180px;
     -fx-padding: 12px 16px;
-    -fx-background-radius: 20px; /* Pill active state */
+    -fx-background-radius: 20px;
 }
 .sidebar-btn:hover {
-    -fx-background-color: #f3f4f6;
-    -fx-text-fill: #111827;
+    -fx-background-color: #2563eb; /* Vibrant royal blue hover capsule */
+    -fx-text-fill: #ffffff;
 }
 .sidebar-btn-active {
-    -fx-background-color: #e0f2fe;
-    -fx-text-fill: #0369a1;
+    -fx-background-color: #ffffff; /* Premium white active capsule */
+    -fx-text-fill: #1e3a8a; /* Deep navy text */
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-alignment: center-left;
