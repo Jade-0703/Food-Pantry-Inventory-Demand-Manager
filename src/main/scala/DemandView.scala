@@ -135,7 +135,7 @@ class DemandView(
     padding = Insets(15)
     styleClass = Seq("form-card")
 
-    add(new Label("Log Family Request") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;" }, 0, 0, 4, 1)
+    add(new Label("Log Family Request") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;"; minWidth = 300 }, 0, 0, 4, 1)
 
     add(new Label("Family Name:"), 0, 1)
     add(familyNameField, 1, 1)
