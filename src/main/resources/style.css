@@ -132,6 +132,8 @@
 .table-view .column-header {
     -fx-background-color: transparent;
     -fx-size: 42px;
+    -fx-border-color: #bae6fd;
+    -fx-border-width: 0 1 0 0; /* Vertical lines between headers */
 }
 .table-view .column-header .label {
     -fx-text-fill: #1e40af;
@@ -143,6 +145,9 @@
     -fx-alignment: CENTER;
     -fx-text-fill: #1f2937;
     -fx-font-size: 13px;
+    -fx-wrap-text: true; /* Auto wrap text when too long */
+    -fx-border-color: #e5e5e0;
+    -fx-border-width: 0 1 1 0; /* Horizontal and vertical grid lines */
 }
 .table-view .table-row-cell {
     -fx-background-color: transparent;
