@@ -27,6 +27,7 @@ class DistributionView(
 
   // Allocation Table
   private val allocationsTable = new TableView[Allocation]:
+    columnResizePolicy = TableView.ConstrainedResizePolicy
     style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No distribution plan generated. Click 'Generate' below.") { style = "-fx-text-fill: #64748b;" }
 

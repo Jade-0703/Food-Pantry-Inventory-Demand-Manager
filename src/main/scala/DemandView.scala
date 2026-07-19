@@ -25,6 +25,7 @@ class DemandView(
 
   // Requests Table
   private val requestsTable = new TableView[FamilyRequest]:
+    columnResizePolicy = TableView.ConstrainedResizePolicy
     style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No pending family requests.") { style = "-fx-text-fill: #64748b;" }
 

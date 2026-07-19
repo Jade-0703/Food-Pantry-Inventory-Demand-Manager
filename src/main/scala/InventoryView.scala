@@ -27,6 +27,7 @@ class InventoryView(
 
   // Inventory Table
   private val inventoryTable = new TableView[FoodItem]:
+    columnResizePolicy = TableView.ConstrainedResizePolicy
     style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No items in inventory.") { style = "-fx-text-fill: #64748b;" }
 

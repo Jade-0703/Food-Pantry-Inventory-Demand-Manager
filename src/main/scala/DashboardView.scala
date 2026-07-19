@@ -57,6 +57,7 @@ class DashboardView(
 
   // Critical items Table (perishables expiring within 3 days)
   private val criticalTable = new TableView[FoodItem]:
+    columnResizePolicy = TableView.ConstrainedResizePolicy
     style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No critical expiring items.") { style = "-fx-text-fill: #64748b;" }
     
