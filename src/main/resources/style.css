@@ -130,6 +130,10 @@
     -fx-text-fill: #475569;
     -fx-font-weight: bold;
     -fx-font-size: 12px;
+    -fx-alignment: CENTER;
+}
+.table-view .table-cell {
+    -fx-alignment: CENTER;
 }
 .table-view .table-row-cell {
     -fx-background-color: transparent;
