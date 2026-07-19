@@ -205,17 +205,18 @@
     -fx-border-color: #1e3a8a;
 }
 .sidebar-btn-active {
-    -fx-background-color: #1e3a8a; /* Solid deep navy active capsule */
-    -fx-border-color: #1e3a8a;
-    -fx-border-width: 1px;
+    -fx-background-color: #bde3f5; /* Light sky blue active capsule */
+    -fx-border-color: #7ec8e3; /* Matching sky blue border */
+    -fx-border-width: 1.5px;
     -fx-border-radius: 20px;
-    -fx-text-fill: #ffffff; /* White text for perfect contrast */
+    -fx-text-fill: #1e3a8a; /* Deep navy text for contrast */
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-alignment: center-left;
     -fx-pref-width: 180px;
     -fx-padding: 12px 16px;
     -fx-background-radius: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 4, 0, 0, 2);
 }
 
 /* 10. Dashboard KPI Cards (Clarity soft pastels) */
