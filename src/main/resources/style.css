@@ -206,6 +206,62 @@
     -fx-min-width: 180px;
     -fx-alignment: center;
 }
+.card-blue {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 4 0 0 0;
+}
+.card-orange {
+    -fx-border-color: #ea580c;
+    -fx-border-width: 4 0 0 0;
+}
+.card-red {
+    -fx-border-color: #dc2626;
+    -fx-border-width: 4 0 0 0;
+}
+.card-green {
+    -fx-border-color: #16a34a;
+    -fx-border-width: 4 0 0 0;
+}
+
+/* 10b. Form Cards */
+.form-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-border-color: #e2e8f0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 0 0 0 4; /* Left border blue accent */
+}
+
+/* 10c. Modern Scrollbars */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 7px;
+}
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 4px;
+}
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #94a3b8;
+}
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-pref-height: 7px;
+}
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 4px;
+}
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #94a3b8;
+}
+.scroll-bar .track, .scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
 
 /* 11. Chart styling */
 .chart {

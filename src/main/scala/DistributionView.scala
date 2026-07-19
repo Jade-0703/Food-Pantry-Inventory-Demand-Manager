@@ -147,7 +147,7 @@ class DistributionView(
   private val statsPanel = new VBox:
     spacing = 5
     padding = Insets(10)
-    style = "-fx-background-color: #ffffff; -fx-background-radius: 8px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
+    styleClass = Seq("form-card")
     children = Seq(statsLabel)
 
   private val actionRow = new HBox:

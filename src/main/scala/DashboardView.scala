@@ -26,11 +26,11 @@ class DashboardView(
   private val expiringSoonVal = new Label("0") { style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #dc2626;" }
   private val familiesHelpedVal = new Label("0") { style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #16a34a;" }
 
-  private def createKpiCard(title: String, valueLabel: Label, bgStyle: String): VBox =
+  private def createKpiCard(title: String, valueLabel: Label, bgStyle: String, colorClass: String): VBox =
     new VBox:
       spacing = 5
       padding = Insets(15)
-      styleClass = Seq("kpi-card")
+      styleClass = Seq("kpi-card", colorClass)
       style = s"-fx-background-color: $bgStyle;"
       children = Seq(
         new Label(title) { style = "-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-font-weight: bold;" },
@@ -41,10 +41,10 @@ class DashboardView(
     spacing = 15
     alignment = Pos.CenterLeft
     children = Seq(
-      createKpiCard("TOTAL STOCK UNITS", totalStockVal, "#eff6ff"),
-      createKpiCard("PENDING REQUESTS", pendingFamiliesVal, "#fff7ed"),
-      createKpiCard("EXPIRING SOON (<3 DAYS)", expiringSoonVal, "#fef2f2"),
-      createKpiCard("FAMILIES HELPED", familiesHelpedVal, "#f0fdf4")
+      createKpiCard("TOTAL STOCK UNITS", totalStockVal, "#eff6ff", "card-blue"),
+      createKpiCard("PENDING REQUESTS", pendingFamiliesVal, "#fff7ed", "card-orange"),
+      createKpiCard("EXPIRING SOON (<3 DAYS)", expiringSoonVal, "#fef2f2", "card-red"),
+      createKpiCard("FAMILIES HELPED", familiesHelpedVal, "#f0fdf4", "card-green")
     )
 
   // Chart and Critical Inventory Table

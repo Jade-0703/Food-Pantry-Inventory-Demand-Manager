@@ -133,7 +133,7 @@ class DemandView(
     hgap = 10
     vgap = 10
     padding = Insets(15)
-    style = "-fx-background-color: #ffffff; -fx-background-radius: 8px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
+    styleClass = Seq("form-card")
 
     add(new Label("Log Family Request") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;" }, 0, 0, 4, 1)
 
