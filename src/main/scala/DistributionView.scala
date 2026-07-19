@@ -59,7 +59,7 @@ class DistributionView(
   allocationsTable.items = proposedAllocations
 
   // Info and Stats Labels
-  private val statsLabel = new Label { style = "-fx-font-size: 14px; -fx-text-fill: #334155; -fx-font-weight: bold;" }
+  private val statsLabel = new Label("No active plan. Click 'Generate Plan' to calculate daily distribution layout.") { style = "-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;" }
   private val statusLabel = new Label { style = "-fx-font-weight: bold; -fx-font-size: 13px;" }
 
   private val generateButton = new Button("Generate Plan"):
@@ -102,8 +102,9 @@ class DistributionView(
         proposedInventory.value = Nil
         proposedRequests.value = Nil
         dispatchButton.disable = true
-        dispatchButton.style = "-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 6px; -fx-opacity: 0.5;"
-        statsLabel.text = ""
+        dispatchButton.opacity = 0.5
+        statsLabel.style = "-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"
+        statsLabel.text = "No active plan. Click 'Generate Plan' to calculate daily distribution layout."
       else
         proposedAllocations.clear()
         proposedAllocations.addAll(allocations)
@@ -119,6 +120,7 @@ class DistributionView(
           }
         }.map(_.allocatedQuantity).sum
 
+        statsLabel.style = "-fx-font-size: 14px; -fx-text-fill: #334155; -fx-font-weight: bold;"
         statsLabel.text = s"Plan Details: Satisfied ${allocations.map(_.familyName).distinct.size} families. Allocated ${allocations.map(_.allocatedQuantity).sum} units of food. Waste Minimized (Perishables): $perishablesAllocated units."
         statusLabel.style = "-fx-text-fill: #16a34a;"
         statusLabel.text = "Plan successfully generated! Review above and click 'Confirm & Dispatch'."
@@ -138,7 +140,8 @@ class DistributionView(
       proposedInventory.value = Nil
       proposedRequests.value = Nil
       
-      statsLabel.text = ""
+      statsLabel.style = "-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"
+      statsLabel.text = "No active plan. Click 'Generate Plan' to calculate daily distribution layout."
       statusLabel.style = "-fx-text-fill: #16a34a;"
       statusLabel.text = "Success: Daily plan dispatched! Inventory and request log updated and saved."
       dispatchButton.disable = true
