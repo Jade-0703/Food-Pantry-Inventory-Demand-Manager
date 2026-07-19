@@ -132,22 +132,27 @@ class DemandView(
   private val formGrid = new GridPane:
     hgap = 10
     vgap = 10
+
+    add(new Label("Family Name:"), 0, 0)
+    add(familyNameField, 1, 0)
+
+    add(new Label("Household Size:"), 2, 0)
+    add(sizeField, 3, 0)
+
+    add(new Label("Dietary Restr.:"), 0, 1)
+    add(restrictionCombo, 1, 1)
+
+    add(new Label("Category:"), 2, 1)
+    add(categoryCombo, 3, 1)
+
+  private val formContainer = new VBox:
+    spacing = 10
     padding = Insets(15)
     styleClass = Seq("form-card")
-
-    add(new Label("Log Family Request") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;"; minWidth = 500 }, 0, 0, 4, 1)
-
-    add(new Label("Family Name:"), 0, 1)
-    add(familyNameField, 1, 1)
-
-    add(new Label("Household Size:"), 2, 1)
-    add(sizeField, 3, 1)
-
-    add(new Label("Dietary Restr.:"), 0, 2)
-    add(restrictionCombo, 1, 2)
-
-    add(new Label("Category:"), 2, 2)
-    add(categoryCombo, 3, 2)
+    children = Seq(
+      new Label("Log Family Request") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;" },
+      formGrid
+    )
 
   private val buttonRow = new HBox:
     spacing = 15
@@ -157,7 +162,7 @@ class DemandView(
   children = Seq(
     titleLabel,
     requestsTable,
-    formGrid,
+    formContainer,
     buttonRow
   )
 

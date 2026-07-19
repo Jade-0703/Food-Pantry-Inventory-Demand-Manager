@@ -181,31 +181,36 @@ class InventoryView(
   private val formGrid = new GridPane:
     hgap = 10
     vgap = 10
+
+    add(new Label("Name:"), 0, 0)
+    add(nameField, 1, 0)
+
+    add(new Label("Category:"), 2, 0)
+    add(categoryCombo, 3, 0)
+
+    add(new Label("Quantity:"), 0, 1)
+    add(qtyField, 1, 1)
+
+    add(new Label("Unit:"), 2, 1)
+    add(unitField, 3, 1)
+
+    add(new Label("Type:"), 0, 2)
+    add(itemTypeCombo, 1, 2)
+
+    add(expiryLabel, 2, 2)
+    add(expiryDatePicker, 3, 2)
+
+    add(shelfLifeLabel, 2, 2)
+    add(shelfLifeField, 3, 2)
+
+  private val formContainer = new VBox:
+    spacing = 10
     padding = Insets(15)
     styleClass = Seq("form-card")
-
-    add(new Label("Add Inventory Item") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;"; minWidth = 500 }, 0, 0, 4, 1)
-
-    add(new Label("Name:"), 0, 1)
-    add(nameField, 1, 1)
-
-    add(new Label("Category:"), 2, 1)
-    add(categoryCombo, 3, 1)
-
-    add(new Label("Quantity:"), 0, 2)
-    add(qtyField, 1, 2)
-
-    add(new Label("Unit:"), 2, 2)
-    add(unitField, 3, 2)
-
-    add(new Label("Type:"), 0, 3)
-    add(itemTypeCombo, 1, 3)
-
-    add(expiryLabel, 2, 3)
-    add(expiryDatePicker, 3, 3)
-
-    add(shelfLifeLabel, 2, 3)
-    add(shelfLifeField, 3, 3)
+    children = Seq(
+      new Label("Add Inventory Item") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;" },
+      formGrid
+    )
 
   // Layout assembly
   private val buttonRow = new HBox:
@@ -216,7 +221,7 @@ class InventoryView(
   children = Seq(
     titleLabel,
     inventoryTable,
-    formGrid,
+    formContainer,
     buttonRow
   )
 
