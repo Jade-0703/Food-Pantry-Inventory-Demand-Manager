@@ -15,18 +15,18 @@ class DashboardView(
   
   spacing = 20
   padding = Insets(20)
-  style = "-fx-background-color: #f1f5f9;"
+  style = "-fx-background-color: #fbf9f4;"
 
   private val titleLabel = new Label("Dashboard & Pantry Analytics"):
     font = Font.font("System", FontWeight.Bold, 24)
-    style = "-fx-text-fill: #1e293b;"
+    style = "-fx-text-fill: #111827;"
     minWidth = 500
 
   // KPI Panels
-  private val totalStockVal = new Label("0") { style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2563eb;" }
-  private val pendingFamiliesVal = new Label("0") { style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #ea580c;" }
-  private val expiringSoonVal = new Label("0") { style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #dc2626;" }
-  private val familiesHelpedVal = new Label("0") { style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #16a34a;" }
+  private val totalStockVal = new Label("0") { style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0369a1;" }
+  private val pendingFamiliesVal = new Label("0") { style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #c2410c;" }
+  private val expiringSoonVal = new Label("0") { style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #b91c1c;" }
+  private val familiesHelpedVal = new Label("0") { style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #6b21a8;" }
 
   private def createKpiCard(title: String, valueLabel: Label, bgStyle: String, colorClass: String): VBox =
     new VBox:
@@ -35,7 +35,7 @@ class DashboardView(
       styleClass = Seq("kpi-card", colorClass)
       style = s"-fx-background-color: $bgStyle;"
       children = Seq(
-        new Label(title) { style = "-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-font-weight: bold;" },
+        new Label(title) { style = "-fx-font-size: 11px; -fx-text-fill: #4b5563; -fx-font-weight: bold;" },
         valueLabel
       )
 
@@ -43,10 +43,10 @@ class DashboardView(
     spacing = 15
     alignment = Pos.CenterLeft
     children = Seq(
-      createKpiCard("TOTAL STOCK UNITS", totalStockVal, "#eff6ff", "card-blue"),
-      createKpiCard("PENDING REQUESTS", pendingFamiliesVal, "#fff7ed", "card-orange"),
-      createKpiCard("EXPIRING SOON (<3 DAYS)", expiringSoonVal, "#fef2f2", "card-red"),
-      createKpiCard("FAMILIES HELPED", familiesHelpedVal, "#f0fdf4", "card-green")
+      createKpiCard("TOTAL STOCK UNITS", totalStockVal, "#e0f2fe", "card-blue"),
+      createKpiCard("PENDING REQUESTS", pendingFamiliesVal, "#ffedd5", "card-orange"),
+      createKpiCard("EXPIRING SOON (<3 DAYS)", expiringSoonVal, "#fee2e2", "card-red"),
+      createKpiCard("FAMILIES HELPED", familiesHelpedVal, "#f3e8ff", "card-green")
     )
 
   // Chart and Critical Inventory Table

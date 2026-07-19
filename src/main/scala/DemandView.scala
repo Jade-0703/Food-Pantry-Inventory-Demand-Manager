@@ -16,11 +16,11 @@ class DemandView(
 
   spacing = 15
   padding = Insets(20)
-  style = "-fx-background-color: #f1f5f9;"
+  style = "-fx-background-color: #fbf9f4;"
 
   private val titleLabel = new Label("Family Demand & Requests Log"):
     font = Font.font("System", FontWeight.Bold, 24)
-    style = "-fx-text-fill: #1e293b;"
+    style = "-fx-text-fill: #111827;"
     minWidth = 500
 
   // Requests Table
