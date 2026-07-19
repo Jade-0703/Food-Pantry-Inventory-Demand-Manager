@@ -6,6 +6,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import scala.util.Try
+import scalafx.scene.text.{Font, FontWeight}
 
 @annotation.nowarn("cat=deprecation")
 class DemandView(
@@ -19,7 +20,8 @@ class DemandView(
 
   // Header Title
   private val titleLabel = new Label("Family Demand & Requests Log"):
-    style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"
+    font = Font.font("System", FontWeight.Bold, 24)
+    style = "-fx-text-fill: #1e293b;"
 
   // Requests Table
   private val requestsTable = new TableView[FamilyRequest]:
@@ -150,7 +152,7 @@ class DemandView(
     padding = Insets(15)
     styleClass = Seq("form-card")
     children = Seq(
-      new Label("Log Family Request") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;" },
+      new Label("Log Family Request") { font = Font.font("System", FontWeight.Bold, 15); style = "-fx-text-fill: #1e293b;" },
       formGrid
     )
 

@@ -6,6 +6,7 @@ import scalafx.scene.chart.PieChart
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Insets, Pos}
 import java.time.LocalDate
+import scalafx.scene.text.{Font, FontWeight}
 
 class DashboardView(
   inventory: ObservableBuffer[FoodItem],
@@ -18,7 +19,8 @@ class DashboardView(
 
   // Header Title
   private val titleLabel = new Label("Dashboard & Pantry Analytics"):
-    style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"
+    font = Font.font("System", FontWeight.Bold, 24)
+    style = "-fx-text-fill: #1e293b;"
 
   // KPI Panels
   private val totalStockVal = new Label("0") { style = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2563eb;" }

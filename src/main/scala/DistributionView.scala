@@ -7,6 +7,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import java.time.LocalDate
+import scalafx.scene.text.{Font, FontWeight}
 
 @annotation.nowarn("cat=deprecation")
 class DistributionView(
@@ -21,7 +22,8 @@ class DistributionView(
 
   // Header Title
   private val titleLabel = new Label("Daily Distribution Optimizer"):
-    style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"
+    font = Font.font("System", FontWeight.Bold, 24)
+    style = "-fx-text-fill: #1e293b;"
 
   // Allocation Table
   private val allocationsTable = new TableView[Allocation]:

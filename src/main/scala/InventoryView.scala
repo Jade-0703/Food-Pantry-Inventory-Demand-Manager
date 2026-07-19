@@ -7,6 +7,7 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import java.time.LocalDate
 import scala.util.Try
+import scalafx.scene.text.{Font, FontWeight}
 
 @annotation.nowarn("cat=deprecation")
 class InventoryView(
@@ -20,7 +21,8 @@ class InventoryView(
 
   // Header Title
   private val titleLabel = new Label("Pantry Inventory Log"):
-    style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"
+    font = Font.font("System", FontWeight.Bold, 24)
+    style = "-fx-text-fill: #1e293b;"
 
   // Inventory Table
   private val inventoryTable = new TableView[FoodItem]:
@@ -208,7 +210,7 @@ class InventoryView(
     padding = Insets(15)
     styleClass = Seq("form-card")
     children = Seq(
-      new Label("Add Inventory Item") { style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e293b;" },
+      new Label("Add Inventory Item") { font = Font.font("System", FontWeight.Bold, 15); style = "-fx-text-fill: #1e293b;" },
       formGrid
     )
 
