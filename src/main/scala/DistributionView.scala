@@ -54,6 +54,7 @@ class DistributionView(
 
     columns ++= Seq(idCol, familyCol, itemCol, categoryCol, qtyCol)
     prefHeight = 280
+    // ai-assisted: #14
     clip = new scalafx.scene.shape.Rectangle {
       arcWidth = 12
       arcHeight = 12
