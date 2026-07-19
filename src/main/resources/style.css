@@ -186,9 +186,9 @@
 
 /* 9. Side-bar Navigation styling */
 .sidebar-btn {
-    -fx-background-color: transparent;
+    -fx-background-color: #ffffff; /* Solid white background capsule */
     -fx-border-color: #1e3a8a; /* Deep navy border outline */
-    -fx-border-width: 1px;
+    -fx-border-width: 1.5px;
     -fx-border-radius: 20px;
     -fx-text-fill: #1e3a8a; /* Deep navy text */
     -fx-font-size: 14px;
@@ -199,14 +199,14 @@
     -fx-background-radius: 20px;
 }
 .sidebar-btn:hover {
-    -fx-background-color: #1e3a8a15; /* Soft navy background tint on hover */
+    -fx-background-color: #eff6ff; /* Light sky blue background tint on hover */
     -fx-text-fill: #1e3a8a;
     -fx-border-color: #1e3a8a;
 }
 .sidebar-btn-active {
     -fx-background-color: #1e3a8a; /* Solid deep navy active capsule */
     -fx-border-color: #1e3a8a;
-    -fx-border-width: 1px;
+    -fx-border-width: 1.5px;
     -fx-border-radius: 20px;
     -fx-text-fill: #ffffff; /* White text for perfect contrast */
     -fx-font-size: 14px;
