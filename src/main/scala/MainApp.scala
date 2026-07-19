@@ -60,6 +60,7 @@ object MainApp extends JFXApp3:
       scene = new Scene:
         stylesheets = Seq(getClass.getResource("/style.css").toExternalForm)
         root = new BorderPane:
+          val mainBorderPane = this
           // Left Sidebar Navigation
           left = new VBox:
             spacing = 10
@@ -82,8 +83,9 @@ object MainApp extends JFXApp3:
             val btnReq = createNavButton("👪 Family Requests", demandView)
             val btnDist = createNavButton("🚛 Distribution Plan", distributionView)
 
-            // Dynamic background highlight for selected nav button
+            // Dynamic background highlight for selected nav button and center view swap
             activeView.onChange { (_, _, newView) =>
+              mainBorderPane.center = newView
               Seq(
                 (btnDash, dashboardView),
                 (btnInv, inventoryView),
@@ -102,8 +104,8 @@ object MainApp extends JFXApp3:
 
             children = Seq(appTitle, btnDash, btnInv, btnReq, btnDist)
           
-          // Main Content Pane
-          center <== activeView
+          // Initial Content Pane
+          center = dashboardView
 
   private def saveInventory(): Unit =
     inventoryRepo.saveAll(inventoryItems.toList)
