@@ -79,6 +79,25 @@ class DashboardView(
         new scalafx.beans.property.StringProperty(this, "status", statusStr)
       }
       prefWidth = 150
+      cellFactory = { (col: TableColumn[FoodItem, String]) =>
+        new TableCell[FoodItem, String] {
+          item.onChange { (_, _, newText) =>
+            if newText != null then
+              val (bg, fg) = if newText.contains("EXPIRED") then
+                ("#fee2e2", "#b91c1c") // light red background, dark red text
+              else if newText.contains("Expires TODAY!") then
+                ("#fef2f2", "#dc2626") // light red, red text
+              else
+                ("#ffedd5", "#c2410c") // light orange, orange-red text
+              graphic = new Label(newText) {
+                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
+              }
+              alignment = scalafx.geometry.Pos.Center
+            else
+              graphic = null
+          }
+        }
+      }
 
     columns ++= Seq(nameCol, categoryCol, qtyCol, statusCol)
     prefHeight = 250

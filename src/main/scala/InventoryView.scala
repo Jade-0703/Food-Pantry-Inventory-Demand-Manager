@@ -50,15 +50,51 @@ class InventoryView(
     val perishableCol = new TableColumn[FoodItem, String]("Perishable?"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "isPerishable", if cellData.value.isPerishable then "Yes" else "No") }
       prefWidth = 100
+      cellFactory = { (col: TableColumn[FoodItem, String]) =>
+        new TableCell[FoodItem, String] {
+          item.onChange { (_, _, newText) =>
+            if newText != null then
+              val (bg, fg) = if newText == "Yes" then
+                ("#e0f2fe", "#0369a1") // blue pill
+              else
+                ("#f3f4f6", "#4b5563") // grey pill
+              graphic = new Label(newText) {
+                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
+              }
+              alignment = scalafx.geometry.Pos.Center
+            else
+              graphic = null
+          }
+        }
+      }
 
     val detailCol = new TableColumn[FoodItem, String]("Expiry / Shelf Life"):
       cellValueFactory = { cellData => 
-        val text = cellData.value match
-          case item: PerishableItem => s"Expires: ${item.expiryDate.toString}"
-          case item: NonPerishableItem => s"Shelf Life: ${item.shelfLifeMonths} months"
+        val text = cellData.value.getExpiryStatus(LocalDate.now())
         new scalafx.beans.property.StringProperty(this, "detail", text)
       }
       prefWidth = 180
+      cellFactory = { (col: TableColumn[FoodItem, String]) =>
+        new TableCell[FoodItem, String] {
+          item.onChange { (_, _, newText) =>
+            if newText != null then
+              val (bg, fg) = if newText.contains("EXPIRED") then
+                ("#fee2e2", "#b91c1c") // light red background, dark red text
+              else if newText.contains("Expires TODAY!") then
+                ("#fef2f2", "#dc2626") // light red, red text
+              else if newText.contains("Expires in") then
+                ("#ffedd5", "#c2410c") // light orange, orange-red text
+              else
+                ("#f0fdf4", "#16a34a") // light green, green text (for shelf-stable)
+              graphic = new Label(newText) {
+                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
+              }
+              alignment = scalafx.geometry.Pos.Center
+            else
+              graphic = null
+          }
+        }
+      }
 
     columns ++= Seq(idCol, nameCol, categoryCol, qtyCol, perishableCol, detailCol)
     prefHeight = 300

@@ -44,6 +44,24 @@ class DemandView(
     val restrictionCol = new TableColumn[FamilyRequest, String]("Dietary Restriction"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "diet", cellData.value.dietaryRestriction.toString) }
       prefWidth = 140
+      cellFactory = { (col: TableColumn[FamilyRequest, String]) =>
+        new TableCell[FamilyRequest, String] {
+          item.onChange { (_, _, newText) =>
+            if newText != null then
+              val (bg, fg) = newText match
+                case "Vegetarian" => ("#ecfdf5", "#047857") // light green, green text
+                case "Halal" => ("#fdf2f8", "#be185d")      // light pink, pink text
+                case "GlutenFree" => ("#fffbeb", "#b45309") // light amber, amber text
+                case _ => ("#f3f4f6", "#4b5563")            // light grey, grey text (for None)
+              graphic = new Label(newText) {
+                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
+              }
+              alignment = scalafx.geometry.Pos.Center
+            else
+              graphic = null
+          }
+        }
+      }
 
     val categoryCol = new TableColumn[FamilyRequest, String]("Category Requested"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "category", cellData.value.requestedCategory.toString) }
@@ -52,6 +70,22 @@ class DemandView(
     val statusCol = new TableColumn[FamilyRequest, String]("Status"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "status", cellData.value.status.toString) }
       prefWidth = 110
+      cellFactory = { (col: TableColumn[FamilyRequest, String]) =>
+        new TableCell[FamilyRequest, String] {
+          item.onChange { (_, _, newText) =>
+            if newText != null then
+              val (bg, fg) = newText match
+                case "Fulfilled" => ("#dcfce7", "#15803d") // light success green
+                case _ => ("#ffedd5", "#c2410c")           // light orange (for Pending)
+              graphic = new Label(newText) {
+                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
+              }
+              alignment = scalafx.geometry.Pos.Center
+            else
+              graphic = null
+          }
+        }
+      }
 
     columns ++= Seq(idCol, nameCol, sizeCol, restrictionCol, categoryCol, statusCol)
     prefHeight = 300
