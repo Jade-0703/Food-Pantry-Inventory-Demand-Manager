@@ -200,8 +200,8 @@
     -fx-text-fill: #111827;
 }
 .sidebar-btn-active {
-    -fx-background-color: #111827;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: #e0f2fe;
+    -fx-text-fill: #0369a1;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-alignment: center-left;
