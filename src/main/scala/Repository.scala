@@ -1,0 +1,95 @@
+package foodpantry
+
+import java.io.{File, PrintWriter}
+import scala.io.Source
+import scala.util.Try
+
+// S1-9 Parametric polymorphism: Generic interface for data access
+trait Serializer[T]:
+  def serialize(value: T): String
+  def deserialize(line: String): Try[T]
+
+trait Repository[T]:
+  def loadAll(): Try[List[T]]
+  def saveAll(items: List[T]): Try[Unit]
+
+// ai-assisted: #3
+// why: Assisted with drafting the generic persistence repository interface pattern using serializers.
+// S1-9 Parametric polymorphism: Generic class implementing Repository
+class FileRepository[T](
+  filePathString: String,
+  serializer: Serializer[T]
+) extends Repository[T]:
+
+  // S1-10 Encapsulation: Private field with adjacent rationale comment
+  // Rationale: Keep database filepath hidden to prevent raw file modification bypass
+  private val dataFilePath: String = filePathString
+
+  // S1-12 Exception handling: Every IO or parsing operation is wrapped in scala.util.Try
+  override def loadAll(): Try[List[T]] = Try {
+    val file = new File(dataFilePath)
+    if !file.exists() then
+      List.empty[T]
+    else
+      val source = Source.fromFile(file)
+      try
+        val lines = source.getLines().toList
+        // Convert lines to items, ignoring empty or invalid ones safely
+        lines.filter(_.trim.nonEmpty).flatMap { line =>
+          serializer.deserialize(line).toOption
+        }
+      finally
+        source.close()
+  }
+
+  override def saveAll(items: List[T]): Try[Unit] = Try {
+    val file = new File(dataFilePath)
+    val writer = new PrintWriter(file)
+    try
+      items.foreach { item =>
+        writer.println(serializer.serialize(item))
+      }
+    finally
+      writer.close()
+  }
+
+object FoodItemSerializer extends Serializer[FoodItem]:
+  override def serialize(value: FoodItem): String = value match
+    case PerishableItem(id, name, category, quantity, unit, expiryDate) =>
+      s"PERISHABLE,$id,$name,${category.toString},$quantity,$unit,${expiryDate.toString}"
+    case NonPerishableItem(id, name, category, quantity, unit, shelfLifeMonths) =>
+      s"NONPERISHABLE,$id,$name,${category.toString},$quantity,$unit,$shelfLifeMonths"
+
+  override def deserialize(line: String): Try[FoodItem] = Try {
+    val parts = line.split(",")
+    val itemType = parts(0)
+    val id = parts(1)
+    val name = parts(2)
+    val category = FoodCategory.valueOf(parts(3))
+    val quantity = parts(4).toDouble
+    val unit = parts(5)
+    itemType match
+      case "PERISHABLE" =>
+        val expiryDate = java.time.LocalDate.parse(parts(6))
+        PerishableItem(id, name, category, quantity, unit, expiryDate)
+      case "NONPERISHABLE" =>
+        val shelfLifeMonths = parts(6).toInt
+        NonPerishableItem(id, name, category, quantity, unit, shelfLifeMonths)
+      case _ =>
+        throw new IllegalArgumentException(s"Unknown item type: $itemType")
+  }
+
+object FamilyRequestSerializer extends Serializer[FamilyRequest]:
+  override def serialize(value: FamilyRequest): String =
+    s"${value.id},${value.familyName},${value.householdSize},${value.dietaryRestriction.toString},${value.requestedCategory.toString},${value.status.toString}"
+
+  override def deserialize(line: String): Try[FamilyRequest] = Try {
+    val parts = line.split(",")
+    val id = parts(0)
+    val familyName = parts(1)
+    val householdSize = parts(2).toInt
+    val dietaryRestriction = DietaryRestriction.valueOf(parts(3))
+    val requestedCategory = FoodCategory.valueOf(parts(4))
+    val status = RequestStatus.valueOf(parts(5))
+    FamilyRequest(id, familyName, householdSize, dietaryRestriction, requestedCategory, status)
+  }
