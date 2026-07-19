@@ -29,7 +29,7 @@
 |---|---|---|
 | Number of classes / traits in src/main/scala | ≥ 5 | 11 |
 | Number of `// ai-assisted: #N` tags in src/ | ≥ 3 | 3 |
-| Number of entries in ai/interaction_log.md | ≥ 10 | 10 |
+| Number of entries in ai/interaction_log.md | ≥ 10 | 15 |
 | Distinct dates in docs/dev_log.md | ≥ 5 | 6 |
 | Word count of docs/reflection.md | 350–700 | 448 |
 | Word count of docs/ai_reflection.md | 300–500 | 382 |
