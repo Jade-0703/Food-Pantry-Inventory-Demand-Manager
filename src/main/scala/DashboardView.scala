@@ -54,6 +54,11 @@ class DashboardView(
     title = "Inventory Categories"
     style = "-fx-background-color: #ffffff; -fx-background-radius: 12px; -fx-border-radius: 12px; -fx-border-color: #cbd5e1; -fx-border-width: 1px; -fx-padding: 10px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
     legendVisible = true
+    labelsVisible = true
+    labelLineLength = 8
+    prefWidth = 480
+    minWidth = 420
+    prefHeight = 350
 
   // Critical items Table (perishables expiring within 3 days)
   private val criticalTable = new TableView[FoodItem]:
@@ -64,22 +69,30 @@ class DashboardView(
     
     val nameCol = new TableColumn[FoodItem, String]("Name"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "name", cellData.value.name) }
-      prefWidth = 120
+      prefWidth = 260
+      cellFactory = { (col: TableColumn[FoodItem, String]) =>
+        new TableCell[FoodItem, String] {
+          item.onChange { (_, _, newText) =>
+            text = newText
+            tooltip = if newText != null && newText.nonEmpty then new Tooltip(newText) else null
+          }
+        }
+      }
       
     val categoryCol = new TableColumn[FoodItem, String]("Category"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "category", cellData.value.category.toString) }
-      prefWidth = 100
+      prefWidth = 90
       
     val qtyCol = new TableColumn[FoodItem, String]("Quantity"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "quantity", s"${cellData.value.quantity} ${cellData.value.unit}") }
-      prefWidth = 100
+      prefWidth = 90
       
     val statusCol = new TableColumn[FoodItem, String]("Expiry Status"):
       cellValueFactory = { cellData => 
         val statusStr = cellData.value.getExpiryStatus(LocalDate.now())
         new scalafx.beans.property.StringProperty(this, "status", statusStr)
       }
-      prefWidth = 150
+      prefWidth = 140
       cellFactory = { (col: TableColumn[FoodItem, String]) =>
         new TableCell[FoodItem, String] {
           item.onChange { (_, _, newText) =>
@@ -101,7 +114,7 @@ class DashboardView(
       }
 
     columns ++= Seq(nameCol, categoryCol, qtyCol, statusCol)
-    prefHeight = 250
+    prefHeight = 350
     clip = new scalafx.scene.shape.Rectangle {
       arcWidth = 12
       arcHeight = 12

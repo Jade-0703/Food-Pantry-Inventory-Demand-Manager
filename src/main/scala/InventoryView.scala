@@ -38,7 +38,15 @@ class InventoryView(
       
     val nameCol = new TableColumn[FoodItem, String]("Name"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "name", cellData.value.name) }
-      prefWidth = 150
+      prefWidth = 180
+      cellFactory = { (col: TableColumn[FoodItem, String]) =>
+        new TableCell[FoodItem, String] {
+          item.onChange { (_, _, newText) =>
+            text = newText
+            tooltip = if newText != null && newText.nonEmpty then new Tooltip(newText) else null
+          }
+        }
+      }
       
     val categoryCol = new TableColumn[FoodItem, String]("Category"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "category", cellData.value.category.toString) }

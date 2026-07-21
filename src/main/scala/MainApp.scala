@@ -54,8 +54,8 @@ object MainApp extends JFXApp3:
 
     stage = new PrimaryStage:
       title = "Food Pantry Inventory & Demand Manager"
-      width = 1100
-      height = 750
+      width = 1240
+      height = 780
       
       scene = new Scene:
         stylesheets = Seq(getClass.getResource("/style.css").toExternalForm)
