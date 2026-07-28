@@ -6,7 +6,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import scala.util.Try
-import scalafx.scene.text.{Font, FontWeight}
+import javafx.collections.transformation.{FilteredList, SortedList}
 
 @annotation.nowarn("cat=deprecation")
 class DemandView(
@@ -19,86 +19,109 @@ class DemandView(
   style = "-fx-background-color: #fbf9f4;"
 
   private val titleLabel = new Label("Family Demand & Requests Log"):
-    font = Font.font("System", FontWeight.Bold, 24)
-    style = "-fx-text-fill: #111827;"
-    minWidth = 500
+    style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 20px;"
 
   // Requests Table
   private val requestsTable = new TableView[FamilyRequest]:
-    val selfTable = this
+    val selfTable: TableView[FamilyRequest] = this
     columnResizePolicy = TableView.ConstrainedResizePolicy
-    style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No pending family requests.") { style = "-fx-text-fill: #64748b;" }
 
-    val idCol = new TableColumn[FamilyRequest, String]("Request ID"):
+    // S1-14 / Entry 14 clip layout to prevent row background bleed
+    clip = UIUtils.createRoundedClip(selfTable)
+
+    private val idCol: TableColumn[FamilyRequest, String] = new TableColumn[FamilyRequest, String]("Request ID"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "id", cellData.value.id) }
       prefWidth = 100
       
-    val nameCol = new TableColumn[FamilyRequest, String]("Family Name"):
+    private val nameCol: TableColumn[FamilyRequest, String] = new TableColumn[FamilyRequest, String]("Family Name"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "name", cellData.value.familyName) }
       prefWidth = 160
       
-    val sizeCol = new TableColumn[FamilyRequest, String]("Household Size"):
+    private val sizeCol: TableColumn[FamilyRequest, String] = new TableColumn[FamilyRequest, String]("Household Size"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "size", cellData.value.householdSize.toString) }
       prefWidth = 110
       
-    val restrictionCol = new TableColumn[FamilyRequest, String]("Dietary Restriction"):
+    private val restrictionCol: TableColumn[FamilyRequest, String] = new TableColumn[FamilyRequest, String]("Dietary Restriction"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "diet", cellData.value.dietaryRestriction.toString) }
       prefWidth = 140
       cellFactory = { (col: TableColumn[FamilyRequest, String]) =>
         new TableCell[FamilyRequest, String] {
           item.onChange { (_, _, newText) =>
             if newText != null then
-              val (bg, fg) = newText match
-                case "Vegetarian" => ("#ecfdf5", "#047857") // light green, green text
-                case "Halal" => ("#fdf2f8", "#be185d")      // light pink, pink text
-                case "GlutenFree" => ("#fffbeb", "#b45309") // light amber, amber text
-                case _ => ("#f3f4f6", "#4b5563")            // light grey, grey text (for None)
-              graphic = new Label(newText) {
-                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
-              }
+              graphic = UIUtils.getDietaryLabel(newText)
+              text = null
               alignment = scalafx.geometry.Pos.Center
             else
               graphic = null
+              text = null
           }
         }
       }
 
-    val categoryCol = new TableColumn[FamilyRequest, String]("Category Requested"):
+    private val categoryCol: TableColumn[FamilyRequest, String] = new TableColumn[FamilyRequest, String]("Category Requested"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "category", cellData.value.requestedCategory.toString) }
       prefWidth = 140
 
-    val statusCol = new TableColumn[FamilyRequest, String]("Status"):
+    private val statusCol: TableColumn[FamilyRequest, String] = new TableColumn[FamilyRequest, String]("Status"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "status", cellData.value.status.toString) }
       prefWidth = 110
       cellFactory = { (col: TableColumn[FamilyRequest, String]) =>
         new TableCell[FamilyRequest, String] {
           item.onChange { (_, _, newText) =>
             if newText != null then
-              val (bg, fg) = newText match
-                case "Fulfilled" => ("#dcfce7", "#15803d") // light success green
-                case _ => ("#ffedd5", "#c2410c")           // light orange (for Pending)
-              graphic = new Label(newText) {
-                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
-              }
+              graphic = UIUtils.getStatusLabel(newText)
+              text = null
               alignment = scalafx.geometry.Pos.Center
             else
               graphic = null
+              text = null
           }
         }
       }
 
     columns ++= Seq(idCol, nameCol, sizeCol, restrictionCol, categoryCol, statusCol)
     prefHeight = 300
-    clip = new scalafx.scene.shape.Rectangle {
-      arcWidth = 12
-      arcHeight = 12
-      width <== selfTable.width
-      height <== selfTable.height
-    }
+
+  private val tableWrapper = new StackPane:
+    styleClass = Seq("table-wrapper")
+    children = Seq(requestsTable)
 
   // Bind requests buffer
-  requestsTable.items = requests
+  private val searchField = new TextField {
+    promptText = "🔍 Search requests by family name..."
+    style = "-fx-pref-width: 250px; -fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-font-size: 13px;"
+  }
+
+  private val categoryFilterCombo = new ComboBox[String](Seq("All Categories Requested") ++ FoodCategory.values.map(_.toString).toSeq) {
+    value = "All Categories Requested"
+    style = "-fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-font-size: 13px;"
+  }
+
+  private val filterBar = new HBox {
+    spacing = 10
+    children = Seq(searchField, categoryFilterCombo)
+    alignment = scalafx.geometry.Pos.CenterLeft
+  }
+
+  private val filteredRequests = new FilteredList[FamilyRequest](requests.delegate)
+  private val sortedRequests = new SortedList[FamilyRequest](filteredRequests)
+
+  sortedRequests.comparatorProperty().bind(requestsTable.comparatorProperty)
+
+  private def updateFilter(): Unit =
+    val query = if searchField.text.value == null then "" else searchField.text.value.toLowerCase.trim
+    val cat = categoryFilterCombo.value.value
+    filteredRequests.setPredicate { item =>
+      val matchesSearch = query.isEmpty || item.familyName.toLowerCase.contains(query)
+      val matchesCategory = cat == "All Categories Requested" || item.requestedCategory.toString == cat
+      matchesSearch && matchesCategory
+    }
+
+  searchField.text.onChange { (_, _, _) => updateFilter() }
+  categoryFilterCombo.value.onChange { (_, _, _) => updateFilter() }
+
+  requestsTable.items = scalafx.collections.transformation.SortedBuffer(sortedRequests)
 
   // Form Controls
   private val familyNameField = new TextField { promptText = "Family Name"; prefWidth = 160 }
@@ -121,6 +144,10 @@ class DemandView(
     styleClass = Seq("button", "button-danger")
     onAction = handle { performDeleteSelected() }
 
+  private val archiveButton = new Button("Archive Fulfilled"):
+    styleClass = Seq("button", "button-secondary")
+    onAction = handle { performArchiveFulfilled() }
+
   private def performAddRequest(): Unit =
     statusLabel.text = ""
     
@@ -128,26 +155,28 @@ class DemandView(
     val sizeStr = sizeField.text.value.trim
     val diet = restrictionCombo.value.value
     val category = categoryCombo.value.value
-
-    // S1-18 Invalid-input handling 1: Check empty fields
-    if familyName.isEmpty then
-      statusLabel.text = "Error: Family Name cannot be empty!"
-    else if sizeStr.isEmpty then
-      statusLabel.text = "Error: Household size cannot be empty!"
-    else if diet == null then
-      statusLabel.text = "Error: Please select a Dietary Restriction!"
-    else if category == null then
-      statusLabel.text = "Error: Please select a Requested Food Category!"
+    
+    if familyName.isEmpty || sizeStr.isEmpty || diet == null || category == null then
+      statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
+      statusLabel.text = "Error: All fields are required."
     else
-      // S1-12 & S1-18 Invalid-input handling 2: Parse integer safely
-      Try(sizeStr.toInt).toOption match
+      val sizeOpt = scala.util.Try(sizeStr.toInt).toOption
+      sizeOpt match
         case None =>
-          statusLabel.text = "Error: Household size must be a valid integer number!"
-        case Some(sizeVal) if sizeVal <= 0 =>
-          statusLabel.text = "Error: Household size must be a positive integer (> 0)!"
-        case Some(sizeVal) =>
-          val nextId = s"req-${requests.size + 1}"
-          val newRequest = FamilyRequest(nextId, familyName, sizeVal, diet, category, RequestStatus.Pending)
+          statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
+          statusLabel.text = "Error: Household size must be a valid integer."
+        case Some(size) if size <= 0 =>
+          statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
+          statusLabel.text = "Error: Household size must be positive."
+        case Some(size) =>
+          val newRequest = FamilyRequest(
+            id = s"req-${System.currentTimeMillis()}",
+            familyName = familyName,
+            householdSize = size,
+            dietaryRestriction = diet,
+            requestedCategory = category,
+            status = RequestStatus.Pending
+          )
           requests.add(newRequest)
           onSave()
           clearForm()
@@ -155,9 +184,9 @@ class DemandView(
           statusLabel.text = s"Success: Request for '$familyName' logged."
 
   private def performDeleteSelected(): Unit =
-    val selectedIndex = requestsTable.selectionModel.value.getSelectedIndex
-    if selectedIndex >= 0 then
-      requests.remove(selectedIndex)
+    val selectedItem = requestsTable.selectionModel.value.getSelectedItem
+    if selectedItem != null then
+      requests.remove(selectedItem)
       onSave()
       statusLabel.style = "-fx-text-fill: #16a34a; -fx-font-weight: bold;"
       statusLabel.text = "Success: Selected request deleted."
@@ -165,12 +194,22 @@ class DemandView(
       statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
       statusLabel.text = "Warning: Select a request in the table to delete."
 
+  private def performArchiveFulfilled(): Unit =
+    val fulfilled = requests.filter(_.status == RequestStatus.Fulfilled).toList
+    if fulfilled.nonEmpty then
+      requests --= fulfilled
+      onSave()
+      statusLabel.style = "-fx-text-fill: #16a34a; -fx-font-weight: bold;"
+      statusLabel.text = s"Success: Archived ${fulfilled.size} fulfilled requests."
+    else
+      statusLabel.style = "-fx-text-fill: #64748b; -fx-font-weight: bold;"
+      statusLabel.text = "Notice: No fulfilled requests to archive."
+
   private def clearForm(): Unit =
     familyNameField.text = ""
     sizeField.text = ""
     restrictionCombo.value = null
     categoryCombo.value = null
-    statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
 
   // Form Layout
   private val formGrid = new GridPane:
@@ -194,18 +233,19 @@ class DemandView(
     padding = Insets(15)
     styleClass = Seq("form-card")
     children = Seq(
-      new Label("Log Family Request") { font = Font.font("System", FontWeight.Bold, 15); style = "-fx-text-fill: #1e293b;"; minWidth = 500 },
+      new Label("Log Family Request") { style = "-fx-text-fill: #1e293b; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 15px;"; minWidth = 500 },
       formGrid
     )
 
   private val buttonRow = new HBox:
     spacing = 15
-    children = Seq(addButton, deleteButton, statusLabel)
+    children = Seq(addButton, deleteButton, archiveButton, statusLabel)
     alignment = Pos.CenterLeft
 
   children = Seq(
     titleLabel,
-    requestsTable,
+    filterBar,
+    tableWrapper,
     formContainer,
     buttonRow
   )

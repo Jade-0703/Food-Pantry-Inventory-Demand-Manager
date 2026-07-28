@@ -4,7 +4,8 @@ scalaVersion := "3.3.3"
 
 libraryDependencies ++= Seq(
   "org.scalafx" %% "scalafx" % "21.0.0-R32",
-  "org.scalatest" %% "scalatest" % "3.2.18" % Test
+  "org.scalatest" %% "scalatest" % "3.2.18" % Test,
+  "org.apache.pdfbox" % "pdfbox" % "2.0.30"
 )
 
 // Add OS-specific JavaFX libraries for ScalaFX
@@ -22,6 +23,5 @@ libraryDependencies ++= Seq("base", "controls", "fxml", "graphics", "media", "sw
 )
 
 scalacOptions ++= Seq(
-  "-Wunused:all",
-  "-deprecation"
+  "-Wunused:all"
 )

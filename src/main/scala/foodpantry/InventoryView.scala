@@ -7,7 +7,7 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import java.time.LocalDate
 import scala.util.Try
-import scalafx.scene.text.{Font, FontWeight}
+import javafx.collections.transformation.{FilteredList, SortedList}
 
 @annotation.nowarn("cat=deprecation")
 class InventoryView(
@@ -21,22 +21,22 @@ class InventoryView(
 
   // Header Title
   private val titleLabel = new Label("Pantry Inventory Log"):
-    font = Font.font("System", FontWeight.Bold, 24)
-    style = "-fx-text-fill: #111827;"
-    minWidth = 500
+    style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 20px;"
 
   // Inventory Table
   private val inventoryTable = new TableView[FoodItem]:
-    val selfTable = this
+    val selfTable: TableView[FoodItem] = this
     columnResizePolicy = TableView.ConstrainedResizePolicy
-    style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No items in inventory.") { style = "-fx-text-fill: #64748b;" }
 
-    val idCol = new TableColumn[FoodItem, String]("ID"):
+    // S1-14 / Entry 14 clip layout to prevent row background bleed
+    clip = UIUtils.createRoundedClip(selfTable)
+
+    private val idCol: TableColumn[FoodItem, String] = new TableColumn[FoodItem, String]("ID"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "id", cellData.value.id) }
       prefWidth = 60
       
-    val nameCol = new TableColumn[FoodItem, String]("Name"):
+    private val nameCol: TableColumn[FoodItem, String] = new TableColumn[FoodItem, String]("Name"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "name", cellData.value.name) }
       prefWidth = 180
       cellFactory = { (col: TableColumn[FoodItem, String]) =>
@@ -48,36 +48,50 @@ class InventoryView(
         }
       }
       
-    val categoryCol = new TableColumn[FoodItem, String]("Category"):
+    private val categoryCol: TableColumn[FoodItem, String] = new TableColumn[FoodItem, String]("Category"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "category", cellData.value.category.toString) }
       prefWidth = 100
       
-    val qtyCol = new TableColumn[FoodItem, String]("Quantity"):
-      cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "quantity", s"${cellData.value.quantity} ${cellData.value.unit}") }
+    private val qtyCol: TableColumn[FoodItem, FoodItem] = new TableColumn[FoodItem, FoodItem]("Quantity"):
+      cellValueFactory = { cellData => new scalafx.beans.property.ObjectProperty(this, "quantityItem", cellData.value) }
       prefWidth = 100
+      cellFactory = { (col: TableColumn[FoodItem, FoodItem]) =>
+        new TableCell[FoodItem, FoodItem] {
+          item.onChange { (_, _, foodItem) =>
+            if foodItem != null then
+              val displayStr = s"${foodItem.quantity} ${foodItem.unit}"
+              if foodItem.quantity < 5.0 then
+                graphic = UIUtils.getLowStockLabel(displayStr, foodItem.quantity)
+                text = null
+                alignment = scalafx.geometry.Pos.Center
+              else
+                graphic = null
+                text = displayStr
+            else
+              graphic = null
+              text = null
+          }
+        }
+      }
 
-    val perishableCol = new TableColumn[FoodItem, String]("Perishable?"):
+    private val perishableCol: TableColumn[FoodItem, String] = new TableColumn[FoodItem, String]("Perishable?"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "isPerishable", if cellData.value.isPerishable then "Yes" else "No") }
       prefWidth = 100
       cellFactory = { (col: TableColumn[FoodItem, String]) =>
         new TableCell[FoodItem, String] {
           item.onChange { (_, _, newText) =>
             if newText != null then
-              val (bg, fg) = if newText == "Yes" then
-                ("#e0f2fe", "#0369a1") // blue pill
-              else
-                ("#f3f4f6", "#4b5563") // grey pill
-              graphic = new Label(newText) {
-                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
-              }
+              graphic = UIUtils.getPerishableLabel(newText)
+              text = null
               alignment = scalafx.geometry.Pos.Center
             else
               graphic = null
+              text = null
           }
         }
       }
 
-    val detailCol = new TableColumn[FoodItem, String]("Expiry / Shelf Life"):
+    private val detailCol: TableColumn[FoodItem, String] = new TableColumn[FoodItem, String]("Expiry / Shelf Life"):
       cellValueFactory = { cellData => 
         val text = cellData.value.getExpiryStatus(LocalDate.now())
         new scalafx.beans.property.StringProperty(this, "detail", text)
@@ -87,35 +101,58 @@ class InventoryView(
         new TableCell[FoodItem, String] {
           item.onChange { (_, _, newText) =>
             if newText != null then
-              val (bg, fg) = if newText.contains("EXPIRED") then
-                ("#fee2e2", "#b91c1c") // light red background, dark red text
-              else if newText.contains("Expires TODAY!") then
-                ("#fef2f2", "#dc2626") // light red, red text
-              else if newText.contains("Expires in") then
-                ("#ffedd5", "#c2410c") // light orange, orange-red text
-              else
-                ("#f0fdf4", "#16a34a") // light green, green text (for shelf-stable)
-              graphic = new Label(newText) {
-                style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px;"
-              }
+              graphic = UIUtils.getExpiryLabel(newText)
+              text = null
               alignment = scalafx.geometry.Pos.Center
             else
               graphic = null
+              text = null
           }
         }
       }
 
     columns ++= Seq(idCol, nameCol, categoryCol, qtyCol, perishableCol, detailCol)
     prefHeight = 300
-    clip = new scalafx.scene.shape.Rectangle {
-      arcWidth = 12
-      arcHeight = 12
-      width <== selfTable.width
-      height <== selfTable.height
-    }
+
+  private val tableWrapper = new StackPane:
+    styleClass = Seq("table-wrapper")
+    children = Seq(inventoryTable)
 
   // Bind repository items to the table
-  inventoryTable.items = inventory
+  private val searchField = new TextField {
+    promptText = "🔍 Search inventory by name..."
+    style = "-fx-pref-width: 250px; -fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-font-size: 13px;"
+  }
+
+  private val categoryFilterCombo = new ComboBox[String](Seq("All Categories") ++ FoodCategory.values.map(_.toString).toSeq) {
+    value = "All Categories"
+    style = "-fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-font-size: 13px;"
+  }
+
+  private val filterBar = new HBox {
+    spacing = 10
+    children = Seq(searchField, categoryFilterCombo)
+    alignment = scalafx.geometry.Pos.CenterLeft
+  }
+
+  private val filteredInventory = new FilteredList[FoodItem](inventory.delegate)
+  private val sortedInventory = new SortedList[FoodItem](filteredInventory)
+
+  sortedInventory.comparatorProperty().bind(inventoryTable.comparatorProperty)
+
+  private def updateFilter(): Unit =
+    val query = if searchField.text.value == null then "" else searchField.text.value.toLowerCase.trim
+    val cat = categoryFilterCombo.value.value
+    filteredInventory.setPredicate { item =>
+      val matchesSearch = query.isEmpty || item.name.toLowerCase.contains(query)
+      val matchesCategory = cat == "All Categories" || item.category.toString == cat
+      matchesSearch && matchesCategory
+    }
+
+  searchField.text.onChange { (_, _, _) => updateFilter() }
+  categoryFilterCombo.value.onChange { (_, _, _) => updateFilter() }
+
+  inventoryTable.items = scalafx.collections.transformation.SortedBuffer(sortedInventory)
 
   // Form Controls
   private val nameField = new TextField { promptText = "Item Name"; prefWidth = 150 }
@@ -263,7 +300,7 @@ class InventoryView(
     padding = Insets(15)
     styleClass = Seq("form-card")
     children = Seq(
-      new Label("Add Inventory Item") { font = Font.font("System", FontWeight.Bold, 15); style = "-fx-text-fill: #1e293b;"; minWidth = 500 },
+      new Label("Add Inventory Item") { style = "-fx-text-fill: #1e293b; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 15px;"; minWidth = 500 },
       formGrid
     )
 
@@ -275,7 +312,8 @@ class InventoryView(
 
   children = Seq(
     titleLabel,
-    inventoryTable,
+    filterBar,
+    tableWrapper,
     formContainer,
     buttonRow
   )

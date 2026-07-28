@@ -7,7 +7,6 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import java.time.LocalDate
-import scalafx.scene.text.{Font, FontWeight}
 
 @annotation.nowarn("cat=deprecation")
 class DistributionView(
@@ -21,46 +20,43 @@ class DistributionView(
   style = "-fx-background-color: #fbf9f4;"
 
   private val titleLabel = new Label("Daily Distribution Optimizer"):
-    font = Font.font("System", FontWeight.Bold, 24)
-    style = "-fx-text-fill: #111827;"
-    minWidth = 500
+    style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 20px;"
 
   // Allocation Table
   private val allocationsTable = new TableView[Allocation]:
-    val selfTable = this
+    val selfTable: TableView[Allocation] = this
     columnResizePolicy = TableView.ConstrainedResizePolicy
-    style = "-fx-background-radius: 8px; -fx-background-color: #ffffff;"
     placeholder = new Label("No distribution plan generated. Click 'Generate' below.") { style = "-fx-text-fill: #64748b;" }
 
-    val idCol = new TableColumn[Allocation, String]("ID"):
+    // S1-14 / Entry 14 clip layout to prevent row background bleed
+    clip = UIUtils.createRoundedClip(selfTable)
+
+    private val idCol: TableColumn[Allocation, String] = new TableColumn[Allocation, String]("ID"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "id", cellData.value.id) }
       prefWidth = 80
       
-    val familyCol = new TableColumn[Allocation, String]("Recipient Family"):
+    private val familyCol: TableColumn[Allocation, String] = new TableColumn[Allocation, String]("Recipient Family"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "family", cellData.value.familyName) }
       prefWidth = 180
       
-    val itemCol = new TableColumn[Allocation, String]("Allocated Item"):
+    private val itemCol: TableColumn[Allocation, String] = new TableColumn[Allocation, String]("Allocated Item"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "item", cellData.value.itemName) }
       prefWidth = 180
       
-    val categoryCol = new TableColumn[Allocation, String]("Category"):
+    private val categoryCol: TableColumn[Allocation, String] = new TableColumn[Allocation, String]("Category"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "category", cellData.value.category.toString) }
       prefWidth = 120
 
-    val qtyCol = new TableColumn[Allocation, String]("Quantity"):
+    private val qtyCol: TableColumn[Allocation, String] = new TableColumn[Allocation, String]("Quantity"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "quantity", s"${cellData.value.allocatedQuantity} ${cellData.value.unit}") }
       prefWidth = 140
 
     columns ++= Seq(idCol, familyCol, itemCol, categoryCol, qtyCol)
     prefHeight = 280
-    // ai-assisted: #14
-    clip = new scalafx.scene.shape.Rectangle {
-      arcWidth = 12
-      arcHeight = 12
-      width <== selfTable.width
-      height <== selfTable.height
-    }
+
+  private val tableWrapper = new StackPane:
+    styleClass = Seq("table-wrapper")
+    children = Seq(allocationsTable)
 
   // Local state for the generated proposed changes
   private val proposedAllocations = ObservableBuffer[Allocation]()
@@ -75,13 +71,22 @@ class DistributionView(
 
   private val generateButton = new Button("Generate Plan"):
     styleClass = Seq("button", "button-primary")
+    minWidth = scalafx.scene.layout.Region.USE_PREF_SIZE
     onAction = handle { performGeneratePlan() }
 
   private val dispatchButton = new Button("Confirm & Dispatch Plan"):
     styleClass = Seq("button", "button-success")
+    minWidth = scalafx.scene.layout.Region.USE_PREF_SIZE
     opacity = 0.5
     disable = true
     onAction = handle { performDispatch() }
+
+  private val exportButton = new Button("📤 Export Report"):
+    styleClass = Seq("button", "button-secondary")
+    minWidth = scalafx.scene.layout.Region.USE_PREF_SIZE
+    opacity = 0.5
+    disable = true
+    onAction = handle { performExport() }
 
   private def performGeneratePlan(): Unit =
     statusLabel.text = ""
@@ -97,6 +102,8 @@ class DistributionView(
       proposedRequests.value = Nil
       dispatchButton.disable = true
       dispatchButton.style = "-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 6px; -fx-opacity: 0.5;"
+      exportButton.disable = true
+      exportButton.opacity = 0.5
       statsLabel.text = ""
     else
       // Execute the pure waste minimizing policy
@@ -114,6 +121,8 @@ class DistributionView(
         proposedRequests.value = Nil
         dispatchButton.disable = true
         dispatchButton.opacity = 0.5
+        exportButton.disable = true
+        exportButton.opacity = 0.5
         statsLabel.style = "-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"
         statsLabel.text = "No active plan. Click 'Generate Plan' to calculate daily distribution layout."
       else
@@ -137,6 +146,8 @@ class DistributionView(
         statusLabel.text = "Plan successfully generated! Review above and click 'Confirm & Dispatch'."
         dispatchButton.disable = false
         dispatchButton.opacity = 1.0
+        exportButton.disable = false
+        exportButton.opacity = 1.0
 
   private def performDispatch(): Unit =
     if proposedInventory.value.nonEmpty && proposedRequests.value.nonEmpty then
@@ -157,6 +168,87 @@ class DistributionView(
       statusLabel.text = "Success: Daily plan dispatched! Inventory and request log updated and saved."
       dispatchButton.disable = true
       dispatchButton.opacity = 0.5
+      exportButton.disable = true
+      exportButton.opacity = 0.5
+
+  private def performExport(): Unit =
+    if proposedAllocations.nonEmpty then
+      try
+        import org.apache.pdfbox.pdmodel.PDDocument
+        import org.apache.pdfbox.pdmodel.PDPage
+        import org.apache.pdfbox.pdmodel.PDPageContentStream
+        import org.apache.pdfbox.pdmodel.font.PDType1Font
+
+        val doc = new PDDocument()
+        val page = new PDPage()
+        doc.addPage(page)
+        
+        val content = new PDPageContentStream(doc, page)
+        
+        // Title
+        content.beginText()
+        content.setFont(PDType1Font.HELVETICA_BOLD, 16)
+        content.newLineAtOffset(50, 750)
+        content.showText("DAILY FOOD DISTRIBUTION REPORT")
+        content.endText()
+        
+        // Date info
+        content.beginText()
+        content.setFont(PDType1Font.HELVETICA, 10)
+        content.newLineAtOffset(50, 730)
+        content.showText(s"Generated on: ${LocalDate.now()}")
+        content.endText()
+        
+        // Draw Table Header
+        var y = 680
+        content.beginText()
+        content.setFont(PDType1Font.HELVETICA_BOLD, 10)
+        content.newLineAtOffset(50, y.toFloat)
+        content.showText("Allocation ID")
+        content.newLineAtOffset(100, 0)
+        content.showText("Family Name")
+        content.newLineAtOffset(150, 0)
+        content.showText("Allocated Item")
+        content.newLineAtOffset(150, 0)
+        content.showText("Quantity")
+        content.endText()
+        
+        // Divider line
+        content.setLineWidth(1.0f)
+        content.moveTo(50, (y - 5).toFloat)
+        content.lineTo(550, (y - 5).toFloat)
+        content.stroke()
+        
+        y -= 25
+        
+        // Draw Rows
+        content.setFont(PDType1Font.HELVETICA, 9)
+        proposedAllocations.foreach { alloc =>
+          if y > 50 then
+            content.beginText()
+            content.newLineAtOffset(50, y.toFloat)
+            content.showText(alloc.id)
+            content.newLineAtOffset(100, 0)
+            content.showText(alloc.familyName)
+            content.newLineAtOffset(150, 0)
+            content.showText(s"${alloc.itemName} (${alloc.category})")
+            content.newLineAtOffset(150, 0)
+            content.showText(s"${alloc.allocatedQuantity} ${alloc.unit}")
+            content.endText()
+            y -= 20
+        }
+        
+        content.close()
+        val file = new java.io.File("daily_distribution_report.pdf")
+        doc.save(file)
+        doc.close()
+        
+        statusLabel.style = "-fx-text-fill: #16a34a; -fx-font-weight: bold;"
+        statusLabel.text = s"✓ PDF Report successfully exported to ${file.getAbsolutePath}!"
+      catch
+        case e: Exception =>
+          statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
+          statusLabel.text = s"✗ Error exporting PDF: ${e.getMessage}"
 
   private val statsPanel = new VBox:
     spacing = 5
@@ -164,14 +256,19 @@ class DistributionView(
     styleClass = Seq("form-card")
     children = Seq(statsLabel)
 
-  private val actionRow = new HBox:
+  private val buttonsBox = new HBox:
     spacing = 15
     alignment = Pos.CenterLeft
-    children = Seq(generateButton, dispatchButton, statusLabel)
+    children = Seq(generateButton, dispatchButton, exportButton)
+
+  private val actionRow = new VBox:
+    spacing = 10
+    alignment = Pos.CenterLeft
+    children = Seq(buttonsBox, statusLabel)
 
   children = Seq(
     titleLabel,
-    allocationsTable,
+    tableWrapper,
     statsPanel,
     actionRow
   )

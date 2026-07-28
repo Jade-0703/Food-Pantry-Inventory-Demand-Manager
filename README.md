@@ -52,6 +52,16 @@ sbt run
 ## AI Use Summary
 
 This project was built under Sunway University's **Tier C (AI-Integrated)** academic policy.
-- **AI Tools Used**: Cursor, Gemini.
+- **AI Tools Used**: Gemini, Antigravity.
 - **Integration Rationale**: AI assisted in designing the ScalaFX scene layout structure and the recursive immutable allocation loop. All AI outputs were reviewed, typed-checked, refactored to conform to strict immutability criteria, and verified.
 - **Logs**: Refer to [ai/interaction_log.md](file:///Users/jadewenxi/Documents/Project_23093495/ai/interaction_log.md) and [docs/ai_reflection.md](file:///Users/jadewenxi/Documents/Project_23093495/docs/ai_reflection.md) for full traceability.
+
+---
+
+## Third-Party Citations & Licenses
+
+This project utilizes the following external libraries:
+- **ScalaFX**: BSD 3-Clause License (https://github.com/scalafx/scalafx)
+- **OpenJFX (JavaFX)**: GPLv2 with Classpath Exception (https://openjfx.io/)
+- **ScalaTest**: Apache License, Version 2.0 (https://www.scalatest.org/)
+

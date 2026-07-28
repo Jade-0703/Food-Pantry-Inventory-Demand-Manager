@@ -62,9 +62,15 @@ object WasteMinimizingPolicy extends DistributionPolicy:
     def isCompatible(item: FoodItem, diet: DietaryRestriction): Boolean =
       diet match
         case DietaryRestriction.None => true
-        case DietaryRestriction.Vegetarian => item.category != FoodCategory.Meat
-        case DietaryRestriction.Halal => item.category != FoodCategory.Meat // Safely avoid meat for simplicity
-        case DietaryRestriction.GlutenFree => item.category != FoodCategory.Grains
+        case DietaryRestriction.Vegetarian => 
+          item.category != FoodCategory.Meat
+        case DietaryRestriction.Halal => 
+          item.category != FoodCategory.Meat || !item.name.toLowerCase.contains("pork")
+        case DietaryRestriction.GlutenFree => 
+          item.category != FoodCategory.Grains || 
+          item.name.toLowerCase.contains("gluten-free") || 
+          item.name.toLowerCase.contains("gf") || 
+          item.name.toLowerCase.contains("rice")
 
     /**
      * Tail-recursive matching loop over family request objects.
