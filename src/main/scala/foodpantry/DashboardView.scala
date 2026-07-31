@@ -142,6 +142,9 @@ class DashboardView(
       criticalTableWrapper
     )
 
+  HBox.setHgrow(pieChart, Priority.Always)
+  HBox.setHgrow(barChart, Priority.Always)
+
   private val chartsHBox = new HBox:
     spacing = 20
     alignment = Pos.TopCenter

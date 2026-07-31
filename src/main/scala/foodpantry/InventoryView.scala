@@ -113,7 +113,14 @@ class InventoryView(
       }
 
     columns ++= Seq(idCol, nameCol, categoryCol, qtyCol, perishableCol, detailCol)
-    prefHeight = 300
+    prefHeight <== scalafx.beans.binding.Bindings.createDoubleBinding(
+      () => {
+        val rowCount = items.value.size()
+        if rowCount == 0 then 100.0
+        else math.min((rowCount * 40.0) + 45.0, 360.0)
+      },
+      items
+    )
 
   private val tableWrapper = new StackPane:
     styleClass = Seq("table-wrapper")
