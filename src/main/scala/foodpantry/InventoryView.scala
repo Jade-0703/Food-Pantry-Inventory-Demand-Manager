@@ -129,9 +129,16 @@ class InventoryView(
     style = "-fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-font-size: 13px;"
   }
 
+  private val resetFilterBtn = new Button("🔄 Reset"):
+    style = "-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-cursor: hand;"
+    onAction = handle {
+      searchField.text = ""
+      categoryFilterCombo.value = "All Categories"
+    }
+
   private val filterBar = new HBox {
     spacing = 10
-    children = Seq(searchField, categoryFilterCombo)
+    children = Seq(searchField, categoryFilterCombo, resetFilterBtn)
     alignment = scalafx.geometry.Pos.CenterLeft
   }
 

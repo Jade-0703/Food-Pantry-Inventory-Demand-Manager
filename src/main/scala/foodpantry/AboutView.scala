@@ -1,10 +1,18 @@
 package foodpantry
 
-import scalafx.scene.layout.{VBox, HBox, Priority}
-import scalafx.scene.control.Label
+import scalafx.scene.layout.{VBox, HBox, Priority, Region}
+import scalafx.scene.control.{Label, Button}
 import scalafx.geometry.{Insets, Pos}
+import scalafx.collections.ObservableBuffer
+import scalafx.Includes._
+import scala.annotation.nowarn
 
-class AboutView extends VBox:
+@nowarn("cat=deprecation")
+class AboutView(
+  inventory: ObservableBuffer[FoodItem],
+  requests: ObservableBuffer[FamilyRequest],
+  onResetSampleData: () => Unit
+) extends VBox:
   spacing = 18
   padding = Insets(20)
   style = "-fx-background-color: #fbf9f4;"
@@ -20,7 +28,7 @@ class AboutView extends VBox:
         style = "-fx-text-fill: #64748b; -fx-font-size: 13px;"
     )
 
-  // 2. Ticker Ribbon Bar (Matching Sidebar Theme)
+  // 2. Ticker Ribbon Bar
   private val tickerRibbon = new HBox:
     spacing = 16
     alignment = Pos.Center
@@ -31,7 +39,40 @@ class AboutView extends VBox:
         style = "-fx-text-fill: #1e3a8a; -fx-font-weight: bold; -fx-font-size: 11px; -fx-letter-spacing: 1px;"
     )
 
-  // 3. Card 1: Mission & UN Sustainable Development Goals
+  // 3. Live System Status Bar & Demo Data Controls
+  private val statusLabel = new Label("System Status: Active & Synced"):
+    style = "-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 12px;"
+
+  private val invCountLabel = new Label:
+    style = "-fx-text-fill: #1e3a8a; -fx-font-weight: bold; -fx-font-size: 13px;"
+    text <== scalafx.beans.binding.Bindings.createStringPropertyBinding(
+      () => s"📦 Inventory: ${inventory.size} items",
+      inventory
+    )
+
+  private val reqCountLabel = new Label:
+    style = "-fx-text-fill: #b45309; -fx-font-weight: bold; -fx-font-size: 13px;"
+    text <== scalafx.beans.binding.Bindings.createStringPropertyBinding(
+      () => s"👪 Requests: ${requests.size} households",
+      requests
+    )
+
+  private val seedDataBtn = new Button("🌱 Seed Demo Sample Data"):
+    style = "-fx-background-color: #1e3a8a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 8px; -fx-padding: 6px 14px; -fx-cursor: hand;"
+    onAction = handle {
+      onResetSampleData()
+      statusLabel.text = "Success: Reset & seeded demo sample data."
+      statusLabel.style = "-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 12px;"
+    }
+
+  private val liveStatusBar = new HBox:
+    spacing = 20
+    alignment = Pos.CenterLeft
+    padding = Insets(12, 16, 12, 16)
+    style = "-fx-background-color: #ffffff; -fx-background-radius: 10px; -fx-border-color: #cbd5e1; -fx-border-radius: 10px; -fx-border-width: 1px;"
+    children = Seq(invCountLabel, reqCountLabel, statusLabel, new Region { HBox.setHgrow(this, Priority.Always) }, seedDataBtn)
+
+  // 4. Card 1: Mission & UN Sustainable Development Goals
   private val sdgTile1 = createSdgTile(
     "SDG 1: No Poverty",
     "#fef2f2", "#dc2626", "#fca5a5",
@@ -62,7 +103,7 @@ class AboutView extends VBox:
       sdgRow
     )
 
-  // 4. Card 2: Core Application Features
+  // 5. Card 2: Core Application Features
   private val featuresCard = new VBox:
     spacing = 10
     padding = Insets(18)
@@ -77,7 +118,7 @@ class AboutView extends VBox:
       createFeatureTile("🚛 Automated Distribution & PDF Export", "#f0fdf4", "#15803d", "#bbf7d0", "Executes waste-minimizing allocation policy and generates downloadable daily PDF reports.")
     )
 
-  // 5. Card 3: Technical Architecture
+  // 6. Card 3: Technical Architecture
   private val techCard = new VBox:
     spacing = 10
     padding = Insets(18)
@@ -92,7 +133,7 @@ class AboutView extends VBox:
       createTechRow("Report Engine", "Apache PDFBox automated daily report exporter")
     )
 
-  children = Seq(titleArea, tickerRibbon, missionCard, featuresCard, techCard)
+  children = Seq(titleArea, tickerRibbon, liveStatusBar, missionCard, featuresCard, techCard)
 
   // Helper Methods
   private def createSdgTile(title: String, bg: String, fg: String, bc: String, desc: String): VBox =

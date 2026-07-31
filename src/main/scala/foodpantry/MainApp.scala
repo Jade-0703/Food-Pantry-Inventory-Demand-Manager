@@ -54,7 +54,10 @@ object MainApp extends JFXApp3:
       saveRequests()
     })
 
-    val aboutView = new AboutView()
+    val aboutView = new AboutView(inventoryItems, familyRequests, () => {
+      seedInitialData()
+      loadAllData()
+    })
 
     // Navigation state container (About page active by default)
     val activeView = ObjectProperty[scalafx.scene.Node](aboutView)
