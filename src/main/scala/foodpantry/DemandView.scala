@@ -16,10 +16,12 @@ class DemandView(
 
   spacing = 15
   padding = Insets(20)
-  style = "-fx-background-color: #fbf9f4;"
+  styleClass = Seq("content-pane")
 
-  private val titleLabel = new Label("Family Demand & Requests Log"):
-    style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 20px;"
+  private val headerBlock = UIUtils.createPageHeader(
+    "Family Demand & Requests Log",
+    "Log and manage recipient family requests with household size, dietary restrictions, and food preferences."
+  )
 
   // Requests Table
   private val requestsTable = new TableView[FamilyRequest]:
@@ -90,16 +92,15 @@ class DemandView(
   // Bind requests buffer
   private val searchField = new TextField {
     promptText = "🔍 Search requests by family name..."
-    style = "-fx-pref-width: 250px; -fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-font-size: 13px;"
+    styleClass = Seq("filter-field")
   }
 
   private val categoryFilterCombo = new ComboBox[String](Seq("All Categories Requested") ++ FoodCategory.values.map(_.toString).toSeq) {
     value = "All Categories Requested"
-    style = "-fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-font-size: 13px;"
   }
 
   private val resetFilterBtn = new Button("🔄 Reset"):
-    style = "-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8px; -fx-padding: 6px 12px; -fx-cursor: hand;"
+    styleClass = Seq("filter-reset-btn")
     onAction = handle {
       searchField.text = ""
       categoryFilterCombo.value = "All Categories Requested"
@@ -107,6 +108,7 @@ class DemandView(
 
   private val filterBar = new HBox {
     spacing = 10
+    styleClass = Seq("filter-bar")
     children = Seq(searchField, categoryFilterCombo, resetFilterBtn)
     alignment = scalafx.geometry.Pos.CenterLeft
   }
@@ -136,7 +138,7 @@ class DemandView(
   private val restrictionCombo = new ComboBox[DietaryRestriction](DietaryRestriction.values.toIndexedSeq) { promptText = "Dietary Restriction"; prefWidth = 150 }
   private val categoryCombo = new ComboBox[FoodCategory](FoodCategory.values.toIndexedSeq) { promptText = "Requested Category"; prefWidth = 150 }
   
-  private val statusLabel = new Label { style = "-fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 13px;" }
+  private val statusLabel = new Label { styleClass = Seq("status-label", "status-error") }
 
   // Keyboard navigation Setup
   private def setupFormActions(submitAction: () => Unit): Unit =
@@ -164,17 +166,14 @@ class DemandView(
     val category = categoryCombo.value.value
     
     if familyName.isEmpty || sizeStr.isEmpty || diet == null || category == null then
-      statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
-      statusLabel.text = "Error: All fields are required."
+      UIUtils.applyStatus(statusLabel, "error", "Error: All fields are required.")
     else
       val sizeOpt = scala.util.Try(sizeStr.toInt).toOption
       sizeOpt match
         case None =>
-          statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
-          statusLabel.text = "Error: Household size must be a valid integer."
+          UIUtils.applyStatus(statusLabel, "error", "Error: Household size must be a valid integer.")
         case Some(size) if size <= 0 =>
-          statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
-          statusLabel.text = "Error: Household size must be positive."
+          UIUtils.applyStatus(statusLabel, "error", "Error: Household size must be positive.")
         case Some(size) =>
           val newRequest = FamilyRequest(
             id = s"req-${System.currentTimeMillis()}",
@@ -187,30 +186,25 @@ class DemandView(
           requests.add(newRequest)
           onSave()
           clearForm()
-          statusLabel.style = "-fx-text-fill: #16a34a; -fx-font-weight: bold;"
-          statusLabel.text = s"Success: Request for '$familyName' logged."
+          UIUtils.applyStatus(statusLabel, "success", s"Success: Request for '$familyName' logged.")
 
   private def performDeleteSelected(): Unit =
     val selectedItem = requestsTable.selectionModel.value.getSelectedItem
     if selectedItem != null then
       requests.remove(selectedItem)
       onSave()
-      statusLabel.style = "-fx-text-fill: #16a34a; -fx-font-weight: bold;"
-      statusLabel.text = "Success: Selected request deleted."
+      UIUtils.applyStatus(statusLabel, "success", "Success: Selected request deleted.")
     else
-      statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
-      statusLabel.text = "Warning: Select a request in the table to delete."
+      UIUtils.applyStatus(statusLabel, "error", "Warning: Select a request in the table to delete.")
 
   private def performArchiveFulfilled(): Unit =
     val fulfilled = requests.filter(_.status == RequestStatus.Fulfilled).toList
     if fulfilled.nonEmpty then
       requests --= fulfilled
       onSave()
-      statusLabel.style = "-fx-text-fill: #16a34a; -fx-font-weight: bold;"
-      statusLabel.text = s"Success: Archived ${fulfilled.size} fulfilled requests."
+      UIUtils.applyStatus(statusLabel, "success", s"Success: Archived ${fulfilled.size} fulfilled requests.")
     else
-      statusLabel.style = "-fx-text-fill: #64748b; -fx-font-weight: bold;"
-      statusLabel.text = "Notice: No fulfilled requests to archive."
+      UIUtils.applyStatus(statusLabel, "info", "Notice: No fulfilled requests to archive.")
 
   private def clearForm(): Unit =
     familyNameField.text = ""
@@ -240,7 +234,7 @@ class DemandView(
     padding = Insets(15)
     styleClass = Seq("form-card")
     children = Seq(
-      new Label("Log Family Request") { style = "-fx-text-fill: #1e293b; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 15px;"; minWidth = 500 },
+      new Label("Log Family Request") { styleClass = Seq("form-card-title"); minWidth = 500 },
       formGrid
     )
 
@@ -250,7 +244,7 @@ class DemandView(
     alignment = Pos.CenterLeft
 
   children = Seq(
-    titleLabel,
+    headerBlock,
     filterBar,
     tableWrapper,
     formContainer,

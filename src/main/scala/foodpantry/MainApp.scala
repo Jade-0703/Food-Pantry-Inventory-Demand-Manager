@@ -7,7 +7,6 @@ import scalafx.scene.layout._
 import scalafx.scene.control._
 import scalafx.collections.ObservableBuffer
 import scalafx.beans.property.ObjectProperty
-import scalafx.geometry.Insets
 import scalafx.Includes._
 import java.io.File
 import scala.util.Try
@@ -73,12 +72,15 @@ object MainApp extends JFXApp3:
           val mainBorderPane: BorderPane = this
           // Left Sidebar Navigation
           left = new VBox:
-            spacing = 10
-            padding = Insets(20)
-            style = "-fx-background-color: #f8efdeff; -fx-min-width: 220px;"
+            spacing = 8
+            styleClass = Seq("sidebar")
             
             val appTitle: Label = new Label("Food Pantry"):
-              style = "-fx-text-fill: #1e3a8a; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"
+              styleClass = Seq("sidebar-app-title")
+            val appSubtitle: Label = new Label("SDG 1 · SDG 12 · Food Bank Ops"):
+              styleClass = Seq("sidebar-app-subtitle")
+            val navSectionLabel: Label = new Label("NAVIGATION"):
+              styleClass = Seq("sidebar-section-label")
             
             @annotation.nowarn("cat=deprecation")
             def createNavButton(text: String, view: scalafx.scene.Node): Button = 
@@ -100,7 +102,8 @@ object MainApp extends JFXApp3:
                 content = newView
                 fitToWidth = true
                 hbarPolicy = ScrollPane.ScrollBarPolicy.Never
-                style = "-fx-background-color: #fbf9f4; -fx-background-insets: 0; -fx-padding: 0; -fx-border-width: 0px;"
+                styleClass = Seq("scroll-pane")
+                style = "-fx-background-color: #fbf9f4;"
               }
               Seq(
                 (btnAbout, aboutView),
@@ -119,14 +122,15 @@ object MainApp extends JFXApp3:
             // Set About page active by default
             btnAbout.styleClass = Seq("sidebar-btn-active")
 
-            children = Seq(appTitle, btnAbout, btnDash, btnInv, btnReq, btnDist)
+            children = Seq(appTitle, appSubtitle, navSectionLabel, btnAbout, btnDash, btnInv, btnReq, btnDist)
           
           // Initial Content Pane
           center = new ScrollPane {
             content = aboutView
             fitToWidth = true
             hbarPolicy = ScrollPane.ScrollBarPolicy.Never
-            style = "-fx-background-color: #fbf9f4; -fx-background-insets: 0; -fx-padding: 0; -fx-border-width: 0px;"
+            styleClass = Seq("scroll-pane")
+            style = "-fx-background-color: #fbf9f4;"
           }
 
   private def saveInventory(): Unit =
@@ -177,7 +181,21 @@ object MainApp extends JFXApp3:
 
 object UIUtils:
   import scalafx.scene.control.{Label, TableView}
+  import scalafx.scene.layout.VBox
   import scalafx.scene.shape.Rectangle
+
+  /** Shared page header used across all four operational views (S1-13 DRY). */
+  def createPageHeader(title: String, subtitle: String): VBox =
+    new VBox:
+      spacing = 4
+      children = Seq(
+        new Label(title) { styleClass = Seq("page-title") },
+        new Label(subtitle) { styleClass = Seq("page-subtitle") }
+      )
+
+  def applyStatus(label: Label, kind: String, message: String): Unit =
+    label.text = message
+    label.styleClass = Seq("status-label", s"status-$kind")
 
   def createRoundedClip(table: TableView[_]): Rectangle = new Rectangle {
     width <== table.width

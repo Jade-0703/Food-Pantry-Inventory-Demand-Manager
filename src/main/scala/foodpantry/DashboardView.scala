@@ -14,26 +14,27 @@ class DashboardView(
   
   spacing = 20
   padding = Insets(20)
-  style = "-fx-background-color: #fbf9f4;"
+  styleClass = Seq("content-pane")
 
-  private val titleLabel = new Label("Dashboard & Pantry Analytics"):
-    style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 20px;"
+  private val headerBlock = UIUtils.createPageHeader(
+    "Dashboard & Pantry Analytics",
+    "Real-time KPIs, category PieChart, dietary needs overview, and expiring-stock alerts (SDG 1 & 12)."
+  )
 
   // KPI Panels
-  private val totalStockVal = new Label("0") { style = "-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #0369a1; -fx-font-family: 'Inter';" }
-  private val pendingFamiliesVal = new Label("0") { style = "-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #c2410c; -fx-font-family: 'Inter';" }
-  private val expiringSoonVal = new Label("0") { style = "-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #b91c1c; -fx-font-family: 'Inter';" }
-  private val familiesHelpedVal = new Label("0") { style = "-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #6b21a8; -fx-font-family: 'Inter';" }
+  private val totalStockVal = new Label("0") { styleClass = Seq("kpi-card-value", "kpi-blue") }
+  private val pendingFamiliesVal = new Label("0") { styleClass = Seq("kpi-card-value", "kpi-orange") }
+  private val expiringSoonVal = new Label("0") { styleClass = Seq("kpi-card-value", "kpi-red") }
+  private val familiesHelpedVal = new Label("0") { styleClass = Seq("kpi-card-value", "kpi-green") }
 
-  private def createKpiCard(title: String, valueLabel: Label, bgStyle: String, colorClass: String): VBox =
+  private def createKpiCard(title: String, valueLabel: Label, colorClass: String): VBox =
     new VBox:
       spacing = 6
       padding = Insets(16)
       styleClass = Seq("kpi-card", colorClass)
-      style = s"-fx-background-color: $bgStyle;"
       hgrow = Priority.Always
       children = Seq(
-        new Label(title) { style = "-fx-font-size: 12px; -fx-text-fill: #4b5563; -fx-font-weight: 600; -fx-font-family: 'Inter';" },
+        new Label(title) { styleClass = Seq("kpi-card-title") },
         valueLabel
       )
 
@@ -42,16 +43,16 @@ class DashboardView(
     alignment = Pos.CenterLeft
     hgrow = Priority.Always
     children = Seq(
-      createKpiCard("Total Stock Units", totalStockVal, "#e0f2fe", "card-blue"),
-      createKpiCard("Pending Requests", pendingFamiliesVal, "#ffedd5", "card-orange"),
-      createKpiCard("Expiring Soon (<3 Days)", expiringSoonVal, "#fee2e2", "card-red"),
-      createKpiCard("Families Helped", familiesHelpedVal, "#f3e8ff", "card-green")
+      createKpiCard("Total Stock Units", totalStockVal, "card-blue"),
+      createKpiCard("Pending Requests", pendingFamiliesVal, "card-orange"),
+      createKpiCard("Expiring Soon (<3 Days)", expiringSoonVal, "card-red"),
+      createKpiCard("Families Helped", familiesHelpedVal, "card-green")
     )
 
   // Chart and Critical Inventory Table
   private val pieChart = new PieChart:
     title = "Inventory Categories"
-    style = "-fx-background-color: #ffffff; -fx-background-radius: 12px; -fx-border-radius: 12px; -fx-border-color: #cbd5e1; -fx-border-width: 1px; -fx-padding: 10px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
+    styleClass = Seq("chart-card")
     legendVisible = true
     labelsVisible = true
     labelLineLength = 8
@@ -63,7 +64,7 @@ class DashboardView(
   private val yAxis = new NumberAxis { label = "Families" }
   private val barChart = new BarChart[String, Number](xAxis, yAxis):
     title = "Family Dietary Needs"
-    style = "-fx-background-color: #ffffff; -fx-background-radius: 12px; -fx-border-radius: 12px; -fx-border-color: #cbd5e1; -fx-border-width: 1px; -fx-padding: 10px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
+    styleClass = Seq("chart-card")
     legendVisible = false
     prefWidth = 480
     minWidth = 420
@@ -134,10 +135,10 @@ class DashboardView(
 
   private val criticalSection = new VBox:
     spacing = 10
-    style = "-fx-background-color: #ffffff; -fx-background-radius: 12px; -fx-border-radius: 12px; -fx-border-color: #cbd5e1; -fx-border-width: 1px; -fx-padding: 15px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);"
+    styleClass = Seq("section-card")
     hgrow = Priority.Always
     children = Seq(
-      new Label("Urgently Expiring Stock") { style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" },
+      new Label("Urgently Expiring Stock") { styleClass = Seq("section-card-title") },
       criticalTableWrapper
     )
 
@@ -156,7 +157,7 @@ class DashboardView(
   }
 
   children = Seq(
-    titleLabel,
+    headerBlock,
     alertsBox,
     kpiGrid,
     chartsHBox,
@@ -241,7 +242,7 @@ class DashboardView(
     if shortages.nonEmpty then
       shortages.foreach { alertText =>
         val alertLabel = new Label(alertText) {
-          style = "-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-border-color: #fca5a5; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 8px 12px; -fx-font-weight: bold; -fx-font-size: 13px;"
+          styleClass = Seq("alert-banner")
           maxWidth = Double.MaxValue
         }
         alertsBox.children.add(alertLabel)

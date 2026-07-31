@@ -17,10 +17,12 @@ class DistributionView(
 
   spacing = 15
   padding = Insets(20)
-  style = "-fx-background-color: #fbf9f4;"
+  styleClass = Seq("content-pane")
 
-  private val titleLabel = new Label("Daily Distribution Optimizer"):
-    style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 20px;"
+  private val headerBlock = UIUtils.createPageHeader(
+    "Daily Distribution Optimizer",
+    "Generate waste-minimizing expiry-first allocation plans, confirm dispatch, and export PDF reports."
+  )
 
   // Allocation Table
   private val allocationsTable = new TableView[Allocation]:
@@ -66,8 +68,10 @@ class DistributionView(
   allocationsTable.items = proposedAllocations
 
   // Info and Stats Labels
-  private val statsLabel = new Label("No active plan. Click 'Generate Plan' to calculate daily distribution layout.") { style = "-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;" }
-  private val statusLabel = new Label { style = "-fx-font-weight: bold; -fx-font-size: 13px;" }
+  private val statsLabel = new Label("No active plan. Click 'Generate Plan' to calculate daily distribution layout.") {
+    styleClass = Seq("status-label", "status-info")
+  }
+  private val statusLabel = new Label { styleClass = Seq("status-label") }
 
   private val generateButton = new Button("Generate Plan"):
     styleClass = Seq("button", "button-primary")
@@ -95,13 +99,12 @@ class DistributionView(
     // Check if there are any pending requests
     val pendingCount = requests.count(_.status == RequestStatus.Pending)
     if pendingCount == 0 then
-      statusLabel.style = "-fx-text-fill: #dc2626;"
-      statusLabel.text = "Error: There are no pending family requests to satisfy!"
+      UIUtils.applyStatus(statusLabel, "error", "Error: There are no pending family requests to satisfy!")
       proposedAllocations.clear()
       proposedInventory.value = Nil
       proposedRequests.value = Nil
       dispatchButton.disable = true
-      dispatchButton.style = "-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 6px; -fx-opacity: 0.5;"
+      dispatchButton.opacity = 0.5
       exportButton.disable = true
       exportButton.opacity = 0.5
       statsLabel.text = ""
@@ -114,8 +117,7 @@ class DistributionView(
       )
 
       if allocations.isEmpty then
-        statusLabel.style = "-fx-text-fill: #ea580c;"
-        statusLabel.text = "Notice: Generated plan matches 0 items (insufficient or incompatible stock)."
+        UIUtils.applyStatus(statusLabel, "warning", "Notice: Generated plan matches 0 items (insufficient or incompatible stock).")
         proposedAllocations.clear()
         proposedInventory.value = Nil
         proposedRequests.value = Nil
@@ -123,8 +125,7 @@ class DistributionView(
         dispatchButton.opacity = 0.5
         exportButton.disable = true
         exportButton.opacity = 0.5
-        statsLabel.style = "-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"
-        statsLabel.text = "No active plan. Click 'Generate Plan' to calculate daily distribution layout."
+        UIUtils.applyStatus(statsLabel, "info", "No active plan. Click 'Generate Plan' to calculate daily distribution layout.")
       else
         proposedAllocations.clear()
         proposedAllocations.addAll(allocations)
@@ -133,17 +134,16 @@ class DistributionView(
 
         // Calculate potential waste prevented (perishable quantities allocated)
         val perishablesAllocated = allocations.filter { allocation =>
-          // Look up if this item was perishable in original inventory
           inventory.exists {
             case item: PerishableItem if item.name == allocation.itemName => true
             case _ => false
           }
         }.map(_.allocatedQuantity).sum
 
-        statsLabel.style = "-fx-font-size: 14px; -fx-text-fill: #334155; -fx-font-weight: bold;"
+        statsLabel.styleClass = Seq("status-label")
+        statsLabel.style = "-fx-font-size: 14px; -fx-text-fill: #334155;"
         statsLabel.text = s"Plan Details: Satisfied ${allocations.map(_.familyName).distinct.size} families. Allocated ${allocations.map(_.allocatedQuantity).sum} units of food. Waste Minimized (Perishables): $perishablesAllocated units."
-        statusLabel.style = "-fx-text-fill: #16a34a;"
-        statusLabel.text = "Plan successfully generated! Review above and click 'Confirm & Dispatch'."
+        UIUtils.applyStatus(statusLabel, "success", "Plan successfully generated! Review above and click 'Confirm & Dispatch'.")
         dispatchButton.disable = false
         dispatchButton.opacity = 1.0
         exportButton.disable = false
@@ -162,10 +162,9 @@ class DistributionView(
       proposedInventory.value = Nil
       proposedRequests.value = Nil
       
-      statsLabel.style = "-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"
+      statsLabel.styleClass = Seq("status-label", "status-info")
       statsLabel.text = "No active plan. Click 'Generate Plan' to calculate daily distribution layout."
-      statusLabel.style = "-fx-text-fill: #16a34a;"
-      statusLabel.text = "Success: Daily plan dispatched! Inventory and request log updated and saved."
+      UIUtils.applyStatus(statusLabel, "success", "Success: Daily plan dispatched! Inventory and request log updated and saved.")
       dispatchButton.disable = true
       dispatchButton.opacity = 0.5
       exportButton.disable = true
@@ -243,12 +242,10 @@ class DistributionView(
         doc.save(file)
         doc.close()
         
-        statusLabel.style = "-fx-text-fill: #16a34a; -fx-font-weight: bold;"
-        statusLabel.text = s"✓ PDF Report successfully exported to ${file.getAbsolutePath}!"
+        UIUtils.applyStatus(statusLabel, "success", s"✓ PDF Report successfully exported to ${file.getAbsolutePath}!")
       catch
         case e: Exception =>
-          statusLabel.style = "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
-          statusLabel.text = s"✗ Error exporting PDF: ${e.getMessage}"
+          UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting PDF: ${e.getMessage}")
 
   private val statsPanel = new VBox:
     spacing = 5
@@ -267,7 +264,7 @@ class DistributionView(
     children = Seq(buttonsBox, statusLabel)
 
   children = Seq(
-    titleLabel,
+    headerBlock,
     tableWrapper,
     statsPanel,
     actionRow
