@@ -85,7 +85,7 @@ class DistributionView(
     disable = true
     onAction = handle { performDispatch() }
 
-  private val exportButton = new Button("📤 Export Report"):
+  private val exportButton = new Button("📄 Export PDF Report"):
     styleClass = Seq("button", "button-secondary")
     minWidth = scalafx.scene.layout.Region.USE_PREF_SIZE
     opacity = 0.5

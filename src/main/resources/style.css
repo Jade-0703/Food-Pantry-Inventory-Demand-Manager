@@ -56,18 +56,18 @@
     -fx-border-color: #1e3a8a;
 }
 .sidebar-btn-active {
-    -fx-background-color: #bde3f5;
-    -fx-border-color: #7ec8e3;
+    -fx-background-color: #1e3a8a;
+    -fx-border-color: #1e3a8a;
     -fx-border-width: 1.5px;
     -fx-border-radius: 20px;
-    -fx-text-fill: #1e3a8a;
+    -fx-text-fill: #ffffff;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-alignment: center-left;
     -fx-pref-width: 180px;
     -fx-padding: 12px 16px;
     -fx-background-radius: 20px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 4, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, rgba(30,58,138,0.25), 8, 0, 0, 3);
 }
 
 /* ── 3. Page headers (shared across all operational views) ──────────────── */
