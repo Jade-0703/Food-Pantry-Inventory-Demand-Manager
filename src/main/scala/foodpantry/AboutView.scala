@@ -45,14 +45,14 @@ class AboutView(
 
   private val invCountLabel = new Label:
     style = "-fx-text-fill: #1e3a8a; -fx-font-weight: bold; -fx-font-size: 13px;"
-    text <== scalafx.beans.binding.Bindings.createStringPropertyBinding(
+    text <== scalafx.beans.binding.Bindings.createStringBinding(
       () => s"📦 Inventory: ${inventory.size} items",
       inventory
     )
 
   private val reqCountLabel = new Label:
     style = "-fx-text-fill: #b45309; -fx-font-weight: bold; -fx-font-size: 13px;"
-    text <== scalafx.beans.binding.Bindings.createStringPropertyBinding(
+    text <== scalafx.beans.binding.Bindings.createStringBinding(
       () => s"👪 Requests: ${requests.size} households",
       requests
     )
