@@ -517,24 +517,27 @@
     -fx-font-size: 15px;
 }
 .dark-accent-card {
-    -fx-background-color: #1e293b;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 16px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 4);
+    -fx-border-color: #d97706 #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-radius: 16px;
+    -fx-border-width: 4px 1px 1px 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);
 }
 .dark-accent-title {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #1e3a8a;
     -fx-font-family: "Inter";
     -fx-font-weight: bold;
     -fx-font-size: 18px;
     -fx-wrap-text: true;
 }
 .dark-accent-body {
-    -fx-text-fill: #94a3b8;
+    -fx-text-fill: #334155;
     -fx-font-size: 13px;
     -fx-wrap-text: true;
 }
 .dark-accent-bullet {
-    -fx-text-fill: #cbd5e1;
+    -fx-text-fill: #475569;
     -fx-font-size: 12px;
 }
 .stat-counter-card {
@@ -555,12 +558,15 @@
     -fx-font-weight: bold;
 }
 .live-status-card {
-    -fx-background-color: #0f172a;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 14px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 4);
+    -fx-border-color: #0284c7 #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-radius: 14px;
+    -fx-border-width: 4px 1px 1px 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);
 }
 .live-status-title {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #1e3a8a;
     -fx-font-family: "Inter";
     -fx-font-weight: bold;
     -fx-font-size: 15px;

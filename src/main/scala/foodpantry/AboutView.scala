@@ -145,14 +145,14 @@ class AboutView(
   HBox.setHgrow(feedbackFormCard, Priority.Always)
 
   private val invCountLabel = new Label:
-    style = "-fx-text-fill: #e2e8f0; -fx-font-weight: bold; -fx-font-size: 14px;"
+    style = "-fx-text-fill: #1e3a8a; -fx-font-weight: bold; -fx-font-size: 13px;"
     text <== scalafx.beans.binding.Bindings.createStringBinding(
       () => s"📦 Inventory Stock: ${inventory.size} items",
       inventory
     )
 
   private val reqCountLabel = new Label:
-    style = "-fx-text-fill: #fde68a; -fx-font-weight: bold; -fx-font-size: 14px;"
+    style = "-fx-text-fill: #b45309; -fx-font-weight: bold; -fx-font-size: 13px;"
     text <== scalafx.beans.binding.Bindings.createStringBinding(
       () => s"👪 Household Demands: ${requests.size} families",
       requests
@@ -173,9 +173,9 @@ class AboutView(
       new Label("⚡ Live System Operational Metrics") { styleClass = Seq("live-status-title") },
       invCountLabel,
       reqCountLabel,
-      new Label("📄 PDF Export Engine: Apache PDFBox Ready") { style = "-fx-text-fill: #cbd5e1; -fx-font-size: 13px;" },
+      new Label("📄 PDF Export Engine: Apache PDFBox Ready") { style = "-fx-text-fill: #475569; -fx-font-size: 13px;" },
       new Label("✅ Matching Algorithm: Active (Waste-Minimizing)") {
-        style = "-fx-text-fill: #4ade80; -fx-font-weight: bold; -fx-font-size: 13px;"
+        style = "-fx-text-fill: #15803d; -fx-font-weight: bold; -fx-font-size: 13px;"
       },
       seedDataBtn
     )
