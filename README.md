@@ -1,6 +1,8 @@
 # Food Pantry Inventory & Demand Manager
 
-An interactive ScalaFX desktop application designed to address UN Sustainable Development Goal 1 (No Poverty) by optimizing resource distribution inside community food pantries.
+## About
+
+**Food Pantry Inventory & Demand Manager** is an interactive desktop application built in Scala 3 and ScalaFX. It addresses **UN Sustainable Development Goal 1 (No Poverty)** and **SDG 12 (Responsible Consumption & Production)** by streamlining food bank inventory logging, tracking household dietary requirements, and automating daily resource allocation.
 
 ## Project Summary
 

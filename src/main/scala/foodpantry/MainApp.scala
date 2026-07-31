@@ -54,6 +54,8 @@ object MainApp extends JFXApp3:
       saveRequests()
     })
 
+    val aboutView = createAboutView()
+
     // Navigation state container
     val activeView = ObjectProperty[scalafx.scene.Node](dashboardView)
 
@@ -87,6 +89,7 @@ object MainApp extends JFXApp3:
             val btnInv = createNavButton("📦 Inventory Log", inventoryView)
             val btnReq = createNavButton("👪 Family Requests", demandView)
             val btnDist = createNavButton("🚛 Distribution Plan", distributionView)
+            val btnAbout = createNavButton("ℹ️ About", aboutView)
 
             // Dynamic background highlight for selected nav button and center view swap
             activeView.onChange { (_, _, newView) =>
@@ -100,7 +103,8 @@ object MainApp extends JFXApp3:
                 (btnDash, dashboardView),
                 (btnInv, inventoryView),
                 (btnReq, demandView),
-                (btnDist, distributionView)
+                (btnDist, distributionView),
+                (btnAbout, aboutView)
               ).foreach { case (btn, viewInstance) =>
                 if newView == viewInstance then
                   btn.styleClass = Seq("sidebar-btn-active")
@@ -112,7 +116,7 @@ object MainApp extends JFXApp3:
             // Set dashboard active by default
             btnDash.styleClass = Seq("sidebar-btn-active")
 
-            children = Seq(appTitle, btnDash, btnInv, btnReq, btnDist)
+            children = Seq(appTitle, btnDash, btnInv, btnReq, btnDist, btnAbout)
           
           // Initial Content Pane
           center = new ScrollPane {
@@ -121,6 +125,64 @@ object MainApp extends JFXApp3:
             hbarPolicy = ScrollPane.ScrollBarPolicy.Never
             style = "-fx-background-color: #fbf9f4; -fx-background-insets: 0; -fx-padding: 0; -fx-border-width: 0px;"
           }
+
+  private def createAboutView(): VBox = new VBox:
+    spacing = 15
+    padding = Insets(20)
+    style = "-fx-background-color: #fbf9f4;"
+
+    private val titleLabel = new Label("About Food Pantry Manager"):
+      style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 20px;"
+
+    private val overviewCard = new VBox:
+      spacing = 10
+      padding = Insets(18)
+      styleClass = Seq("form-card")
+      children = Seq(
+        new Label("🌾 Food Pantry Inventory & Demand Manager"):
+          style = "-fx-text-fill: #1e3a8a; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 16px;"
+        ,
+        new Label("Version 1.0.0 • Academic Final Project • Sunway University"):
+          style = "-fx-text-fill: #6b7280; -fx-font-size: 12px; -fx-font-weight: bold;"
+        ,
+        new Label("An interactive ScalaFX desktop application designed to empower community food banks by streamlining inventory logging, tracking household demands, and automating food package distribution."):
+          style = "-fx-text-fill: #374151; -fx-font-size: 13px; -fx-wrap-text: true;"
+      )
+
+    private val sdgCard = new VBox:
+      spacing = 10
+      padding = Insets(18)
+      styleClass = Seq("form-card")
+      children = Seq(
+        new Label("📌 UN Sustainable Development Goals Alignment"):
+          style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 15px;"
+        ,
+        new Label("• SDG 1 (No Poverty): Provides targeted food package allocation to vulnerable households tailored by family size and specific dietary restrictions."):
+          style = "-fx-text-fill: #374151; -fx-font-size: 13px; -fx-wrap-text: true;"
+        ,
+        new Label("• SDG 12 (Responsible Consumption & Production): Implements a Waste-Minimizing Expiry-First matching policy to distribute perishable stock before expiration."):
+          style = "-fx-text-fill: #374151; -fx-font-size: 13px; -fx-wrap-text: true;"
+      )
+
+    private val techCard = new VBox:
+      spacing = 10
+      padding = Insets(18)
+      styleClass = Seq("form-card")
+      children = Seq(
+        new Label("🛠️ Technical Architecture & Features"):
+          style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 15px;"
+        ,
+        new Label("• Core Stack: Scala 3.3.3 (JVM 21) & ScalaFX 21 (JavaFX UI toolkit)"):
+          style = "-fx-text-fill: #374151; -fx-font-size: 13px;"
+        ,
+        new Label("• Functional Design: Pure immutable domain modeling with zero mutable logic collections"):
+          style = "-fx-text-fill: #374151; -fx-font-size: 13px;"
+        ,
+        new Label("• Persistence & Export: Type-safe CSV file repositories wrapped in Try, with PDFBox daily distribution report exporting"):
+          style = "-fx-text-fill: #374151; -fx-font-size: 13px; -fx-wrap-text: true;"
+      )
+
+    children = Seq(titleLabel, overviewCard, sdgCard, techCard)
 
   private def saveInventory(): Unit =
     inventoryRepo.saveAll(inventoryItems.toList)
