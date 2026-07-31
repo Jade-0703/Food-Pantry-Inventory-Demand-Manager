@@ -1,6 +1,6 @@
 package foodpantry
 
-import scalafx.scene.layout.{VBox, HBox, Priority, Region, GridPane}
+import scalafx.scene.layout.{VBox, HBox, Priority}
 import scalafx.scene.control.Label
 import scalafx.geometry.{Insets, Pos}
 
