@@ -5,110 +5,131 @@ import scalafx.scene.control.Label
 import scalafx.geometry.{Insets, Pos}
 
 class AboutView extends VBox:
-  spacing = 22
-  padding = Insets(24)
-  style = "-fx-background-color: #fafaf9;"
+  spacing = 18
+  padding = Insets(20)
+  style = "-fx-background-color: #fbf9f4;"
 
-  // 1. Top Title Header
+  // 1. Header Title Area
   private val titleArea = new VBox:
-    spacing = 6
-    alignment = Pos.Center
-    padding = Insets(6, 0, 6, 0)
+    spacing = 4
     children = Seq(
       new Label("Food Pantry Inventory & Demand Manager"):
-        style = "-fx-text-fill: #0f172a; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 26px; -fx-text-alignment: center;"
+        style = "-fx-text-fill: #111827; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 22px;"
       ,
-      new Label("Optimizing Resource Allocation & Reducing Food Waste for Local Communities"):
-        style = "-fx-text-fill: #64748b; -fx-font-size: 13px; -fx-text-alignment: center;"
+      new Label("Community Resource Allocation & Food Waste Reduction Platform"):
+        style = "-fx-text-fill: #64748b; -fx-font-size: 13px;"
     )
 
-  // 2. Horizontal Ticker Ribbon (Soft Light Pastel Yellow)
+  // 2. Ticker Ribbon Bar (Matching Sidebar Theme)
   private val tickerRibbon = new HBox:
     spacing = 16
     alignment = Pos.Center
-    padding = Insets(8, 20, 8, 20)
-    style = "-fx-background-color: #fef9c3; -fx-background-radius: 20px; -fx-border-color: #fef08a; -fx-border-radius: 20px; -fx-border-width: 1px;"
+    padding = Insets(8, 18, 8, 18)
+    style = "-fx-background-color: #f8efde; -fx-background-radius: 8px; -fx-border-color: #e5e7eb; -fx-border-radius: 8px; -fx-border-width: 1px;"
     children = Seq(
       new Label("COMMUNITY PANTRY  •  UN SDG 1: NO POVERTY  •  UN SDG 12: RESPONSIBLE CONSUMPTION  •  ZERO WASTE ALGORITHM"):
-        style = "-fx-text-fill: #854d0e; -fx-font-weight: bold; -fx-font-size: 11px; -fx-letter-spacing: 1px;"
+        style = "-fx-text-fill: #1e3a8a; -fx-font-weight: bold; -fx-font-size: 11px; -fx-letter-spacing: 1px;"
     )
 
-  // 3. Center Highlight Callout Card (Lighter Pastel Cream with Dashed Border)
-  private val dashedHighlightCard = new VBox:
+  // 3. Card 1: Mission & UN Sustainable Development Goals
+  private val sdgTile1 = createSdgTile(
+    "SDG 1: No Poverty",
+    "#fef2f2", "#dc2626", "#fca5a5",
+    "Matches food packages to vulnerable households based on family size and dietary restrictions (Halal, Vegetarian, Gluten-Free)."
+  )
+
+  private val sdgTile2 = createSdgTile(
+    "SDG 12: Responsible Consumption & Production",
+    "#f0fdf4", "#16a34a", "#bbf7d0",
+    "Prioritizes perishable food items close to expiration date to prevent food waste and minimize landfill impact."
+  )
+
+  private val sdgRow = new HBox:
     spacing = 12
-    alignment = Pos.Center
-    padding = Insets(26)
-    style = "-fx-background-color: #fefce8; -fx-background-radius: 20px; -fx-border-color: #fde047; -fx-border-style: dashed; -fx-border-radius: 20px; -fx-border-width: 2px;"
+    children = Seq(sdgTile1, sdgTile2)
+
+  private val missionCard = new VBox:
+    spacing = 12
+    padding = Insets(18)
+    styleClass = Seq("form-card")
     children = Seq(
-      new Label("SUSTAINABILITY MISSION"):
-        style = "-fx-background-color: #eab308; -fx-text-fill: #ffffff; -fx-padding: 3px 12px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 10px; -fx-letter-spacing: 1px;"
+      new Label("Mission & UN Sustainable Development Goals"):
+        style = "-fx-text-fill: #1e3a8a; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 16px;"
       ,
-      new Label("Streamlining Food Bank Operations with Expiry-First Matching"):
-        style = "-fx-text-fill: #1e293b; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 19px; -fx-text-alignment: center; -fx-wrap-text: true;"
+      new Label("Designed for food bank coordinators and volunteers, this platform streamlines inventory logging, tracks household demands, and automates daily food allocation to ensure fair distribution while eliminating food waste."):
+        style = "-fx-text-fill: #374151; -fx-font-size: 13px; -fx-wrap-text: true;"
       ,
-      new Label("By combining perishable inventory tracking with recipient family dietary constraints (Halal, Vegetarian, Gluten-Free), our algorithm prioritizes items nearing expiration to ensure zero food waste while fulfilling household needs."):
-        style = "-fx-text-fill: #475569; -fx-font-size: 13px; -fx-text-alignment: center; -fx-wrap-text: true; -fx-max-width: 750px;"
+      sdgRow
     )
 
-  // 4. Bottom Lighter Pastel Yellow Container with 3 Feature Cards
-  private val bottomSectionTitle = new Label("LET'S OPTIMIZE PANTRY DISTRIBUTION TOGETHER"):
-    style = "-fx-text-fill: #a16207; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 12px; -fx-letter-spacing: 1.5px; -fx-text-alignment: center;"
+  // 4. Card 2: Core Application Features
+  private val featuresCard = new VBox:
+    spacing = 10
+    padding = Insets(18)
+    styleClass = Seq("form-card")
+    children = Seq(
+      new Label("Core Application Features"):
+        style = "-fx-text-fill: #1e3a8a; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 16px;"
+      ,
+      createFeatureTile("📊 Real-Time Analytics Dashboard", "#f0f9ff", "#0369a1", "#bae6fd", "Provides KPI summary counters, category stock charts, and urgent perishable expiration alerts (<3 days)."),
+      createFeatureTile("📦 Smart Inventory Logging", "#f8fafc", "#334155", "#cbd5e1", "Supports adding, searching, filtering, and deleting perishable and non-perishable food items with automatic expiry status calculation."),
+      createFeatureTile("👪 Family Request Management", "#fffbeb", "#b45309", "#fde68a", "Records recipient family details, household sizes, preference notes, and strict dietary constraints."),
+      createFeatureTile("🚛 Automated Distribution & PDF Export", "#f0fdf4", "#15803d", "#bbf7d0", "Executes waste-minimizing allocation policy and generates downloadable daily PDF reports.")
+    )
 
-  private val card1 = createFeatureCard(
-    "📦", "#ffedd5",
-    "STEP 01",
-    "Smart Inventory Log",
-    "Track perishable and non-perishable food items, record quantity units, and calculate expiration dates automatically."
-  )
+  // 5. Card 3: Technical Architecture
+  private val techCard = new VBox:
+    spacing = 10
+    padding = Insets(18)
+    styleClass = Seq("form-card")
+    children = Seq(
+      new Label("Technical Architecture & Implementation"):
+        style = "-fx-text-fill: #1e3a8a; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 16px;"
+      ,
+      createTechRow("Language & UI Toolkit", "Scala 3.3.3 & ScalaFX 21 (JVM 21)"),
+      createTechRow("Architecture", "Pure functional domain model with 100% immutable data structures"),
+      createTechRow("Data Storage", "Type-safe CSV file repositories wrapped in Try"),
+      createTechRow("Report Engine", "Apache PDFBox automated daily report exporter")
+    )
 
-  private val card2 = createFeatureCard(
-    "👪", "#dbeafe",
-    "STEP 02",
-    "Household Matching",
-    "Log recipient family requests, household sizes, and strict dietary constraints (Halal, Vegetarian, Gluten-Free)."
-  )
+  children = Seq(titleArea, tickerRibbon, missionCard, featuresCard, techCard)
 
-  private val card3 = createFeatureCard(
-    "🚛", "#dcfce7",
-    "STEP 03",
-    "Waste-Minimizing Engine",
-    "Executes automated allocation matching, prioritizes urgent items nearing expiry, and exports PDF daily reports."
-  )
+  // Helper Methods
+  private def createSdgTile(title: String, bg: String, fg: String, bc: String, desc: String): VBox =
+    val box = new VBox:
+      spacing = 4
+      padding = Insets(12)
+      style = s"-fx-background-color: $bg; -fx-background-radius: 8px; -fx-border-color: $bc; -fx-border-radius: 8px; -fx-border-width: 1px;"
+      children = Seq(
+        new Label(title):
+          style = s"-fx-text-fill: $fg; -fx-font-weight: bold; -fx-font-size: 13px;"
+        ,
+        new Label(desc):
+          style = "-fx-text-fill: #374151; -fx-font-size: 12px; -fx-wrap-text: true;"
+      )
+    HBox.setHgrow(box, Priority.Always)
+    box
 
-  private val cardsRow = new HBox:
-    spacing = 18
-    alignment = Pos.Center
-    children = Seq(card1, card2, card3)
+  private def createFeatureTile(title: String, bg: String, fg: String, bc: String, desc: String): VBox =
+    new VBox:
+      spacing = 3
+      padding = Insets(10, 14, 10, 14)
+      style = s"-fx-background-color: $bg; -fx-background-radius: 8px; -fx-border-color: $bc; -fx-border-radius: 8px; -fx-border-width: 1px;"
+      children = Seq(
+        new Label(title):
+          style = s"-fx-text-fill: $fg; -fx-font-weight: bold; -fx-font-size: 13px;"
+        ,
+        new Label(desc):
+          style = "-fx-text-fill: #374151; -fx-font-size: 12px; -fx-wrap-text: true;"
+      )
 
-  private val bottomContainer = new VBox:
-    spacing = 18
-    alignment = Pos.Center
-    padding = Insets(26)
-    style = "-fx-background-color: #fef9c3; -fx-background-radius: 24px; -fx-border-color: #fef08a; -fx-border-radius: 24px; -fx-border-width: 1px;"
-    children = Seq(bottomSectionTitle, cardsRow)
-
-  children = Seq(titleArea, tickerRibbon, dashedHighlightCard, bottomContainer)
-
-  // Helper method for the 3 Feature Cards with circular icon badges
-  private def createFeatureCard(icon: String, iconBg: String, stepText: String, titleText: String, descText: String): VBox =
-    val iconBadge = new Label(icon):
-      style = s"-fx-background-color: $iconBg; -fx-background-radius: 24px; -fx-min-width: 48px; -fx-min-height: 48px; -fx-alignment: center; -fx-font-size: 20px;"
-
-    val stepLabel = new Label(stepText):
-      style = "-fx-text-fill: #a16207; -fx-font-weight: bold; -fx-font-size: 10px; -fx-letter-spacing: 1px;"
-
-    val title = new Label(titleText):
-      style = "-fx-text-fill: #0f172a; -fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 15px; -fx-wrap-text: true; -fx-text-alignment: center;"
-
-    val desc = new Label(descText):
-      style = "-fx-text-fill: #64748b; -fx-font-size: 12px; -fx-wrap-text: true; -fx-text-alignment: center;"
-
-    val card = new VBox:
-      spacing = 10
-      alignment = Pos.Center
-      padding = Insets(20)
-      style = "-fx-background-color: #ffffff; -fx-background-radius: 18px; -fx-border-color: #f1f5f9; -fx-border-radius: 18px; -fx-border-width: 1px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);"
-      children = Seq(iconBadge, stepLabel, title, desc)
-
-    HBox.setHgrow(card, Priority.Always)
-    card
+  private def createTechRow(label: String, value: String): VBox =
+    new VBox:
+      spacing = 2
+      children = Seq(
+        new Label(s"• $label:"):
+          style = "-fx-text-fill: #111827; -fx-font-weight: bold; -fx-font-size: 12px;"
+        ,
+        new Label(s"  $value"):
+          style = "-fx-text-fill: #475569; -fx-font-size: 12px; -fx-wrap-text: true;"
+      )
