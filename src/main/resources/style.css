@@ -1089,10 +1089,10 @@
 }
 
 .form-card.card-color-planner {
-    -fx-background-color: linear-gradient(to bottom right, #fffdf8, #f5f3ff);
-    -fx-border-color: #ddd6fe #ddd6fe #ddd6fe #7c3aed;
+    -fx-background-color: linear-gradient(to bottom right, #fffdf8, #f0fdfa);
+    -fx-border-color: #99f6e4 #d9f99d #d9f99d #0d9488;
     -fx-border-width: 1px 1px 1px 5px;
-    -fx-effect: dropshadow(three-pass-box, rgba(124,58,237,0.07), 14, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, rgba(13,148,136,0.07), 14, 0, 0, 5);
 }
 
 .form-card.card-color-inventory:hover,
