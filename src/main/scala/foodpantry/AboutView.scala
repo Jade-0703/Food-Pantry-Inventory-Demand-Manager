@@ -1,7 +1,7 @@
 package foodpantry
 
 import scalafx.scene.layout.{VBox, HBox, Priority, Region, GridPane, ColumnConstraints}
-import scalafx.scene.control.{Label, Button, TextField}
+import scalafx.scene.control.{Label, Button, TextField, TextArea}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.collections.ObservableBuffer
 import scalafx.Includes._
@@ -109,17 +109,23 @@ class AboutView(
       new Label("• Expiry-first perishable matching logic prioritizing stock nearing expiration") { styleClass = Seq("dark-accent-bullet") },
       new Label("• Automatic household size scaling for balanced package distribution") { styleClass = Seq("dark-accent-bullet") },
       new Label("• Strict dietary constraint enforcement (Halal, Vegetarian, Gluten-Free)") { styleClass = Seq("dark-accent-bullet") },
-      new HBox {
-        spacing = 12
+      new VBox {
+        spacing = 8
         padding = Insets(8, 0, 0, 0)
-        alignment = Pos.CenterLeft
-        children = Seq(invBadge, reqBadge, seedDataBtn)
+        children = Seq(
+          new HBox { spacing = 10; alignment = Pos.CenterLeft; children = Seq(invBadge, reqBadge) },
+          seedDataBtn
+        )
       }
     )
 
   // 5. Contact Coordinator Form Card
   private val contactEmailField = new TextField { promptText = "Your Email (e.g. staff@sunway.edu.my)"; maxWidth = Double.MaxValue }
-  private val contactMessageField = new TextField { promptText = "Enter your message or inquiry..."; maxWidth = Double.MaxValue }
+  private val contactMessageField = new TextArea {
+    promptText = "Enter your message or inquiry..."
+    maxWidth = Double.MaxValue
+    prefRowCount = 3
+  }
   private val contactStatusLabel = new Label { styleClass = Seq("status-label") }
 
   private val sendContactBtn = new Button("✉️ Send Message"):
