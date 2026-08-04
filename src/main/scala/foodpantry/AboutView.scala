@@ -113,6 +113,7 @@ class AboutView(
       new Label("• Strict dietary constraint enforcement (Halal, Vegetarian, Gluten-Free)") { styleClass = Seq("dark-accent-bullet") },
       new VBox {
         spacing = 8
+        padding = Insets(4, 0, 0, 0)
         children = Seq(
           new HBox { spacing = 10; alignment = Pos.CenterLeft; children = Seq(invBadge, reqBadge) },
           seedDataBtn
