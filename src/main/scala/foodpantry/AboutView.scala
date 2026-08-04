@@ -112,8 +112,7 @@ class AboutView(
       new Label("• Automatic household size scaling for balanced package distribution") { styleClass = Seq("dark-accent-bullet") },
       new Label("• Strict dietary constraint enforcement (Halal, Vegetarian, Gluten-Free)") { styleClass = Seq("dark-accent-bullet") },
       new VBox {
-        spacing = 8
-        padding = Insets(4, 0, 0, 0)
+        spacing = 12
         children = Seq(
           new HBox { spacing = 10; alignment = Pos.CenterLeft; children = Seq(invBadge, reqBadge) },
           seedDataBtn
