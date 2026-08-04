@@ -544,10 +544,10 @@
 .dark-accent-card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 16px;
-    -fx-border-color: #d97706 #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-color: #1e3a8a #e2e8f0 #e2e8f0 #e2e8f0;
     -fx-border-radius: 16px;
     -fx-border-width: 4px 1px 1px 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, rgba(30,58,138,0.06), 10, 0, 0, 4);
 }
 .dark-accent-title {
     -fx-text-fill: #1e3a8a;
@@ -585,18 +585,18 @@
 .card-color-feedback {
     -fx-background-color: #f8fafc;
     -fx-background-radius: 14px;
-    -fx-border-color: #2563eb #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-color: #1e3a8a #e2e8f0 #e2e8f0 #e2e8f0;
     -fx-border-radius: 14px;
     -fx-border-width: 4px 1px 1px 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.06), 10, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, rgba(30,58,138,0.06), 10, 0, 0, 4);
 }
 .card-color-inventory {
     -fx-background-color: #f8fafc;
     -fx-background-radius: 14px;
-    -fx-border-color: #2563eb #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-color: #1e3a8a #e2e8f0 #e2e8f0 #e2e8f0;
     -fx-border-radius: 14px;
     -fx-border-width: 4px 1px 1px 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.05), 10, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, rgba(30,58,138,0.05), 10, 0, 0, 4);
 }
 .card-color-demand {
     -fx-background-color: #fffbeb;

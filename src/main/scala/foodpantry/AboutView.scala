@@ -159,11 +159,8 @@ class AboutView(
     children = Seq(
       new Label("📩 Contact Pantry Coordinator") { styleClass = Seq("form-card-title") },
       contactFormGrid,
-      new HBox {
-        spacing = 14
-        alignment = Pos.CenterLeft
-        children = Seq(sendContactBtn, contactStatusLabel)
-      }
+      sendContactBtn,
+      contactStatusLabel
     )
 
   // 6. Contact tiles + footer
