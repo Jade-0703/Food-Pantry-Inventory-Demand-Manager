@@ -259,27 +259,14 @@ class DemandView(
     categoryCombo.value = null
 
   // Form Layout
-  private val formGrid = new GridPane:
-    hgap = 14
-    vgap = 12
-    columnConstraints = Seq(
-      new ColumnConstraints { minWidth = 95 },
-      new ColumnConstraints { hgrow = Priority.Always },
-      new ColumnConstraints { minWidth = 110 },
-      new ColumnConstraints { hgrow = Priority.Always }
+  private val formContent = new VBox:
+    spacing = 10
+    children = Seq(
+      new VBox { spacing = 4; children = Seq(new Label("Family Name:") { styleClass = Seq("form-field-label") }, familyNameField) },
+      new VBox { spacing = 4; children = Seq(new Label("Household Size:") { styleClass = Seq("form-field-label") }, sizeField) },
+      new VBox { spacing = 4; children = Seq(new Label("Dietary Restr.:") { styleClass = Seq("form-field-label") }, restrictionCombo) },
+      new VBox { spacing = 4; children = Seq(new Label("Category:") { styleClass = Seq("form-field-label") }, categoryCombo) }
     )
-
-    add(new Label("Family Name:") { styleClass = Seq("form-field-label") }, 0, 0)
-    add(familyNameField, 1, 0)
-
-    add(new Label("Household Size:") { styleClass = Seq("form-field-label") }, 2, 0)
-    add(sizeField, 3, 0)
-
-    add(new Label("Dietary Restr.:") { styleClass = Seq("form-field-label") }, 0, 1)
-    add(restrictionCombo, 1, 1)
-
-    add(new Label("Category:") { styleClass = Seq("form-field-label") }, 2, 1)
-    add(categoryCombo, 3, 1)
 
   private val formContainer = new VBox:
     spacing = 12
@@ -287,7 +274,7 @@ class DemandView(
     styleClass = Seq("form-card", "card-color-demand")
     children = Seq(
       new Label("📝 Log Household Demand Request") { styleClass = Seq("form-card-title") },
-      formGrid,
+      formContent,
       new HBox {
         spacing = 12
         alignment = Pos.CenterLeft
@@ -295,11 +282,21 @@ class DemandView(
       }
     )
 
+  private val mainContentRow = new GridPane:
+    hgap = 18
+    columnConstraints = Seq(
+      new ColumnConstraints { percentWidth = 65.0; hgrow = Priority.Always },
+      new ColumnConstraints { percentWidth = 35.0 }
+    )
+    add(tableWrapper, 0, 0)
+    add(formContainer, 1, 0)
+    javafx.scene.layout.GridPane.setFillHeight(tableWrapper.delegate, true)
+    javafx.scene.layout.GridPane.setFillHeight(formContainer.delegate, true)
+
   children = Seq(
     headerBlock,
     filterBar,
-    tableWrapper,
-    formContainer
+    mainContentRow
   )
 
   // Setup keyboard actions

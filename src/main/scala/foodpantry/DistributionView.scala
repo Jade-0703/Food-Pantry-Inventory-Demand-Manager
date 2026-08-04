@@ -4,7 +4,7 @@ import scalafx.scene.layout._
 import scalafx.scene.control._
 import scalafx.collections.ObservableBuffer
 import scalafx.beans.property.ObjectProperty
-import scalafx.geometry.{Insets, Pos}
+import scalafx.geometry.Insets
 import scalafx.Includes._
 import java.time.LocalDate
 
@@ -76,19 +76,19 @@ class DistributionView(
 
   private val generateButton = new Button("Generate Plan"):
     styleClass = Seq("button", "button-primary")
-    minWidth = scalafx.scene.layout.Region.USE_PREF_SIZE
+    maxWidth = Double.MaxValue
     onAction = handle { performGeneratePlan() }
 
   private val dispatchButton = new Button("Confirm & Dispatch Plan"):
     styleClass = Seq("button", "button-success")
-    minWidth = scalafx.scene.layout.Region.USE_PREF_SIZE
+    maxWidth = Double.MaxValue
     opacity = 0.5
     disable = true
     onAction = handle { performDispatch() }
 
   private val exportButton = new Button("📄 Export PDF Report"):
     styleClass = Seq("button", "button-secondary")
-    minWidth = scalafx.scene.layout.Region.USE_PREF_SIZE
+    maxWidth = Double.MaxValue
     opacity = 0.5
     disable = true
     onAction = handle { performExport() }
@@ -255,19 +255,37 @@ class DistributionView(
     styleClass = Seq("plan-info-banner")
     children = Seq(statsLabel)
 
-  private val buttonsBox = new HBox:
+  private val plannerSidePanel = new VBox:
     spacing = 15
-    alignment = Pos.CenterLeft
-    children = Seq(generateButton, dispatchButton, exportButton)
+    padding = Insets(18)
+    styleClass = Seq("form-card", "card-color-feedback")
+    children = Seq(
+      new Label("⚙️ Planner Console") { styleClass = Seq("form-card-title") },
+      statsPanel,
+      new VBox {
+        spacing = 10
+        children = Seq(
+          new Label("Actions:") { styleClass = Seq("form-field-label") },
+          generateButton,
+          dispatchButton,
+          exportButton
+        )
+      },
+      statusLabel
+    )
 
-  private val actionRow = new VBox:
-    spacing = 10
-    alignment = Pos.CenterLeft
-    children = Seq(buttonsBox, statusLabel)
+  private val mainContentRow = new GridPane:
+    hgap = 18
+    columnConstraints = Seq(
+      new ColumnConstraints { percentWidth = 65.0; hgrow = Priority.Always },
+      new ColumnConstraints { percentWidth = 35.0 }
+    )
+    add(tableWrapper, 0, 0)
+    add(plannerSidePanel, 1, 0)
+    javafx.scene.layout.GridPane.setFillHeight(tableWrapper.delegate, true)
+    javafx.scene.layout.GridPane.setFillHeight(plannerSidePanel.delegate, true)
 
   children = Seq(
     headerBlock,
-    tableWrapper,
-    statsPanel,
-    actionRow
+    mainContentRow
   )

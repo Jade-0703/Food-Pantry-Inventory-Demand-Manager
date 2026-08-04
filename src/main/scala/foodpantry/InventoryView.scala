@@ -310,36 +310,30 @@ class InventoryView(
     expiryDatePicker.value = LocalDate.now().plusDays(7)
 
   // Form Layout
-  private val formGrid = new GridPane:
-    hgap = 14
-    vgap = 12
-    columnConstraints = Seq(
-      new ColumnConstraints { minWidth = 70 },
-      new ColumnConstraints { hgrow = Priority.Always },
-      new ColumnConstraints { minWidth = 90 },
-      new ColumnConstraints { hgrow = Priority.Always }
+  private val formContent = new VBox:
+    spacing = 10
+    children = Seq(
+      new VBox { spacing = 4; children = Seq(new Label("Item Name:") { styleClass = Seq("form-field-label") }, nameField) },
+      new VBox { spacing = 4; children = Seq(new Label("Category:") { styleClass = Seq("form-field-label") }, categoryCombo) },
+      new HBox {
+        spacing = 10
+        hgrow = Priority.Always
+        children = Seq(
+          new VBox { spacing = 4; hgrow = Priority.Always; children = Seq(new Label("Quantity:") { styleClass = Seq("form-field-label") }, qtyField) },
+          new VBox { spacing = 4; hgrow = Priority.Always; children = Seq(new Label("Unit:") { styleClass = Seq("form-field-label") }, unitField) }
+        )
+      },
+      new VBox { spacing = 4; children = Seq(new Label("Type:") { styleClass = Seq("form-field-label") }, itemTypeCombo) },
+      new VBox {
+        spacing = 4
+        children = Seq(
+          expiryLabel,
+          expiryDatePicker,
+          shelfLifeLabel,
+          shelfLifeField
+        )
+      }
     )
-
-    add(new Label("Name:") { styleClass = Seq("form-field-label") }, 0, 0)
-    add(nameField, 1, 0)
-
-    add(new Label("Category:") { styleClass = Seq("form-field-label") }, 2, 0)
-    add(categoryCombo, 3, 0)
-
-    add(new Label("Quantity:") { styleClass = Seq("form-field-label") }, 0, 1)
-    add(qtyField, 1, 1)
-
-    add(new Label("Unit:") { styleClass = Seq("form-field-label") }, 2, 1)
-    add(unitField, 3, 1)
-
-    add(new Label("Type:") { styleClass = Seq("form-field-label") }, 0, 2)
-    add(itemTypeCombo, 1, 2)
-
-    add(expiryLabel, 2, 2)
-    add(expiryDatePicker, 3, 2)
-
-    add(shelfLifeLabel, 2, 2)
-    add(shelfLifeField, 3, 2)
 
   private val formContainer = new VBox:
     spacing = 12
@@ -347,7 +341,7 @@ class InventoryView(
     styleClass = Seq("form-card", "card-color-inventory")
     children = Seq(
       new Label("➕ Add New Inventory Item") { styleClass = Seq("form-card-title") },
-      formGrid,
+      formContent,
       new HBox {
         spacing = 12
         alignment = Pos.CenterLeft
@@ -355,11 +349,21 @@ class InventoryView(
       }
     )
 
+  private val mainContentRow = new GridPane:
+    hgap = 18
+    columnConstraints = Seq(
+      new ColumnConstraints { percentWidth = 65.0; hgrow = Priority.Always },
+      new ColumnConstraints { percentWidth = 35.0 }
+    )
+    add(tableWrapper, 0, 0)
+    add(formContainer, 1, 0)
+    javafx.scene.layout.GridPane.setFillHeight(tableWrapper.delegate, true)
+    javafx.scene.layout.GridPane.setFillHeight(formContainer.delegate, true)
+
   children = Seq(
     headerBlock,
     filterBar,
-    tableWrapper,
-    formContainer
+    mainContentRow
   )
 
   // Setup key listener actions for Form
