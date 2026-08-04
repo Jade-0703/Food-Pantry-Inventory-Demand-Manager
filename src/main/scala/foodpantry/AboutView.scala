@@ -2,7 +2,7 @@ package foodpantry
 
 import scalafx.scene.layout.{VBox, HBox, Priority, Region, GridPane, ColumnConstraints}
 import scalafx.scene.control.{Label, Button, TextField, TextArea}
-import scalafx.geometry.{Insets, Pos, VPos}
+import scalafx.geometry.{Insets, Pos}
 import scalafx.collections.ObservableBuffer
 import scalafx.Includes._
 import scala.annotation.nowarn
@@ -99,8 +99,7 @@ class AboutView(
 
   private val darkAccentCard = new VBox:
     spacing = 12
-    padding = Insets(24)
-    maxHeight = Region.USE_PREF_SIZE
+    padding = Insets(18)
     styleClass = Seq("dark-accent-card")
     children = Seq(
       new Label("Work Smarter, Prevent Waste, Be More Efficient") { styleClass = Seq("dark-accent-title") },
@@ -170,7 +169,6 @@ class AboutView(
   private val contactCard = new VBox:
     spacing = 14
     padding = Insets(18)
-    maxHeight = Region.USE_PREF_SIZE
     styleClass = Seq("form-card", "card-color-feedback")
     children = Seq(
       new Label("📩 Contact Pantry Coordinator") { styleClass = Seq("form-card-title") },
@@ -187,8 +185,8 @@ class AboutView(
     )
     add(darkAccentCard, 0, 0)
     add(contactCard, 1, 0)
-    GridPane.setValignment(darkAccentCard, VPos.Top)
-    GridPane.setValignment(contactCard, VPos.Top)
+    javafx.scene.layout.GridPane.setFillHeight(darkAccentCard.delegate, true)
+    javafx.scene.layout.GridPane.setFillHeight(contactCard.delegate, true)
 
   // 6. Contact tiles + footer
   private val section3Row = new HBox:
