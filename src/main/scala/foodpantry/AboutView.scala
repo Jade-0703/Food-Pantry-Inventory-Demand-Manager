@@ -124,8 +124,7 @@ class AboutView(
   private val contactMessageField = new TextArea {
     promptText = "Enter your message or inquiry..."
     maxWidth = Double.MaxValue
-    prefRowCount = 2
-    prefHeight = 50
+    maxHeight = Double.MaxValue
   }
   private val contactStatusLabel = new Label { styleClass = Seq("status-label") }
 
@@ -159,10 +158,12 @@ class AboutView(
       },
       new VBox {
         spacing = 4
+        vgrow = Priority.Always
         children = Seq(
           new Label("Message:") { styleClass = Seq("form-field-label") },
           contactMessageField
         )
+        javafx.scene.layout.VBox.setVgrow(contactMessageField.delegate, javafx.scene.layout.Priority.ALWAYS)
       }
     )
 
@@ -176,6 +177,7 @@ class AboutView(
       sendContactBtn,
       contactStatusLabel
     )
+    javafx.scene.layout.VBox.setVgrow(contactFormBox.delegate, javafx.scene.layout.Priority.ALWAYS)
 
   private val cardsRow = new GridPane:
     hgap = 18
