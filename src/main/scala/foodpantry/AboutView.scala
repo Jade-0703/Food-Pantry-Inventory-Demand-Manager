@@ -147,31 +147,33 @@ class AboutView(
         UIUtils.showToast("Message sent to pantry coordinator", "success")
     }
 
-  private val contactFormGrid = new GridPane:
-    hgap = 12
-    vgap = 10
-    columnConstraints = Seq(
-      new ColumnConstraints { minWidth = 80 },
-      new ColumnConstraints { hgrow = Priority.Always }
+  private val contactFormBox = new VBox:
+    spacing = 10
+    children = Seq(
+      new VBox {
+        spacing = 4
+        children = Seq(
+          new Label("Your Email:") { styleClass = Seq("form-field-label") },
+          contactEmailField
+        )
+      },
+      new VBox {
+        spacing = 4
+        children = Seq(
+          new Label("Message:") { styleClass = Seq("form-field-label") },
+          contactMessageField
+        )
+      }
     )
-    add(new Label("Your Email:") { styleClass = Seq("form-field-label") }, 0, 0)
-    add(contactEmailField, 1, 0)
-    add(new Label("Message:") { styleClass = Seq("form-field-label") }, 0, 1)
-    add(contactMessageField, 1, 1)
-
-  private val sendContactBtnBox = new HBox {
-    padding = Insets(10, 0, 0, 0)
-    children = Seq(sendContactBtn)
-  }
 
   private val contactCard = new VBox:
-    spacing = 12
+    spacing = 14
     padding = Insets(18)
     styleClass = Seq("form-card", "card-color-feedback")
     children = Seq(
       new Label("📩 Contact Pantry Coordinator") { styleClass = Seq("form-card-title") },
-      contactFormGrid,
-      sendContactBtnBox,
+      contactFormBox,
+      sendContactBtn,
       contactStatusLabel
     )
 
