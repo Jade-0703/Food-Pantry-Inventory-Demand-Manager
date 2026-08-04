@@ -124,7 +124,8 @@ class AboutView(
   private val contactMessageField = new TextArea {
     promptText = "Enter your message or inquiry..."
     maxWidth = Double.MaxValue
-    prefRowCount = 3
+    prefRowCount = 5
+    prefHeight = 110
   }
   private val contactStatusLabel = new Label { styleClass = Seq("status-label") }
 
