@@ -1,7 +1,7 @@
 package foodpantry
 
-import scalafx.scene.layout.{VBox, HBox, Priority}
-import scalafx.scene.control.{Label, Button, TextField, TextArea}
+import scalafx.scene.layout.{VBox, HBox, Priority, Region, GridPane, ColumnConstraints}
+import scalafx.scene.control.{Label, Button, TextField}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.collections.ObservableBuffer
 import scalafx.Includes._
@@ -61,7 +61,7 @@ class AboutView(
             "Add, view, and delete items. Perishable / non-perishable inputs switch dynamically."
           ),
           createFeatureTile(
-            "👪",
+            "👥",
             "Family Requests",
             "Log household demands with dietary restrictions (Halal, Vegetarian, Gluten-Free)."
           ),
@@ -73,7 +73,30 @@ class AboutView(
         )
     )
 
-  // 4. Mission card + stat counters
+  // 4. Mission card & System Reset Action
+  private val invBadge = new Label:
+    style = "-fx-background-color: #eff6ff; -fx-text-fill: #1e3a8a; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6px 12px; -fx-background-radius: 6px;"
+    text <== scalafx.beans.binding.Bindings.createStringBinding(
+      () => s"📦 Stock: ${inventory.size} items",
+      inventory
+    )
+
+  private val reqBadge = new Label:
+    style = "-fx-background-color: #fffbeb; -fx-text-fill: #b45309; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6px 12px; -fx-background-radius: 6px;"
+    text <== scalafx.beans.binding.Bindings.createStringBinding(
+      () => s"👥 Demands: ${requests.size} families",
+      requests
+    )
+
+  private val seedDataBtn = new Button("🌱 Reset & Seed Sample Data"):
+    styleClass = Seq("button", "button-secondary")
+    minWidth = Region.USE_PREF_SIZE
+    onAction = handle {
+      if UIUtils.showConfirmation("Confirm System Reset", "Reset Sample Data", "Are you sure you want to reset all inventory items and family requests to initial demo sample data?") then
+        onResetSampleData()
+        UIUtils.showToast("Re-seeded demo sample data", "info")
+    }
+
   private val darkAccentCard = new VBox:
     spacing = 12
     padding = Insets(24)
@@ -85,105 +108,63 @@ class AboutView(
       },
       new Label("• Expiry-first perishable matching logic prioritizing stock nearing expiration") { styleClass = Seq("dark-accent-bullet") },
       new Label("• Automatic household size scaling for balanced package distribution") { styleClass = Seq("dark-accent-bullet") },
-      new Label("• Strict dietary constraint enforcement (Halal, Vegetarian, Gluten-Free)") { styleClass = Seq("dark-accent-bullet") }
+      new Label("• Strict dietary constraint enforcement (Halal, Vegetarian, Gluten-Free)") { styleClass = Seq("dark-accent-bullet") },
+      new HBox {
+        spacing = 12
+        padding = Insets(8, 0, 0, 0)
+        alignment = Pos.CenterLeft
+        children = Seq(invBadge, reqBadge, seedDataBtn)
+      }
     )
-  HBox.setHgrow(darkAccentCard, Priority.Always)
 
-  private val statCounterCard = new VBox:
-    spacing = 14
-    padding = Insets(24)
-    alignment = Pos.Center
-    styleClass = Seq("stat-counter-card")
-    children = Seq(
-      createStatBlock("100%", "Zero Food Waste Target", "#15803d"),
-      createStatBlock("4", "Core Operational Modules", "#1e3a8a"),
-      createStatBlock("0", "Compiler Warnings (Pure Scala 3)", "#047857")
-    )
-  HBox.setHgrow(statCounterCard, Priority.Always)
+  // 5. Contact Coordinator Form Card
+  private val contactEmailField = new TextField { promptText = "Your Email (e.g. staff@sunway.edu.my)"; maxWidth = Double.MaxValue }
+  private val contactMessageField = new TextField { promptText = "Enter your message or inquiry..."; maxWidth = Double.MaxValue }
+  private val contactStatusLabel = new Label { styleClass = Seq("status-label") }
 
-  private val section1Row = new HBox:
-    spacing = 18
-    children = Seq(darkAccentCard, statCounterCard)
-
-  // 5. Feedback form + live status
-  private val feedbackEmailField = new TextField { promptText = "Coordinator Email"; prefWidth = 250 }
-  private val feedbackSubjectField = new TextField { promptText = "Subject / Topic"; prefWidth = 250 }
-  private val feedbackMessageArea = new TextArea {
-    promptText = "Enter coordinator notes or operational feedback..."
-    prefWidth = 250
-    prefRowCount = 3
-  }
-
-  private val formStatusLabel = new Label("Ready to record notes."):
-    styleClass = Seq("status-label", "status-info")
-
-  private val submitFeedbackBtn = new Button("Submit Note"):
+  private val sendContactBtn = new Button("✉️ Send Message"):
     styleClass = Seq("button", "button-primary")
+    minWidth = Region.USE_PREF_SIZE
     onAction = handle {
-      val email = feedbackEmailField.text.value.trim
-      val subj = feedbackSubjectField.text.value.trim
-      if email.isEmpty || subj.isEmpty then
-        UIUtils.applyStatus(formStatusLabel, "error", "Error: Please provide Email and Subject!")
+      val email = contactEmailField.text.value.trim
+      val msg = contactMessageField.text.value.trim
+      val emailRegex = """^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$""".r
+      if email.isEmpty || msg.isEmpty then
+        UIUtils.applyStatus(contactStatusLabel, "error", "Error: Please enter your email and message!")
+      else if emailRegex.findFirstIn(email).isEmpty then
+        UIUtils.applyStatus(contactStatusLabel, "error", "Error: Invalid email format! (e.g., user@domain.com)")
       else
-        feedbackEmailField.text = ""
-        feedbackSubjectField.text = ""
-        feedbackMessageArea.text = ""
-        UIUtils.applyStatus(formStatusLabel, "success", "Success: Operational note recorded successfully.")
+        contactEmailField.text = ""
+        contactMessageField.text = ""
+        UIUtils.applyStatus(contactStatusLabel, "success", "Success: Message sent to pantry coordinator!")
+        UIUtils.showToast("Message sent to pantry coordinator", "success")
     }
 
-  private val feedbackFormCard = new VBox:
+  private val contactFormGrid = new GridPane:
+    hgap = 12
+    vgap = 10
+    columnConstraints = Seq(
+      new ColumnConstraints { minWidth = 80 },
+      new ColumnConstraints { hgrow = Priority.Always }
+    )
+    add(new Label("Your Email:") { styleClass = Seq("form-field-label") }, 0, 0)
+    add(contactEmailField, 1, 0)
+    add(new Label("Message:") { styleClass = Seq("form-field-label") }, 0, 1)
+    add(contactMessageField, 1, 1)
+
+  private val contactCard = new VBox:
     spacing = 10
-    padding = Insets(20)
-    styleClass = Seq("form-card")
+    padding = Insets(18)
+    styleClass = Seq("form-card", "card-color-feedback")
     children = Seq(
-      new Label("📬 Coordinator Operational Notes & Feedback") { styleClass = Seq("form-card-title") },
-      feedbackEmailField,
-      feedbackSubjectField,
-      feedbackMessageArea,
-      new HBox { spacing = 12; alignment = Pos.CenterLeft; children = Seq(submitFeedbackBtn, formStatusLabel) }
+      new Label("📩 Contact Pantry Coordinator") { styleClass = Seq("form-card-title") },
+      contactFormGrid,
+      new HBox {
+        spacing = 14
+        alignment = Pos.CenterLeft
+        children = Seq(sendContactBtn, contactStatusLabel)
+      }
     )
-  HBox.setHgrow(feedbackFormCard, Priority.Always)
-
-  private val invCountLabel = new Label:
-    style = "-fx-text-fill: #1e3a8a; -fx-font-weight: bold; -fx-font-size: 13px;"
-    text <== scalafx.beans.binding.Bindings.createStringBinding(
-      () => s"📦 Inventory Stock: ${inventory.size} items",
-      inventory
-    )
-
-  private val reqCountLabel = new Label:
-    style = "-fx-text-fill: #b45309; -fx-font-weight: bold; -fx-font-size: 13px;"
-    text <== scalafx.beans.binding.Bindings.createStringBinding(
-      () => s"👪 Household Demands: ${requests.size} families",
-      requests
-    )
-
-  private val seedDataBtn = new Button("🌱 Reset & Seed Sample Data"):
-    styleClass = Seq("button", "button-secondary")
-    onAction = handle {
-      onResetSampleData()
-      UIUtils.applyStatus(formStatusLabel, "success", "Success: Re-seeded demo sample data.")
-    }
-
-  private val liveStatusCard = new VBox:
-    spacing = 14
-    padding = Insets(20)
-    styleClass = Seq("live-status-card")
-    children = Seq(
-      new Label("⚡ Live System Operational Metrics") { styleClass = Seq("live-status-title") },
-      invCountLabel,
-      reqCountLabel,
-      new Label("📄 PDF Export Engine: Apache PDFBox Ready") { style = "-fx-text-fill: #475569; -fx-font-size: 13px;" },
-      new Label("✅ Matching Algorithm: Active (Waste-Minimizing)") {
-        style = "-fx-text-fill: #15803d; -fx-font-weight: bold; -fx-font-size: 13px;"
-      },
-      seedDataBtn
-    )
-  HBox.setHgrow(liveStatusCard, Priority.Always)
-
-  private val section2Row = new HBox:
-    spacing = 18
-    children = Seq(feedbackFormCard, liveStatusCard)
 
   // 6. Contact tiles + footer
   private val section3Row = new HBox:
@@ -204,7 +185,7 @@ class AboutView(
       }
     )
 
-  children = Seq(titleArea, tickerBar, featuresSection, section1Row, section2Row, section3Row, footerBanner)
+  children = Seq(titleArea, tickerBar, featuresSection, darkAccentCard, contactCard, section3Row, footerBanner)
 
   // --- Helpers ---
 
@@ -225,15 +206,6 @@ class AboutView(
       )
     HBox.setHgrow(box, Priority.Always)
     box
-
-  private def createStatBlock(number: String, label: String, color: String): VBox =
-    new VBox:
-      spacing = 2
-      alignment = Pos.Center
-      children = Seq(
-        new Label(number) { styleClass = Seq("stat-number"); style = s"-fx-text-fill: $color;" },
-        new Label(label) { styleClass = Seq("stat-label") }
-      )
 
   private def createInfoTile(icon: String, header: String, sub: String): VBox =
     val box = new VBox:

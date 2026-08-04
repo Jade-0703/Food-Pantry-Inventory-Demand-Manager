@@ -66,4 +66,5 @@ This project utilizes the following external libraries:
 - **ScalaFX**: BSD 3-Clause License (https://github.com/scalafx/scalafx)
 - **OpenJFX (JavaFX)**: GPLv2 with Classpath Exception (https://openjfx.io/)
 - **ScalaTest**: Apache License, Version 2.0 (https://www.scalatest.org/)
+- **Apache PDFBox**: Apache License, Version 2.0 (https://pdfbox.apache.org/)
 

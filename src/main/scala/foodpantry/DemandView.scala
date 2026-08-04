@@ -106,17 +106,22 @@ class DemandView(
     value = "All Categories Requested"
   }
 
+  private val dietaryFilterCombo = new ComboBox[String](Seq("All Dietary Needs") ++ DietaryRestriction.values.map(_.toString).toSeq) {
+    value = "All Dietary Needs"
+  }
+
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
     onAction = handle {
       searchField.text = ""
       categoryFilterCombo.value = "All Categories Requested"
+      dietaryFilterCombo.value = "All Dietary Needs"
     }
 
   private val filterBar = new HBox {
     spacing = 10
     styleClass = Seq("filter-bar")
-    children = Seq(searchField, categoryFilterCombo, resetFilterBtn)
+    children = Seq(searchField, categoryFilterCombo, dietaryFilterCombo, resetFilterBtn)
     alignment = scalafx.geometry.Pos.CenterLeft
   }
 
@@ -128,22 +133,25 @@ class DemandView(
   private def updateFilter(): Unit =
     val query = if searchField.text.value == null then "" else searchField.text.value.toLowerCase.trim
     val cat = categoryFilterCombo.value.value
+    val diet = dietaryFilterCombo.value.value
     filteredRequests.setPredicate { item =>
       val matchesSearch = query.isEmpty || item.familyName.toLowerCase.contains(query)
       val matchesCategory = cat == "All Categories Requested" || item.requestedCategory.toString == cat
-      matchesSearch && matchesCategory
+      val matchesDiet = diet == "All Dietary Needs" || item.dietaryRestriction.toString == diet
+      matchesSearch && matchesCategory && matchesDiet
     }
 
   searchField.text.onChange { (_, _, _) => updateFilter() }
   categoryFilterCombo.value.onChange { (_, _, _) => updateFilter() }
+  dietaryFilterCombo.value.onChange { (_, _, _) => updateFilter() }
 
   requestsTable.items = scalafx.collections.transformation.SortedBuffer(sortedRequests)
 
   // Form Controls
-  private val familyNameField = new TextField { promptText = "Family Name"; prefWidth = 160 }
-  private val sizeField = new TextField { promptText = "Size (e.g. 4)"; prefWidth = 100 }
-  private val restrictionCombo = new ComboBox[DietaryRestriction](DietaryRestriction.values.toIndexedSeq) { promptText = "Dietary Restriction"; prefWidth = 150 }
-  private val categoryCombo = new ComboBox[FoodCategory](FoodCategory.values.toIndexedSeq) { promptText = "Requested Category"; prefWidth = 150 }
+  private val familyNameField = new TextField { promptText = "Family Name"; maxWidth = Double.MaxValue }
+  private val sizeField = new TextField { promptText = "Size (e.g. 4)"; maxWidth = Double.MaxValue }
+  private val restrictionCombo = new ComboBox[DietaryRestriction](DietaryRestriction.values.toIndexedSeq) { promptText = "Dietary Restriction"; maxWidth = Double.MaxValue }
+  private val categoryCombo = new ComboBox[FoodCategory](FoodCategory.values.toIndexedSeq) { promptText = "Requested Category"; maxWidth = Double.MaxValue }
   
   private val statusLabel = new Label { styleClass = Seq("status-label", "status-error") }
 
@@ -163,6 +171,26 @@ class DemandView(
   private val archiveButton = new Button("Archive Fulfilled"):
     styleClass = Seq("button", "button-secondary")
     onAction = handle { performArchiveFulfilled() }
+
+  private val exportCsvBtn = new Button("📄 Export CSV"):
+    styleClass = Seq("button", "button-secondary")
+    onAction = handle { performExportCsv() }
+
+  private def performExportCsv(): Unit =
+    val file = new java.io.File("demand_backup.csv")
+    Try {
+      val writer = new java.io.PrintWriter(file)
+      try
+        writer.println("id,familyName,householdSize,dietaryRestriction,requestedCategory,status")
+        requests.foreach { req =>
+          writer.println(FamilyRequestSerializer.serialize(req))
+        }
+      finally
+        writer.close()
+      UIUtils.applyStatus(statusLabel, "success", s"✓ Requests backup exported to ${file.getAbsolutePath}!")
+    }.recover { case e =>
+      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting CSV: ${e.getMessage}")
+    }
 
   private def performAddRequest(): Unit =
     statusLabel.text = ""
@@ -194,22 +222,27 @@ class DemandView(
           onSave()
           clearForm()
           UIUtils.applyStatus(statusLabel, "success", s"Success: Request for '$familyName' logged.")
+          UIUtils.showToast(s"Logged demand request for '$familyName' (${size} members)", "success")
 
   private def performDeleteSelected(): Unit =
     val selectedItem = requestsTable.selectionModel.value.getSelectedItem
     if selectedItem != null then
-      requests.remove(selectedItem)
-      onSave()
-      UIUtils.applyStatus(statusLabel, "success", "Success: Selected request deleted.")
+      if UIUtils.showConfirmation("Confirm Deletion", "Delete Household Request", s"Are you sure you want to delete request for '${selectedItem.familyName}'?") then
+        requests.remove(selectedItem)
+        onSave()
+        UIUtils.applyStatus(statusLabel, "success", s"Success: Deleted request for '${selectedItem.familyName}'.")
+        UIUtils.showToast(s"Deleted demand request for '${selectedItem.familyName}'", "success")
     else
       UIUtils.applyStatus(statusLabel, "error", "Warning: Select a request in the table to delete.")
 
   private def performArchiveFulfilled(): Unit =
     val fulfilled = requests.filter(_.status == RequestStatus.Fulfilled).toList
     if fulfilled.nonEmpty then
-      requests --= fulfilled
-      onSave()
-      UIUtils.applyStatus(statusLabel, "success", s"Success: Archived ${fulfilled.size} fulfilled requests.")
+      if UIUtils.showConfirmation("Confirm Archive", "Archive Fulfilled Requests", s"Are you sure you want to archive ${fulfilled.size} fulfilled household requests?") then
+        requests --= fulfilled
+        onSave()
+        UIUtils.applyStatus(statusLabel, "success", s"Success: Archived ${fulfilled.size} fulfilled requests.")
+        UIUtils.showToast(s"Archived ${fulfilled.size} fulfilled demand requests", "success")
     else
       UIUtils.applyStatus(statusLabel, "info", "Notice: No fulfilled requests to archive.")
 
@@ -221,33 +254,39 @@ class DemandView(
 
   // Form Layout
   private val formGrid = new GridPane:
-    hgap = 10
-    vgap = 10
+    hgap = 14
+    vgap = 12
+    columnConstraints = Seq(
+      new ColumnConstraints { minWidth = 95 },
+      new ColumnConstraints { hgrow = Priority.Always },
+      new ColumnConstraints { minWidth = 110 },
+      new ColumnConstraints { hgrow = Priority.Always }
+    )
 
-    add(new Label("Family Name:"), 0, 0)
+    add(new Label("Family Name:") { styleClass = Seq("form-field-label") }, 0, 0)
     add(familyNameField, 1, 0)
 
-    add(new Label("Household Size:"), 2, 0)
+    add(new Label("Household Size:") { styleClass = Seq("form-field-label") }, 2, 0)
     add(sizeField, 3, 0)
 
-    add(new Label("Dietary Restr.:"), 0, 1)
+    add(new Label("Dietary Restr.:") { styleClass = Seq("form-field-label") }, 0, 1)
     add(restrictionCombo, 1, 1)
 
-    add(new Label("Category:"), 2, 1)
+    add(new Label("Category:") { styleClass = Seq("form-field-label") }, 2, 1)
     add(categoryCombo, 3, 1)
 
   private val formContainer = new VBox:
-    spacing = 10
-    padding = Insets(15)
-    styleClass = Seq("form-card")
+    spacing = 12
+    padding = Insets(18)
+    styleClass = Seq("form-card", "card-color-demand")
     children = Seq(
-      new Label("Log Family Request") { styleClass = Seq("form-card-title"); minWidth = 500 },
+      new Label("📝 Log Household Demand Request") { styleClass = Seq("form-card-title") },
       formGrid
     )
 
   private val buttonRow = new HBox:
     spacing = 15
-    children = Seq(addButton, deleteButton, archiveButton, statusLabel)
+    children = Seq(addButton, deleteButton, archiveButton, exportCsvBtn, statusLabel)
     alignment = Pos.CenterLeft
 
   children = Seq(

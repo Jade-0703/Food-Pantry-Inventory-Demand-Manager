@@ -68,8 +68,8 @@ class DistributionView(
   allocationsTable.items = proposedAllocations
 
   // Info and Stats Labels
-  private val statsLabel = new Label("No active plan. Click 'Generate Plan' to calculate daily distribution layout.") {
-    styleClass = Seq("status-label", "status-info")
+  private val statsLabel = new Label("ℹ️ No active plan. Click 'Generate Plan' to calculate daily distribution layout.") {
+    styleClass = Seq("banner-info-text")
   }
   private val statusLabel = new Label { styleClass = Seq("status-label") }
 
@@ -151,24 +151,27 @@ class DistributionView(
 
   private def performDispatch(): Unit =
     if proposedInventory.value.nonEmpty && proposedRequests.value.nonEmpty then
-      // Remove items from inventory if quantity drops to 0 or is very small
-      val filteredInventory = proposedInventory.value.filter(_.quantity > 0.0001)
-      
-      // Dispatch changes back to Main App logic
-      onDispatch(filteredInventory, proposedRequests.value)
-      
-      // Clear local state
-      proposedAllocations.clear()
-      proposedInventory.value = Nil
-      proposedRequests.value = Nil
-      
-      statsLabel.styleClass = Seq("status-label", "status-info")
-      statsLabel.text = "No active plan. Click 'Generate Plan' to calculate daily distribution layout."
-      UIUtils.applyStatus(statusLabel, "success", "Success: Daily plan dispatched! Inventory and request log updated and saved.")
-      dispatchButton.disable = true
-      dispatchButton.opacity = 0.5
-      exportButton.disable = true
-      exportButton.opacity = 0.5
+      val count = proposedAllocations.size
+      if UIUtils.showConfirmation("Confirm Plan Dispatch", "Dispatch Distribution Plan", s"Are you sure you want to confirm and dispatch allocations for $count food items to families?") then
+        // Remove items from inventory if quantity drops to 0 or is very small
+        val filteredInventory = proposedInventory.value.filter(_.quantity > 0.0001)
+        
+        // Dispatch changes back to Main App logic
+        onDispatch(filteredInventory, proposedRequests.value)
+        
+        // Clear local state
+        proposedAllocations.clear()
+        proposedInventory.value = Nil
+        proposedRequests.value = Nil
+        
+        statsLabel.styleClass = Seq("banner-info-text")
+        statsLabel.text = "ℹ️ No active plan. Click 'Generate Plan' to calculate daily distribution layout."
+        UIUtils.applyStatus(statusLabel, "success", "Success: Daily plan dispatched! Inventory and request log updated and saved.")
+        dispatchButton.disable = true
+        dispatchButton.opacity = 0.5
+        exportButton.disable = true
+        exportButton.opacity = 0.5
+        UIUtils.showToast("Daily distribution plan dispatched to families", "success")
 
   private def performExport(): Unit =
     if proposedAllocations.nonEmpty then
@@ -199,10 +202,10 @@ class DistributionView(
         content.endText()
         
         // Draw Table Header
-        var y = 680
+        val headerY = 680f
         content.beginText()
         content.setFont(PDType1Font.HELVETICA_BOLD, 10)
-        content.newLineAtOffset(50, y.toFloat)
+        content.newLineAtOffset(50, headerY)
         content.showText("Allocation ID")
         content.newLineAtOffset(100, 0)
         content.showText("Family Name")
@@ -214,18 +217,17 @@ class DistributionView(
         
         // Divider line
         content.setLineWidth(1.0f)
-        content.moveTo(50, (y - 5).toFloat)
-        content.lineTo(550, (y - 5).toFloat)
+        content.moveTo(50, headerY - 5f)
+        content.lineTo(550, headerY - 5f)
         content.stroke()
-        
-        y -= 25
         
         // Draw Rows
         content.setFont(PDType1Font.HELVETICA, 9)
-        proposedAllocations.foreach { alloc =>
-          if y > 50 then
+        proposedAllocations.zipWithIndex.foreach { (alloc, idx) =>
+          val rowY = headerY - 25f - (idx * 20f)
+          if rowY > 50f then
             content.beginText()
-            content.newLineAtOffset(50, y.toFloat)
+            content.newLineAtOffset(50, rowY)
             content.showText(alloc.id)
             content.newLineAtOffset(100, 0)
             content.showText(alloc.familyName)
@@ -234,7 +236,6 @@ class DistributionView(
             content.newLineAtOffset(150, 0)
             content.showText(s"${alloc.allocatedQuantity} ${alloc.unit}")
             content.endText()
-            y -= 20
         }
         
         content.close()
@@ -249,8 +250,8 @@ class DistributionView(
 
   private val statsPanel = new VBox:
     spacing = 5
-    padding = Insets(10)
-    styleClass = Seq("form-card")
+    padding = Insets(12, 18, 12, 18)
+    styleClass = Seq("plan-info-banner")
     children = Seq(statsLabel)
 
   private val buttonsBox = new HBox:

@@ -115,6 +115,16 @@
     -fx-font-size: 13px;
     -fx-prompt-text-fill: #9ca3af;
 }
+.text-area {
+    -fx-padding: 0px;
+}
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 12px;
+}
+.text-area:focused .content {
+    -fx-background-color: transparent;
+}
 .text-field:focused, .date-picker:focused, .combo-box:focused, .text-area:focused {
     -fx-border-color: #1e3a8a;
     -fx-background-color: #ffffff;
@@ -286,15 +296,29 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
-    -fx-border-color: #111827;
-    -fx-border-width: 0 0 0 4;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.01), 10, 0, 0, 4);
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);
 }
 .form-card-title {
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #0f172a;
     -fx-font-family: "Inter";
     -fx-font-weight: bold;
     -fx-font-size: 15px;
+}
+.form-field-label {
+    -fx-text-fill: #475569;
+    -fx-font-family: "Inter";
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.plan-info-banner {
+    -fx-background-color: #f0f9ff;
+    -fx-background-radius: 10px;
+    -fx-border-color: #bae6fd;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(2,132,199,0.05), 8, 0, 0, 3);
 }
 
 /* ── 12. Tables ───────────────────────────────────────────────────────────── */
@@ -499,6 +523,7 @@
 }
 .feature-tile-icon {
     -fx-font-size: 22px;
+    -fx-border-width: 0px;
 }
 .feature-tile-title {
     -fx-text-fill: #0f172a;
@@ -557,16 +582,40 @@
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
-.live-status-card {
-    -fx-background-color: #ffffff;
+.card-color-feedback {
+    -fx-background-color: #f8fafc;
     -fx-background-radius: 14px;
-    -fx-border-color: #0284c7 #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-color: #2563eb #e2e8f0 #e2e8f0 #e2e8f0;
     -fx-border-radius: 14px;
     -fx-border-width: 4px 1px 1px 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.06), 10, 0, 0, 4);
+}
+.card-color-inventory {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 14px;
+    -fx-border-color: #2563eb #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-radius: 14px;
+    -fx-border-width: 4px 1px 1px 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.05), 10, 0, 0, 4);
+}
+.card-color-demand {
+    -fx-background-color: #fffbeb;
+    -fx-background-radius: 14px;
+    -fx-border-color: #d97706 #fef3c7 #fef3c7 #fef3c7;
+    -fx-border-radius: 14px;
+    -fx-border-width: 4px 1px 1px 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(217,119,6,0.05), 10, 0, 0, 4);
+}
+.live-status-card {
+    -fx-background-color: #f0fdf4;
+    -fx-background-radius: 14px;
+    -fx-border-color: #059669 #bbf7d0 #bbf7d0 #bbf7d0;
+    -fx-border-radius: 14px;
+    -fx-border-width: 4px 1px 1px 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(5,150,105,0.06), 10, 0, 0, 4);
 }
 .live-status-title {
-    -fx-text-fill: #1e3a8a;
+    -fx-text-fill: #065f46;
     -fx-font-family: "Inter";
     -fx-font-weight: bold;
     -fx-font-size: 15px;

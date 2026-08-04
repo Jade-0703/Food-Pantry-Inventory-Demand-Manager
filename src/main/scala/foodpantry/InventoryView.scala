@@ -170,17 +170,17 @@ class InventoryView(
   inventoryTable.items = scalafx.collections.transformation.SortedBuffer(sortedInventory)
 
   // Form Controls
-  private val nameField = new TextField { promptText = "Item Name"; prefWidth = 150 }
-  private val categoryCombo = new ComboBox[FoodCategory](FoodCategory.values.toIndexedSeq) { promptText = "Select Category"; prefWidth = 140 }
-  private val qtyField = new TextField { promptText = "Qty (e.g. 5.0)"; prefWidth = 100 }
-  private val unitField = new TextField { promptText = "Unit (e.g. kg)"; prefWidth = 80 }
+  private val nameField = new TextField { promptText = "Item Name"; maxWidth = Double.MaxValue }
+  private val categoryCombo = new ComboBox[FoodCategory](FoodCategory.values.toIndexedSeq) { promptText = "Select Category"; maxWidth = Double.MaxValue }
+  private val qtyField = new TextField { promptText = "Qty (e.g. 5.0)"; maxWidth = Double.MaxValue }
+  private val unitField = new TextField { promptText = "Unit (e.g. kg)"; maxWidth = Double.MaxValue }
   
-  private val itemTypeCombo = new ComboBox[String](Seq("Perishable", "Non-Perishable")) { value = "Perishable"; prefWidth = 140 }
-  private val expiryDatePicker = new DatePicker { promptText = "Expiry Date"; prefWidth = 140; value = LocalDate.now().plusDays(7) }
-  private val shelfLifeField = new TextField { promptText = "Shelf Life (months)"; prefWidth = 140; visible = false }
+  private val itemTypeCombo = new ComboBox[String](Seq("Perishable", "Non-Perishable")) { value = "Perishable"; maxWidth = Double.MaxValue }
+  private val expiryDatePicker = new DatePicker { promptText = "Expiry Date"; maxWidth = Double.MaxValue; value = LocalDate.now().plusDays(7) }
+  private val shelfLifeField = new TextField { promptText = "Shelf Life (months)"; maxWidth = Double.MaxValue; visible = false }
 
-  private val expiryLabel = new Label("Expiry Date:")
-  private val shelfLifeLabel = new Label("Shelf Life (Mo.):") { visible = false }
+  private val expiryLabel = new Label("Expiry Date:") { styleClass = Seq("form-field-label") }
+  private val shelfLifeLabel = new Label("Shelf Life (Mo.):") { styleClass = Seq("form-field-label"); visible = false }
 
   private val statusLabel = new Label { styleClass = Seq("status-label", "status-error") }
 
@@ -207,6 +207,26 @@ class InventoryView(
   private val deleteButton = new Button("Delete Selected"):
     styleClass = Seq("button", "button-danger")
     onAction = handle { performDeleteSelected() }
+
+  private val exportCsvBtn = new Button("📄 Export CSV"):
+    styleClass = Seq("button", "button-secondary")
+    onAction = handle { performExportCsv() }
+
+  private def performExportCsv(): Unit =
+    val file = new java.io.File("inventory_backup.csv")
+    Try {
+      val writer = new java.io.PrintWriter(file)
+      try
+        writer.println("id,name,category,quantity,unit,isPerishable,expiryDate,shelfLifeMonths")
+        inventory.foreach { item =>
+          writer.println(FoodItemSerializer.serialize(item))
+        }
+      finally
+        writer.close()
+      UIUtils.applyStatus(statusLabel, "success", s"✓ Inventory backup exported to ${file.getAbsolutePath}!")
+    }.recover { case e =>
+      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting CSV: ${e.getMessage}")
+    }
 
   private def performAddItem(): Unit =
     statusLabel.text = ""
@@ -246,6 +266,7 @@ class InventoryView(
               onSave()
               clearForm()
               UIUtils.applyStatus(statusLabel, "success", s"Success: Added perishable item '$name'.")
+              UIUtils.showToast(s"Added perishable item '$name' ($quantity $unit)", "success")
           else
             val shelfLifeStr = shelfLifeField.text.value.trim
             // S1-12 & S1-18 Invalid-input handling 3: Parse integer shelf life safely
@@ -261,13 +282,16 @@ class InventoryView(
                 onSave()
                 clearForm()
                 UIUtils.applyStatus(statusLabel, "success", s"Success: Added non-perishable item '$name'.")
+                UIUtils.showToast(s"Added non-perishable item '$name' ($quantity $unit)", "success")
 
   private def performDeleteSelected(): Unit =
-    val selectedIndex = inventoryTable.selectionModel.value.getSelectedIndex
-    if selectedIndex >= 0 then
-      inventory.remove(selectedIndex)
-      onSave()
-      UIUtils.applyStatus(statusLabel, "success", "Success: Selected item deleted.")
+    val selectedItem = inventoryTable.selectionModel.value.getSelectedItem
+    if selectedItem != null then
+      if UIUtils.showConfirmation("Confirm Deletion", "Delete Inventory Item", s"Are you sure you want to delete '${selectedItem.name}' from inventory?") then
+        inventory.remove(selectedItem)
+        onSave()
+        UIUtils.applyStatus(statusLabel, "success", s"Success: Deleted item '${selectedItem.name}'.")
+        UIUtils.showToast(s"Deleted item '${selectedItem.name}' from stock", "success")
     else
       UIUtils.applyStatus(statusLabel, "error", "Warning: Select an item in the table to delete.")
 
@@ -281,22 +305,28 @@ class InventoryView(
 
   // Form Layout
   private val formGrid = new GridPane:
-    hgap = 10
-    vgap = 10
+    hgap = 14
+    vgap = 12
+    columnConstraints = Seq(
+      new ColumnConstraints { minWidth = 70 },
+      new ColumnConstraints { hgrow = Priority.Always },
+      new ColumnConstraints { minWidth = 90 },
+      new ColumnConstraints { hgrow = Priority.Always }
+    )
 
-    add(new Label("Name:"), 0, 0)
+    add(new Label("Name:") { styleClass = Seq("form-field-label") }, 0, 0)
     add(nameField, 1, 0)
 
-    add(new Label("Category:"), 2, 0)
+    add(new Label("Category:") { styleClass = Seq("form-field-label") }, 2, 0)
     add(categoryCombo, 3, 0)
 
-    add(new Label("Quantity:"), 0, 1)
+    add(new Label("Quantity:") { styleClass = Seq("form-field-label") }, 0, 1)
     add(qtyField, 1, 1)
 
-    add(new Label("Unit:"), 2, 1)
+    add(new Label("Unit:") { styleClass = Seq("form-field-label") }, 2, 1)
     add(unitField, 3, 1)
 
-    add(new Label("Type:"), 0, 2)
+    add(new Label("Type:") { styleClass = Seq("form-field-label") }, 0, 2)
     add(itemTypeCombo, 1, 2)
 
     add(expiryLabel, 2, 2)
@@ -306,18 +336,18 @@ class InventoryView(
     add(shelfLifeField, 3, 2)
 
   private val formContainer = new VBox:
-    spacing = 10
-    padding = Insets(15)
-    styleClass = Seq("form-card")
+    spacing = 12
+    padding = Insets(18)
+    styleClass = Seq("form-card", "card-color-inventory")
     children = Seq(
-      new Label("Add Inventory Item") { styleClass = Seq("form-card-title"); minWidth = 500 },
+      new Label("➕ Add New Inventory Item") { styleClass = Seq("form-card-title") },
       formGrid
     )
 
   // Layout assembly
   private val buttonRow = new HBox:
     spacing = 15
-    children = Seq(addButton, deleteButton, statusLabel)
+    children = Seq(addButton, deleteButton, exportCsvBtn, statusLabel)
     alignment = Pos.CenterLeft
 
   children = Seq(

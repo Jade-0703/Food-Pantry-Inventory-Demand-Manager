@@ -19,6 +19,11 @@ This document registers all external libraries, code fragments, assets, or resou
 - **License**: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
 - **Role**: Testing framework used for unit testing models and matching algorithms.
 
+## 4. Apache PDFBox Library
+- **Resource URL**: https://pdfbox.apache.org/
+- **License**: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+- **Role**: Document generation engine used for creating and exporting distribution PDF reports.
+
 ---
 
 ### Non-Trivial Files Verification

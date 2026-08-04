@@ -68,70 +68,81 @@ object MainApp extends JFXApp3:
       
       scene = new Scene:
         stylesheets = Seq(getClass.getResource("/style.css").toExternalForm)
-        root = new BorderPane:
-          val mainBorderPane: BorderPane = this
-          // Left Sidebar Navigation
-          left = new VBox:
+        root = new StackPane:
+          val toastBox = new VBox:
             spacing = 8
-            styleClass = Seq("sidebar")
-            
-            val appTitle: Label = new Label("Food Pantry"):
-              styleClass = Seq("sidebar-app-title")
-            val appSubtitle: Label = new Label("SDG 1 · SDG 12 · Food Bank Ops"):
-              styleClass = Seq("sidebar-app-subtitle")
-            val navSectionLabel: Label = new Label("NAVIGATION"):
-              styleClass = Seq("sidebar-section-label")
-            
-            @annotation.nowarn("cat=deprecation")
-            def createNavButton(text: String, view: scalafx.scene.Node): Button = 
-              new Button(text):
-                styleClass = Seq("sidebar-btn")
-                onAction = handle {
-                  activeView.value = view
+            alignment = scalafx.geometry.Pos.TopRight
+            padding = scalafx.geometry.Insets(20, 25, 0, 0)
+            pickOnBounds = false
+
+          UIUtils.setToastContainer(toastBox)
+
+          val mainBorderPane = new BorderPane:
+            val borderPaneRef: BorderPane = this
+            // Left Sidebar Navigation
+            left = new VBox:
+              spacing = 8
+              styleClass = Seq("sidebar")
+              
+              val appTitle: Label = new Label("Food Pantry"):
+                styleClass = Seq("sidebar-app-title")
+              val appSubtitle: Label = new Label("SDG 1 · SDG 12 · Food Bank Ops"):
+                styleClass = Seq("sidebar-app-subtitle")
+              val navSectionLabel: Label = new Label("NAVIGATION"):
+                styleClass = Seq("sidebar-section-label")
+              
+              @annotation.nowarn("cat=deprecation")
+              def createNavButton(text: String, view: scalafx.scene.Node): Button = 
+                new Button(text):
+                  styleClass = Seq("sidebar-btn")
+                  onAction = handle {
+                    activeView.value = view
+                  }
+
+              val btnAbout = createNavButton("ℹ️ About", aboutView)
+              val btnDash = createNavButton("📊 Dashboard", dashboardView)
+              val btnInv = createNavButton("📦 Inventory Log", inventoryView)
+              val btnReq = createNavButton("👪 Family Requests", demandView)
+              val btnDist = createNavButton("🚛 Distribution Plan", distributionView)
+
+              // Dynamic background highlight for selected nav button and center view swap
+              activeView.onChange { (_, _, newView) =>
+                borderPaneRef.center = new ScrollPane {
+                  content = newView
+                  fitToWidth = true
+                  hbarPolicy = ScrollPane.ScrollBarPolicy.Never
+                  styleClass = Seq("scroll-pane")
+                  style = "-fx-background-color: #fbf9f4;"
                 }
-
-            val btnAbout = createNavButton("ℹ️ About", aboutView)
-            val btnDash = createNavButton("📊 Dashboard", dashboardView)
-            val btnInv = createNavButton("📦 Inventory Log", inventoryView)
-            val btnReq = createNavButton("👪 Family Requests", demandView)
-            val btnDist = createNavButton("🚛 Distribution Plan", distributionView)
-
-            // Dynamic background highlight for selected nav button and center view swap
-            activeView.onChange { (_, _, newView) =>
-              mainBorderPane.center = new ScrollPane {
-                content = newView
-                fitToWidth = true
-                hbarPolicy = ScrollPane.ScrollBarPolicy.Never
-                styleClass = Seq("scroll-pane")
-                style = "-fx-background-color: #fbf9f4;"
+                Seq(
+                  (btnAbout, aboutView),
+                  (btnDash, dashboardView),
+                  (btnInv, inventoryView),
+                  (btnReq, demandView),
+                  (btnDist, distributionView)
+                ).foreach { case (btn, viewInstance) =>
+                  if newView == viewInstance then
+                    btn.styleClass = Seq("sidebar-btn-active")
+                  else
+                    btn.styleClass = Seq("sidebar-btn")
+                }
               }
-              Seq(
-                (btnAbout, aboutView),
-                (btnDash, dashboardView),
-                (btnInv, inventoryView),
-                (btnReq, demandView),
-                (btnDist, distributionView)
-              ).foreach { case (btn, viewInstance) =>
-                if newView == viewInstance then
-                  btn.styleClass = Seq("sidebar-btn-active")
-                else
-                  btn.styleClass = Seq("sidebar-btn")
-              }
+
+              // Set About page active by default
+              btnAbout.styleClass = Seq("sidebar-btn-active")
+
+              children = Seq(appTitle, appSubtitle, navSectionLabel, btnAbout, btnDash, btnInv, btnReq, btnDist)
+            
+            // Initial Content Pane
+            center = new ScrollPane {
+              content = aboutView
+              fitToWidth = true
+              hbarPolicy = ScrollPane.ScrollBarPolicy.Never
+              styleClass = Seq("scroll-pane")
+              style = "-fx-background-color: #fbf9f4;"
             }
 
-            // Set About page active by default
-            btnAbout.styleClass = Seq("sidebar-btn-active")
-
-            children = Seq(appTitle, appSubtitle, navSectionLabel, btnAbout, btnDash, btnInv, btnReq, btnDist)
-          
-          // Initial Content Pane
-          center = new ScrollPane {
-            content = aboutView
-            fitToWidth = true
-            hbarPolicy = ScrollPane.ScrollBarPolicy.Never
-            styleClass = Seq("scroll-pane")
-            style = "-fx-background-color: #fbf9f4;"
-          }
+          children = Seq(mainBorderPane, toastBox)
 
   private def saveInventory(): Unit =
     inventoryRepo.saveAll(inventoryItems.toList)
@@ -180,9 +191,57 @@ object MainApp extends JFXApp3:
       }
 
 object UIUtils:
-  import scalafx.scene.control.{Label, TableView}
+  import scalafx.scene.control.{Label, TableView, Alert, ButtonType}
+  import scalafx.scene.control.Alert.AlertType
   import scalafx.scene.layout.VBox
   import scalafx.scene.shape.Rectangle
+  import scalafx.animation.{FadeTransition, PauseTransition}
+  import scalafx.util.Duration
+  import scalafx.Includes._
+
+  private var toastBoxOpt: Option[VBox] = None
+
+  def setToastContainer(box: VBox): Unit =
+    toastBoxOpt = Some(box)
+
+  /** Displays a top-right floating toast notification */
+  def showToast(message: String, kind: String = "success"): Unit =
+    toastBoxOpt.foreach { box =>
+      val (bg, icon) = kind match
+        case "error" => ("#b91c1c", "✗")
+        case "info"  => ("#0284c7", "ℹ")
+        case _       => ("#15803d", "✓")
+
+      val toastLabel = new Label(s"$icon $message") {
+        style = s"-fx-background-color: $bg; -fx-text-fill: #ffffff; -fx-padding: 10px 18px; -fx-background-radius: 8px; -fx-font-weight: bold; -fx-font-size: 13px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 10, 0, 0, 4);"
+      }
+
+      box.children.add(toastLabel)
+
+      val fade = new FadeTransition(Duration(500), toastLabel) {
+        fromValue = 1.0
+        toValue = 0.0
+        onFinished = _ => { box.children.remove(toastLabel) }
+      }
+      val pause = new PauseTransition(Duration(2200)) {
+        onFinished = _ => { fade.play() }
+      }
+      pause.play()
+    }
+
+  /** Displays a popup notification alert */
+  def showNotification(titleText: String, headerTextMsg: String, contentTextMsg: String): Unit =
+    showToast(s"$headerTextMsg: $contentTextMsg", "info")
+
+  /** Displays a popup confirmation alert returning true if confirmed */
+  def showConfirmation(titleText: String, headerTextMsg: String, contentTextMsg: String): Boolean =
+    val alert = new Alert(AlertType.Confirmation) {
+      title = titleText
+      headerText = headerTextMsg
+      contentText = contentTextMsg
+    }
+    val res = alert.showAndWait()
+    res.contains(ButtonType.OK)
 
   /** Shared page header used across all four operational views (S1-13 DRY). */
   def createPageHeader(title: String, subtitle: String): VBox =
