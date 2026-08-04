@@ -159,14 +159,19 @@ class AboutView(
     add(new Label("Message:") { styleClass = Seq("form-field-label") }, 0, 1)
     add(contactMessageField, 1, 1)
 
+  private val sendContactBtnBox = new HBox {
+    padding = Insets(10, 0, 0, 0)
+    children = Seq(sendContactBtn)
+  }
+
   private val contactCard = new VBox:
-    spacing = 10
+    spacing = 12
     padding = Insets(18)
     styleClass = Seq("form-card", "card-color-feedback")
     children = Seq(
       new Label("📩 Contact Pantry Coordinator") { styleClass = Seq("form-card-title") },
       contactFormGrid,
-      sendContactBtn,
+      sendContactBtnBox,
       contactStatusLabel
     )
 
