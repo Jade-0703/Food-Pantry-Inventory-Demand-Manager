@@ -100,7 +100,8 @@ class AboutView(
   private val darkAccentCard = new VBox:
     spacing = 12
     padding = Insets(18)
-    maxHeight = Region.USE_PREF_SIZE
+    prefHeight = 310
+    maxHeight = 310
     styleClass = Seq("dark-accent-card")
     children = Seq(
       new Label("Work Smarter, Prevent Waste, Be More Efficient") { styleClass = Seq("dark-accent-title") },
@@ -170,7 +171,8 @@ class AboutView(
   private val contactCard = new VBox:
     spacing = 14
     padding = Insets(18)
-    maxHeight = Region.USE_PREF_SIZE
+    prefHeight = 310
+    maxHeight = 310
     styleClass = Seq("form-card", "card-color-feedback")
     children = Seq(
       new Label("📩 Contact Pantry Coordinator") { styleClass = Seq("form-card-title") },
@@ -188,8 +190,6 @@ class AboutView(
     )
     add(darkAccentCard, 0, 0)
     add(contactCard, 1, 0)
-    javafx.scene.layout.GridPane.setValignment(darkAccentCard.delegate, javafx.geometry.VPos.TOP)
-    javafx.scene.layout.GridPane.setValignment(contactCard.delegate, javafx.geometry.VPos.TOP)
 
   // 6. Contact tiles + footer
   private val section3Row = new HBox:
