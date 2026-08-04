@@ -1088,8 +1088,16 @@
     -fx-effect: dropshadow(three-pass-box, rgba(30,58,138,0.07), 14, 0, 0, 5);
 }
 
+.form-card.card-color-planner {
+    -fx-background-color: linear-gradient(to bottom right, #fffdf8, #f5f3ff);
+    -fx-border-color: #ddd6fe #ddd6fe #ddd6fe #7c3aed;
+    -fx-border-width: 1px 1px 1px 5px;
+    -fx-effect: dropshadow(three-pass-box, rgba(124,58,237,0.07), 14, 0, 0, 5);
+}
+
 .form-card.card-color-inventory:hover,
 .form-card.card-color-demand:hover,
-.form-card.card-color-feedback:hover {
+.form-card.card-color-feedback:hover,
+.form-card.card-color-planner:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(29,42,68,0.12), 18, 0, 0, 7);
 }

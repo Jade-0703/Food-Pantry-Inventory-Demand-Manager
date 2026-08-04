@@ -285,7 +285,7 @@ class DistributionView(
     spacing = 14
     padding = Insets(18)
     maxWidth = Double.MaxValue
-    styleClass = Seq("form-card", "card-color-feedback")
+    styleClass = Seq("form-card", "card-color-planner")
     children = Seq(
       new Label("⚙️ Planner Console") { styleClass = Seq("form-card-title") },
       statsPanel,
