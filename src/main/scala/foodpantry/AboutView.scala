@@ -163,6 +163,15 @@ class AboutView(
       contactStatusLabel
     )
 
+  private val cardsRow = new GridPane:
+    hgap = 18
+    columnConstraints = Seq(
+      new ColumnConstraints { percentWidth = 50.0 },
+      new ColumnConstraints { percentWidth = 50.0 }
+    )
+    add(darkAccentCard, 0, 0)
+    add(contactCard, 1, 0)
+
   // 6. Contact tiles + footer
   private val section3Row = new HBox:
     spacing = 18
@@ -182,7 +191,7 @@ class AboutView(
       }
     )
 
-  children = Seq(titleArea, tickerBar, featuresSection, darkAccentCard, contactCard, section3Row, footerBanner)
+  children = Seq(titleArea, tickerBar, featuresSection, cardsRow, section3Row, footerBanner)
 
   // --- Helpers ---
 
