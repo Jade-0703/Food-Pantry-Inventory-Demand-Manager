@@ -3,11 +3,11 @@ package foodpantry
 import scalafx.scene.layout._
 import scalafx.scene.control._
 import scalafx.collections.ObservableBuffer
+import scalafx.collections.transformation.{FilteredBuffer, SortedBuffer}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import java.time.LocalDate
 import scala.util.Try
-import javafx.collections.transformation.{FilteredList, SortedList}
 
 @annotation.nowarn("cat=deprecation")
 class InventoryView(
@@ -127,14 +127,26 @@ class InventoryView(
     styleClass = Seq("table-wrapper")
     children = Seq(inventoryTable)
 
+  private val tableSection = new VBox:
+    spacing = 10
+    styleClass = Seq("section-card")
+    VBox.setVgrow(tableWrapper, Priority.Always)
+    children = Seq(
+      new Label("Inventory Items") { styleClass = Seq("section-card-title") },
+      tableWrapper
+    )
+
   // Bind repository items to the table
   private val searchField = new TextField {
     promptText = "🔍 Search inventory by name..."
     styleClass = Seq("filter-field")
+    maxWidth = Double.MaxValue
   }
 
   private val categoryFilterCombo = new ComboBox[String](Seq("All Categories") ++ FoodCategory.values.map(_.toString).toSeq) {
     value = "All Categories"
+    prefWidth = 190
+    minWidth = 170
   }
 
   private val addButton = new Button("Add Item"):
@@ -143,38 +155,60 @@ class InventoryView(
 
   private val deleteButton = new Button("Delete Selected"):
     styleClass = Seq("button", "button-danger")
+    minWidth = 132
     onAction = handle { performDeleteSelected() }
 
   private val exportCsvBtn = new Button("📄 Export CSV"):
     styleClass = Seq("button", "button-secondary")
+    minWidth = 120
     onAction = handle { performExportCsv() }
 
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
+    minWidth = 90
     onAction = handle {
       searchField.text = ""
       categoryFilterCombo.value = "All Categories"
     }
 
-  private val filterSpacer = new Region()
-  HBox.setHgrow(filterSpacer, Priority.Always)
+  HBox.setHgrow(searchField, Priority.Always)
 
-  private val filterBar = new HBox {
+  private val filterControlsRow = new HBox {
     spacing = 10
-    styleClass = Seq("filter-bar")
-    children = Seq(searchField, categoryFilterCombo, resetFilterBtn, filterSpacer, deleteButton, exportCsvBtn)
     alignment = scalafx.geometry.Pos.CenterLeft
+    children = Seq(searchField, categoryFilterCombo, resetFilterBtn)
   }
 
-  private val filteredInventory = new FilteredList[FoodItem](inventory.delegate)
-  private val sortedInventory = new SortedList[FoodItem](filteredInventory)
+  private val filterBar = new VBox {
+    spacing = 0
+    styleClass = Seq("filter-bar", "filter-bar-stacked")
+    children = Seq(filterControlsRow)
+  }
 
-  sortedInventory.comparatorProperty().bind(inventoryTable.comparatorProperty)
+  private val tableActionSpacer = new Region()
+  HBox.setHgrow(tableActionSpacer, Priority.Always)
+
+  private val tableActionsBar = new HBox {
+    spacing = 10
+    alignment = scalafx.geometry.Pos.CenterRight
+    styleClass = Seq("table-actions-bar")
+    children = Seq(
+      new Label("Manage selected inventory item") { styleClass = Seq("table-actions-label") },
+      tableActionSpacer,
+      deleteButton,
+      exportCsvBtn
+    )
+  }
+
+  private val filteredInventory = new FilteredBuffer[FoodItem](inventory)
+  private val sortedInventory = new SortedBuffer[FoodItem](filteredInventory)
+
+  sortedInventory.delegate.comparatorProperty().bind(inventoryTable.comparatorProperty)
 
   private def updateFilter(): Unit =
     val query = if searchField.text.value == null then "" else searchField.text.value.toLowerCase.trim
     val cat = categoryFilterCombo.value.value
-    filteredInventory.setPredicate { item =>
+    filteredInventory.predicate = { item =>
       val matchesSearch = query.isEmpty || item.name.toLowerCase.contains(query)
       val matchesCategory = cat == "All Categories" || item.category.toString == cat
       matchesSearch && matchesCategory
@@ -183,7 +217,7 @@ class InventoryView(
   searchField.text.onChange { (_, _, _) => updateFilter() }
   categoryFilterCombo.value.onChange { (_, _, _) => updateFilter() }
 
-  inventoryTable.items = scalafx.collections.transformation.SortedBuffer(sortedInventory)
+  inventoryTable.items = sortedInventory
 
   // Form Controls
   private val nameField = new TextField { promptText = "Item Name"; maxWidth = Double.MaxValue }
@@ -230,8 +264,8 @@ class InventoryView(
       finally
         writer.close()
       UIUtils.applyStatus(statusLabel, "success", s"✓ Inventory backup exported to ${file.getAbsolutePath}!")
-    }.recover { case e =>
-      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting CSV: ${e.getMessage}")
+    }.recover { case ex =>
+      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting CSV: ${ex.getMessage}")
     }
 
   private def performAddItem(): Unit =
@@ -310,30 +344,30 @@ class InventoryView(
     expiryDatePicker.value = LocalDate.now().plusDays(7)
 
   // Form Layout
-  private val formContent = new VBox:
-    spacing = 10
-    children = Seq(
-      new VBox { spacing = 4; children = Seq(new Label("Item Name:") { styleClass = Seq("form-field-label") }, nameField) },
-      new VBox { spacing = 4; children = Seq(new Label("Category:") { styleClass = Seq("form-field-label") }, categoryCombo) },
-      new HBox {
-        spacing = 10
-        hgrow = Priority.Always
-        children = Seq(
-          new VBox { spacing = 4; hgrow = Priority.Always; children = Seq(new Label("Quantity:") { styleClass = Seq("form-field-label") }, qtyField) },
-          new VBox { spacing = 4; hgrow = Priority.Always; children = Seq(new Label("Unit:") { styleClass = Seq("form-field-label") }, unitField) }
-        )
-      },
-      new VBox { spacing = 4; children = Seq(new Label("Type:") { styleClass = Seq("form-field-label") }, itemTypeCombo) },
-      new VBox {
-        spacing = 4
-        children = Seq(
-          expiryLabel,
-          expiryDatePicker,
-          shelfLifeLabel,
-          shelfLifeField
-        )
-      }
+  private val formContent = new GridPane:
+    hgap = 14
+    vgap = 10
+    columnConstraints = Seq(
+      new ColumnConstraints { minWidth = 72 },
+      new ColumnConstraints { percentWidth = 36.0; hgrow = Priority.Always },
+      new ColumnConstraints { minWidth = 92 },
+      new ColumnConstraints { percentWidth = 36.0; hgrow = Priority.Always }
     )
+
+    add(new Label("Item Name:") { styleClass = Seq("form-field-label") }, 0, 0)
+    add(nameField, 1, 0)
+    add(new Label("Category:") { styleClass = Seq("form-field-label") }, 2, 0)
+    add(categoryCombo, 3, 0)
+    add(new Label("Quantity:") { styleClass = Seq("form-field-label") }, 0, 1)
+    add(qtyField, 1, 1)
+    add(new Label("Unit:") { styleClass = Seq("form-field-label") }, 2, 1)
+    add(unitField, 3, 1)
+    add(new Label("Type:") { styleClass = Seq("form-field-label") }, 0, 2)
+    add(itemTypeCombo, 1, 2)
+    add(expiryLabel, 2, 2)
+    add(expiryDatePicker, 3, 2)
+    add(shelfLifeLabel, 2, 2)
+    add(shelfLifeField, 3, 2)
 
   private val formContainer = new VBox:
     spacing = 12
@@ -349,21 +383,12 @@ class InventoryView(
       }
     )
 
-  private val mainContentRow = new GridPane:
-    hgap = 18
-    columnConstraints = Seq(
-      new ColumnConstraints { percentWidth = 65.0; hgrow = Priority.Always },
-      new ColumnConstraints { percentWidth = 35.0 }
-    )
-    add(tableWrapper, 0, 0)
-    add(formContainer, 1, 0)
-    javafx.scene.layout.GridPane.setFillHeight(tableWrapper.delegate, true)
-    javafx.scene.layout.GridPane.setFillHeight(formContainer.delegate, true)
-
   children = Seq(
     headerBlock,
     filterBar,
-    mainContentRow
+    tableSection,
+    tableActionsBar,
+    formContainer
   )
 
   // Setup key listener actions for Form

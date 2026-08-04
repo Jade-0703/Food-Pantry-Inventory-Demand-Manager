@@ -58,8 +58,8 @@ object MainApp extends JFXApp3:
       loadAllData()
     })
 
-    // Navigation state container (About page active by default)
-    val activeView = ObjectProperty[scalafx.scene.Node](aboutView)
+    // Navigation state container (dashboard active by default)
+    val activeView = ObjectProperty[scalafx.scene.Node](dashboardView)
 
     stage = new PrimaryStage:
       title = "Food Pantry Inventory & Demand Manager"
@@ -128,14 +128,14 @@ object MainApp extends JFXApp3:
                 }
               }
 
-              // Set About page active by default
-              btnAbout.styleClass = Seq("sidebar-btn-active")
+              // Set Dashboard active by default
+              btnDash.styleClass = Seq("sidebar-btn-active")
 
               children = Seq(appTitle, appSubtitle, navSectionLabel, btnAbout, btnDash, btnInv, btnReq, btnDist)
             
             // Initial Content Pane
             center = new ScrollPane {
-              content = aboutView
+              content = dashboardView
               fitToWidth = true
               hbarPolicy = ScrollPane.ScrollBarPolicy.Never
               styleClass = Seq("scroll-pane")
@@ -191,6 +191,7 @@ object MainApp extends JFXApp3:
       }
 
 object UIUtils:
+  import scalafx.beans.property.ObjectProperty
   import scalafx.scene.control.{Label, TableView, Alert, ButtonType}
   import scalafx.scene.control.Alert.AlertType
   import scalafx.scene.layout.VBox
@@ -199,14 +200,14 @@ object UIUtils:
   import scalafx.util.Duration
   import scalafx.Includes._
 
-  private var toastBoxOpt: Option[VBox] = None
+  private val toastBoxOpt = ObjectProperty[Option[VBox]](None)
 
   def setToastContainer(box: VBox): Unit =
-    toastBoxOpt = Some(box)
+    toastBoxOpt.value = Some(box)
 
   /** Displays a top-right floating toast notification */
   def showToast(message: String, kind: String = "success"): Unit =
-    toastBoxOpt.foreach { box =>
+    toastBoxOpt.value.foreach { box =>
       val (bg, icon) = kind match
         case "error" => ("#b91c1c", "✗")
         case "info"  => ("#0284c7", "ℹ")
@@ -267,6 +268,7 @@ object UIUtils:
   /** Generic pill-shaped label with background, text colour, and border */
   def createPillLabel(text: String, bg: String, fg: String, borderColor: String): Label =
     new Label(text) {
+      alignment = scalafx.geometry.Pos.Center
       style = s"-fx-background-color: $bg; -fx-text-fill: $fg; -fx-padding: 4px 10px; -fx-background-radius: 12px; -fx-font-weight: bold; -fx-font-size: 11px; -fx-border-color: $borderColor; -fx-border-radius: 12px; -fx-border-width: 1px"
     }
 
@@ -278,12 +280,12 @@ object UIUtils:
     else if statusStr.contains("Expires in") then
       ("#ffedd5", "#c2410c", "#fed7aa")
     else
-      ("#f0fdf4", "#16a34a", "#bbf7d0")
+      ("#f0fdf4", "#16a34a", "#22c55e")
     createPillLabel(statusStr, bg, fg, bc)
 
   def getDietaryLabel(restriction: String): Label =
     val (bg, fg, bc) = restriction match
-      case "Vegetarian" => ("#ecfdf5", "#047857", "#a7f3d0")
+      case "Vegetarian" => ("#ecfdf5", "#047857", "#059669")
       case "Halal"      => ("#fdf2f8", "#be185d", "#fbcfe8")
       case "GlutenFree" => ("#fffbeb", "#b45309", "#fde68a")
       case _            => ("#f1f5f9", "#475569", "#cbd5e1")
@@ -291,7 +293,7 @@ object UIUtils:
 
   def getStatusLabel(status: String): Label =
     val (bg, fg, bc) = status match
-      case "Fulfilled" => ("#dcfce7", "#15803d", "#bbf7d0")
+      case "Fulfilled" => ("#dcfce7", "#15803d", "#16a34a")
       case _           => ("#ffedd5", "#c2410c", "#fed7aa")
     createPillLabel(status, bg, fg, bc)
 
@@ -308,4 +310,3 @@ object UIUtils:
     else
       ("#fef3c7", "#d97706", "#fcd34d")
     createPillLabel(displayStr, bg, fg, bc)
-

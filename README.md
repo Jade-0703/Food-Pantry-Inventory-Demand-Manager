@@ -10,7 +10,7 @@ Pantry coordinators can log donated food items (both perishable with dates, and 
 
 ### Key Features
 1. **Analytics Dashboard & KPI Cards**: Provides immediate insight into total inventory count, pending requests, helped families, and lists perishables expiring in less than 3 days. Includes an interactive `PieChart` visualizer representing stock categories.
-2. **Interactive Inventory Logger**: Add, view, edit, and delete food items. Dynamically switches inputs between perishable and non-perishable variants.
+2. **Interactive Inventory Logger**: Add, view, filter, delete, and export food items. Dynamically switches inputs between perishable and non-perishable variants.
 3. **Interactive Request Logger**: Log and manage recipient family requests, capturing household sizes, specific food preferences, and dietary restrictions.
 4. **Daily Distribution Planner**: Implements the core distribution policy, matching compatible stock to families, logging potential food waste prevented, and executing final inventory write-offs dynamically.
 
@@ -67,4 +67,3 @@ This project utilizes the following external libraries:
 - **OpenJFX (JavaFX)**: GPLv2 with Classpath Exception (https://openjfx.io/)
 - **ScalaTest**: Apache License, Version 2.0 (https://www.scalatest.org/)
 - **Apache PDFBox**: Apache License, Version 2.0 (https://pdfbox.apache.org/)
-

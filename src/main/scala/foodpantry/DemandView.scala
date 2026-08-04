@@ -3,10 +3,10 @@ package foodpantry
 import scalafx.scene.layout._
 import scalafx.scene.control._
 import scalafx.collections.ObservableBuffer
+import scalafx.collections.transformation.{FilteredBuffer, SortedBuffer}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import scala.util.Try
-import javafx.collections.transformation.{FilteredList, SortedList}
 
 @annotation.nowarn("cat=deprecation")
 class DemandView(
@@ -97,18 +97,32 @@ class DemandView(
     styleClass = Seq("table-wrapper")
     children = Seq(requestsTable)
 
+  private val tableSection = new VBox:
+    spacing = 10
+    styleClass = Seq("section-card")
+    VBox.setVgrow(tableWrapper, Priority.Always)
+    children = Seq(
+      new Label("Family Request Records") { styleClass = Seq("section-card-title") },
+      tableWrapper
+    )
+
   // Bind requests buffer
   private val searchField = new TextField {
     promptText = "🔍 Search requests by family name..."
     styleClass = Seq("filter-field")
+    maxWidth = Double.MaxValue
   }
 
-  private val categoryFilterCombo = new ComboBox[String](Seq("All Categories Requested") ++ FoodCategory.values.map(_.toString).toSeq) {
-    value = "All Categories Requested"
+  private val categoryFilterCombo = new ComboBox[String](Seq("All Categories") ++ FoodCategory.values.map(_.toString).toSeq) {
+    value = "All Categories"
+    prefWidth = 190
+    minWidth = 170
   }
 
   private val dietaryFilterCombo = new ComboBox[String](Seq("All Dietary Needs") ++ DietaryRestriction.values.map(_.toString).toSeq) {
     value = "All Dietary Needs"
+    prefWidth = 180
+    minWidth = 160
   }
 
   private val addButton = new Button("Add Request"):
@@ -117,46 +131,70 @@ class DemandView(
 
   private val deleteButton = new Button("Delete Selected"):
     styleClass = Seq("button", "button-danger")
+    minWidth = 138
     onAction = handle { performDeleteSelected() }
 
   private val archiveButton = new Button("Archive Fulfilled"):
     styleClass = Seq("button", "button-secondary")
+    minWidth = 146
     onAction = handle { performArchiveFulfilled() }
 
   private val exportCsvBtn = new Button("📄 Export CSV"):
     styleClass = Seq("button", "button-secondary")
+    minWidth = 120
     onAction = handle { performExportCsv() }
 
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
+    minWidth = 90
     onAction = handle {
       searchField.text = ""
-      categoryFilterCombo.value = "All Categories Requested"
+      categoryFilterCombo.value = "All Categories"
       dietaryFilterCombo.value = "All Dietary Needs"
     }
 
-  private val filterSpacer = new Region()
-  HBox.setHgrow(filterSpacer, Priority.Always)
+  HBox.setHgrow(searchField, Priority.Always)
 
-  private val filterBar = new HBox {
+  private val filterControlsRow = new HBox {
     spacing = 10
-    styleClass = Seq("filter-bar")
-    children = Seq(searchField, categoryFilterCombo, dietaryFilterCombo, resetFilterBtn, filterSpacer, deleteButton, archiveButton, exportCsvBtn)
     alignment = scalafx.geometry.Pos.CenterLeft
+    children = Seq(searchField, categoryFilterCombo, dietaryFilterCombo, resetFilterBtn)
   }
 
-  private val filteredRequests = new FilteredList[FamilyRequest](requests.delegate)
-  private val sortedRequests = new SortedList[FamilyRequest](filteredRequests)
+  private val filterBar = new VBox {
+    spacing = 0
+    styleClass = Seq("filter-bar", "filter-bar-stacked")
+    children = Seq(filterControlsRow)
+  }
 
-  sortedRequests.comparatorProperty().bind(requestsTable.comparatorProperty)
+  private val tableActionSpacer = new Region()
+  HBox.setHgrow(tableActionSpacer, Priority.Always)
+
+  private val tableActionsBar = new HBox {
+    spacing = 10
+    alignment = scalafx.geometry.Pos.CenterRight
+    styleClass = Seq("table-actions-bar")
+    children = Seq(
+      new Label("Manage selected request") { styleClass = Seq("table-actions-label") },
+      tableActionSpacer,
+      deleteButton,
+      archiveButton,
+      exportCsvBtn
+    )
+  }
+
+  private val filteredRequests = new FilteredBuffer[FamilyRequest](requests)
+  private val sortedRequests = new SortedBuffer[FamilyRequest](filteredRequests)
+
+  sortedRequests.delegate.comparatorProperty().bind(requestsTable.comparatorProperty)
 
   private def updateFilter(): Unit =
     val query = if searchField.text.value == null then "" else searchField.text.value.toLowerCase.trim
     val cat = categoryFilterCombo.value.value
     val diet = dietaryFilterCombo.value.value
-    filteredRequests.setPredicate { item =>
+    filteredRequests.predicate = { item =>
       val matchesSearch = query.isEmpty || item.familyName.toLowerCase.contains(query)
-      val matchesCategory = cat == "All Categories Requested" || item.requestedCategory.toString == cat
+      val matchesCategory = cat == "All Categories" || item.requestedCategory.toString == cat
       val matchesDiet = diet == "All Dietary Needs" || item.dietaryRestriction.toString == diet
       matchesSearch && matchesCategory && matchesDiet
     }
@@ -165,7 +203,7 @@ class DemandView(
   categoryFilterCombo.value.onChange { (_, _, _) => updateFilter() }
   dietaryFilterCombo.value.onChange { (_, _, _) => updateFilter() }
 
-  requestsTable.items = scalafx.collections.transformation.SortedBuffer(sortedRequests)
+  requestsTable.items = sortedRequests
 
   // Form Controls
   private val familyNameField = new TextField { promptText = "Family Name"; maxWidth = Double.MaxValue }
@@ -194,8 +232,8 @@ class DemandView(
       finally
         writer.close()
       UIUtils.applyStatus(statusLabel, "success", s"✓ Requests backup exported to ${file.getAbsolutePath}!")
-    }.recover { case e =>
-      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting CSV: ${e.getMessage}")
+    }.recover { case ex =>
+      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting CSV: ${ex.getMessage}")
     }
 
   private def performAddRequest(): Unit =
@@ -259,14 +297,24 @@ class DemandView(
     categoryCombo.value = null
 
   // Form Layout
-  private val formContent = new VBox:
-    spacing = 10
-    children = Seq(
-      new VBox { spacing = 4; children = Seq(new Label("Family Name:") { styleClass = Seq("form-field-label") }, familyNameField) },
-      new VBox { spacing = 4; children = Seq(new Label("Household Size:") { styleClass = Seq("form-field-label") }, sizeField) },
-      new VBox { spacing = 4; children = Seq(new Label("Dietary Restr.:") { styleClass = Seq("form-field-label") }, restrictionCombo) },
-      new VBox { spacing = 4; children = Seq(new Label("Category:") { styleClass = Seq("form-field-label") }, categoryCombo) }
+  private val formContent = new GridPane:
+    hgap = 14
+    vgap = 10
+    columnConstraints = Seq(
+      new ColumnConstraints { minWidth = 100 },
+      new ColumnConstraints { percentWidth = 34.0; hgrow = Priority.Always },
+      new ColumnConstraints { minWidth = 104 },
+      new ColumnConstraints { percentWidth = 34.0; hgrow = Priority.Always }
     )
+
+    add(new Label("Family Name:") { styleClass = Seq("form-field-label") }, 0, 0)
+    add(familyNameField, 1, 0)
+    add(new Label("Household Size:") { styleClass = Seq("form-field-label") }, 2, 0)
+    add(sizeField, 3, 0)
+    add(new Label("Dietary Restr.:") { styleClass = Seq("form-field-label") }, 0, 1)
+    add(restrictionCombo, 1, 1)
+    add(new Label("Category:") { styleClass = Seq("form-field-label") }, 2, 1)
+    add(categoryCombo, 3, 1)
 
   private val formContainer = new VBox:
     spacing = 12
@@ -282,21 +330,12 @@ class DemandView(
       }
     )
 
-  private val mainContentRow = new GridPane:
-    hgap = 18
-    columnConstraints = Seq(
-      new ColumnConstraints { percentWidth = 65.0; hgrow = Priority.Always },
-      new ColumnConstraints { percentWidth = 35.0 }
-    )
-    add(tableWrapper, 0, 0)
-    add(formContainer, 1, 0)
-    javafx.scene.layout.GridPane.setFillHeight(tableWrapper.delegate, true)
-    javafx.scene.layout.GridPane.setFillHeight(formContainer.delegate, true)
-
   children = Seq(
     headerBlock,
     filterBar,
-    mainContentRow
+    tableSection,
+    tableActionsBar,
+    formContainer
   )
 
   // Setup keyboard actions

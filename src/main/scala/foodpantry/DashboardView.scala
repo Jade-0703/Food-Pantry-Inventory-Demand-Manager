@@ -21,13 +21,34 @@ class DashboardView(
     "Real-time KPIs, category PieChart, dietary needs overview, and expiring-stock alerts (SDG 1 & 12)."
   )
 
+  private val summaryTitle = new Label("Pantry operations at a glance") {
+    styleClass = Seq("dashboard-summary-title")
+  }
+  private val summaryText = new Label("Loading today’s inventory and request overview...") {
+    styleClass = Seq("dashboard-summary-text")
+    wrapText = true
+  }
+  private val summaryBadge = new Label("Live overview") {
+    styleClass = Seq("dashboard-summary-badge")
+  }
+  private val summaryTextBox = new VBox:
+    spacing = 4
+    children = Seq(summaryTitle, summaryText)
+  HBox.setHgrow(summaryTextBox, Priority.Always)
+
+  private val summaryBanner = new HBox:
+    spacing = 14
+    alignment = Pos.CenterLeft
+    styleClass = Seq("dashboard-summary-card")
+    children = Seq(summaryTextBox, summaryBadge)
+
   // KPI Panels
   private val totalStockVal = new Label("0") { styleClass = Seq("kpi-card-value", "kpi-blue") }
   private val pendingFamiliesVal = new Label("0") { styleClass = Seq("kpi-card-value", "kpi-orange") }
   private val expiringSoonVal = new Label("0") { styleClass = Seq("kpi-card-value", "kpi-red") }
   private val familiesHelpedVal = new Label("0") { styleClass = Seq("kpi-card-value", "kpi-green") }
 
-  private def createKpiCard(title: String, valueLabel: Label, colorClass: String): VBox =
+  private def createKpiCard(title: String, caption: String, valueLabel: Label, colorClass: String): VBox =
     new VBox:
       spacing = 6
       padding = Insets(16)
@@ -35,7 +56,8 @@ class DashboardView(
       hgrow = Priority.Always
       children = Seq(
         new Label(title) { styleClass = Seq("kpi-card-title") },
-        valueLabel
+        valueLabel,
+        new Label(caption) { styleClass = Seq("kpi-card-caption") }
       )
 
   private val kpiGrid = new HBox:
@@ -43,10 +65,41 @@ class DashboardView(
     alignment = Pos.CenterLeft
     hgrow = Priority.Always
     children = Seq(
-      createKpiCard("Total Stock Units", totalStockVal, "card-blue"),
-      createKpiCard("Pending Requests", pendingFamiliesVal, "card-orange"),
-      createKpiCard("Expiring Soon (<3 Days)", expiringSoonVal, "card-red"),
-      createKpiCard("Families Helped", familiesHelpedVal, "card-green")
+      createKpiCard("Total Stock Units", "Current available pantry quantity", totalStockVal, "card-blue"),
+      createKpiCard("Pending Requests", "Families still waiting for support", pendingFamiliesVal, "card-orange"),
+      createKpiCard("Expiring Soon", "Perishables due within 3 days", expiringSoonVal, "card-red"),
+      createKpiCard("Families Helped", "Requests already fulfilled", familiesHelpedVal, "card-green")
+    )
+
+  private val priorityLowStock = new Label("Low stock: 0") {
+    styleClass = Seq("priority-pill", "priority-pill-orange")
+    wrapText = true
+  }
+  private val priorityPending = new Label("Pending requests: 0") {
+    styleClass = Seq("priority-pill", "priority-pill-blue")
+    wrapText = true
+  }
+  private val priorityExpiry = new Label("Expiring soon: 0") {
+    styleClass = Seq("priority-pill", "priority-pill-red")
+    wrapText = true
+  }
+  private val priorityHint = new Label("Loading priority suggestions...") {
+    styleClass = Seq("priority-hint")
+    wrapText = true
+  }
+
+  private val priorityPillsRow = new HBox:
+    spacing = 10
+    alignment = Pos.CenterLeft
+    children = Seq(priorityLowStock, priorityPending, priorityExpiry)
+
+  private val priorityPanel = new VBox:
+    spacing = 10
+    styleClass = Seq("priority-panel")
+    children = Seq(
+      new Label("Today’s Priorities") { styleClass = Seq("section-card-title") },
+      priorityPillsRow,
+      priorityHint
     )
 
   // Chart and Critical Inventory Table
@@ -146,6 +199,8 @@ class DashboardView(
   HBox.setHgrow(pieChart, Priority.Always)
   HBox.setHgrow(barChart, Priority.Always)
 
+  private val chartSectionTitle = new Label("Analytics Overview") { styleClass = Seq("section-card-title") }
+
   private val chartsHBox = new HBox:
     spacing = 20
     alignment = Pos.TopCenter
@@ -155,6 +210,11 @@ class DashboardView(
       barChart
     )
 
+  private val chartsSection = new VBox:
+    spacing = 10
+    styleClass = Seq("section-card")
+    children = Seq(chartSectionTitle, chartsHBox)
+
   private val alertsBox = new VBox {
     spacing = 8
     style = "-fx-background-color: transparent;"
@@ -162,9 +222,11 @@ class DashboardView(
 
   children = Seq(
     headerBlock,
+    summaryBanner,
     alertsBox,
     kpiGrid,
-    chartsHBox,
+    priorityPanel,
+    chartsSection,
     criticalSection
   )
 
@@ -174,7 +236,8 @@ class DashboardView(
     
     // 1. Update KPI Values
     val totalQty = inventory.map(_.quantity).sum
-    totalStockVal.text = f"$totalQty%.1f"
+    val totalQtyText = f"$totalQty%.1f"
+    totalStockVal.text = totalQtyText
 
     val pendingCount = requests.count(_.status == RequestStatus.Pending)
     pendingFamiliesVal.text = pendingCount.toString
@@ -189,6 +252,21 @@ class DashboardView(
       case _ => false
     }
     expiringSoonVal.text = soonCount.toString
+
+    val lowStockCount = inventory.count(_.quantity < 5.0)
+    priorityLowStock.text = s"Low stock: $lowStockCount"
+    priorityPending.text = s"Pending requests: $pendingCount"
+    priorityExpiry.text = s"Expiring soon: $soonCount"
+    priorityHint.text =
+      if soonCount > 0 then "Start with expiring perishables, then generate a distribution plan for pending families."
+      else if pendingCount > 0 then "Generate a distribution plan to match current stock with pending family requests."
+      else if lowStockCount > 0 then "Review low-stock items and plan restocking before the next distribution cycle."
+      else "No urgent action right now — your pantry records look calm."
+
+    summaryText.text =
+      s"Today you have $totalQtyText stock units, $pendingCount pending family requests, and $soonCount expiring items to watch."
+    summaryBadge.text =
+      if soonCount > 0 || pendingCount > 0 then "Needs attention" else "All clear"
 
     // 2. Update Table (Perishables expiring within 3 days or already expired)
     val criticalItems = inventory.filter {
@@ -251,6 +329,13 @@ class DashboardView(
         }
         alertsBox.children.add(alertLabel)
       }
+    else
+      alertsBox.children.add(
+        new Label("✓ No category shortage warnings right now.") {
+          styleClass = Seq("dashboard-clear-banner")
+          maxWidth = Double.MaxValue
+        }
+      )
 
   // Register listeners for reactive auto-refresh
   inventory.onChange { (_, _) => refreshAll() }

@@ -4,7 +4,7 @@ import scalafx.scene.layout._
 import scalafx.scene.control._
 import scalafx.collections.ObservableBuffer
 import scalafx.beans.property.ObjectProperty
-import scalafx.geometry.Insets
+import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import java.time.LocalDate
 
@@ -71,24 +71,31 @@ class DistributionView(
   // Info and Stats Labels
   private val statsLabel = new Label("ℹ️ No active plan. Click 'Generate Plan' to calculate daily distribution layout.") {
     styleClass = Seq("banner-info-text")
+    wrapText = true
   }
   private val statusLabel = new Label { styleClass = Seq("status-label") }
 
   private val generateButton = new Button("Generate Plan"):
     styleClass = Seq("button", "button-primary")
-    maxWidth = Double.MaxValue
+    prefWidth = 210
+    maxWidth = 210
+    minHeight = 42
     onAction = handle { performGeneratePlan() }
 
   private val dispatchButton = new Button("Confirm & Dispatch Plan"):
     styleClass = Seq("button", "button-success")
-    maxWidth = Double.MaxValue
+    prefWidth = 230
+    maxWidth = 230
+    minHeight = 42
     opacity = 0.5
     disable = true
     onAction = handle { performDispatch() }
 
   private val exportButton = new Button("📄 Export PDF Report"):
     styleClass = Seq("button", "button-secondary")
-    maxWidth = Double.MaxValue
+    prefWidth = 220
+    maxWidth = 220
+    minHeight = 42
     opacity = 0.5
     disable = true
     onAction = handle { performExport() }
@@ -246,46 +253,48 @@ class DistributionView(
         
         UIUtils.applyStatus(statusLabel, "success", s"✓ PDF Report successfully exported to ${file.getAbsolutePath}!")
       catch
-        case e: Exception =>
-          UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting PDF: ${e.getMessage}")
+        case ex: Exception =>
+          UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting PDF: ${ex.getMessage}")
 
   private val statsPanel = new VBox:
-    spacing = 5
+    spacing = 6
     padding = Insets(12, 18, 12, 18)
     styleClass = Seq("plan-info-banner")
     children = Seq(statsLabel)
 
+  private val plannerActionsRow = new HBox:
+    spacing = 10
+    alignment = Pos.CenterLeft
+    styleClass = Seq("planner-actions-row")
+    children = Seq(
+      generateButton,
+      dispatchButton,
+      exportButton
+    )
+
+  private val allocationSection = new VBox:
+    spacing = 10
+    styleClass = Seq("section-card")
+    VBox.setVgrow(tableWrapper, Priority.Always)
+    children = Seq(
+      new Label("Today’s Allocation Plan") { styleClass = Seq("section-card-title") },
+      tableWrapper
+    )
+
   private val plannerSidePanel = new VBox:
-    spacing = 15
+    spacing = 14
     padding = Insets(18)
+    maxWidth = Double.MaxValue
     styleClass = Seq("form-card", "card-color-feedback")
     children = Seq(
       new Label("⚙️ Planner Console") { styleClass = Seq("form-card-title") },
       statsPanel,
-      new VBox {
-        spacing = 10
-        children = Seq(
-          new Label("Actions:") { styleClass = Seq("form-field-label") },
-          generateButton,
-          dispatchButton,
-          exportButton
-        )
-      },
+      plannerActionsRow,
       statusLabel
     )
 
-  private val mainContentRow = new GridPane:
-    hgap = 18
-    columnConstraints = Seq(
-      new ColumnConstraints { percentWidth = 65.0; hgrow = Priority.Always },
-      new ColumnConstraints { percentWidth = 35.0 }
-    )
-    add(tableWrapper, 0, 0)
-    add(plannerSidePanel, 1, 0)
-    javafx.scene.layout.GridPane.setFillHeight(tableWrapper.delegate, true)
-    javafx.scene.layout.GridPane.setFillHeight(plannerSidePanel.delegate, true)
-
   children = Seq(
     headerBlock,
-    mainContentRow
+    allocationSection,
+    plannerSidePanel
   )
