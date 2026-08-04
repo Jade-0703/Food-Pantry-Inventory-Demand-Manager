@@ -181,6 +181,7 @@ class AboutView(
 
   private val cardsRow = new GridPane:
     hgap = 18
+    maxHeight = Region.USE_PREF_SIZE
     columnConstraints = Seq(
       new ColumnConstraints { percentWidth = 50.0 },
       new ColumnConstraints { percentWidth = 50.0 }
@@ -189,8 +190,6 @@ class AboutView(
     add(contactCard, 1, 0)
     javafx.scene.layout.GridPane.setFillHeight(darkAccentCard.delegate, true)
     javafx.scene.layout.GridPane.setFillHeight(contactCard.delegate, true)
-    javafx.scene.layout.GridPane.setVgrow(darkAccentCard.delegate, javafx.scene.layout.Priority.NEVER)
-    javafx.scene.layout.GridPane.setVgrow(contactCard.delegate, javafx.scene.layout.Priority.NEVER)
 
   // 6. Contact tiles + footer
   private val section3Row = new HBox:
