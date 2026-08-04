@@ -247,6 +247,7 @@ object UIUtils:
   def createPageHeader(title: String, subtitle: String): VBox =
     new VBox:
       spacing = 4
+      styleClass = Seq("page-header-box")
       children = Seq(
         new Label(title) { styleClass = Seq("page-title") },
         new Label(subtitle) { styleClass = Seq("page-subtitle") }

@@ -111,6 +111,22 @@ class DemandView(
     value = "All Dietary Needs"
   }
 
+  private val addButton = new Button("Add Request"):
+    styleClass = Seq("button", "button-primary")
+    onAction = handle { performAddRequest() }
+
+  private val deleteButton = new Button("Delete Selected"):
+    styleClass = Seq("button", "button-danger")
+    onAction = handle { performDeleteSelected() }
+
+  private val archiveButton = new Button("Archive Fulfilled"):
+    styleClass = Seq("button", "button-secondary")
+    onAction = handle { performArchiveFulfilled() }
+
+  private val exportCsvBtn = new Button("📄 Export CSV"):
+    styleClass = Seq("button", "button-secondary")
+    onAction = handle { performExportCsv() }
+
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
     onAction = handle {
@@ -119,10 +135,13 @@ class DemandView(
       dietaryFilterCombo.value = "All Dietary Needs"
     }
 
+  private val filterSpacer = new Region()
+  HBox.setHgrow(filterSpacer, Priority.Always)
+
   private val filterBar = new HBox {
     spacing = 10
     styleClass = Seq("filter-bar")
-    children = Seq(searchField, categoryFilterCombo, dietaryFilterCombo, resetFilterBtn)
+    children = Seq(searchField, categoryFilterCombo, dietaryFilterCombo, resetFilterBtn, filterSpacer, deleteButton, archiveButton, exportCsvBtn)
     alignment = scalafx.geometry.Pos.CenterLeft
   }
 
@@ -161,21 +180,7 @@ class DemandView(
     familyNameField.onAction = handle { submitAction() }
     sizeField.onAction = handle { submitAction() }
 
-  private val addButton = new Button("Add Request"):
-    styleClass = Seq("button", "button-primary")
-    onAction = handle { performAddRequest() }
 
-  private val deleteButton = new Button("Delete Selected"):
-    styleClass = Seq("button", "button-danger")
-    onAction = handle { performDeleteSelected() }
-
-  private val archiveButton = new Button("Archive Fulfilled"):
-    styleClass = Seq("button", "button-secondary")
-    onAction = handle { performArchiveFulfilled() }
-
-  private val exportCsvBtn = new Button("📄 Export CSV"):
-    styleClass = Seq("button", "button-secondary")
-    onAction = handle { performExportCsv() }
 
   private def performExportCsv(): Unit =
     val file = new java.io.File("demand_backup.csv")
@@ -282,20 +287,19 @@ class DemandView(
     styleClass = Seq("form-card", "card-color-demand")
     children = Seq(
       new Label("📝 Log Household Demand Request") { styleClass = Seq("form-card-title") },
-      formGrid
+      formGrid,
+      new HBox {
+        spacing = 12
+        alignment = Pos.CenterLeft
+        children = Seq(addButton, statusLabel)
+      }
     )
-
-  private val buttonRow = new HBox:
-    spacing = 15
-    children = Seq(addButton, deleteButton, archiveButton, exportCsvBtn, statusLabel)
-    alignment = Pos.CenterLeft
 
   children = Seq(
     headerBlock,
     filterBar,
     tableWrapper,
-    formContainer,
-    buttonRow
+    formContainer
   )
 
   // Setup keyboard actions

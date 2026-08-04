@@ -137,6 +137,18 @@ class InventoryView(
     value = "All Categories"
   }
 
+  private val addButton = new Button("Add Item"):
+    styleClass = Seq("button", "button-primary")
+    onAction = handle { performAddItem() }
+
+  private val deleteButton = new Button("Delete Selected"):
+    styleClass = Seq("button", "button-danger")
+    onAction = handle { performDeleteSelected() }
+
+  private val exportCsvBtn = new Button("📄 Export CSV"):
+    styleClass = Seq("button", "button-secondary")
+    onAction = handle { performExportCsv() }
+
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
     onAction = handle {
@@ -144,10 +156,13 @@ class InventoryView(
       categoryFilterCombo.value = "All Categories"
     }
 
+  private val filterSpacer = new Region()
+  HBox.setHgrow(filterSpacer, Priority.Always)
+
   private val filterBar = new HBox {
     spacing = 10
     styleClass = Seq("filter-bar")
-    children = Seq(searchField, categoryFilterCombo, resetFilterBtn)
+    children = Seq(searchField, categoryFilterCombo, resetFilterBtn, filterSpacer, deleteButton, exportCsvBtn)
     alignment = scalafx.geometry.Pos.CenterLeft
   }
 
@@ -201,17 +216,7 @@ class InventoryView(
     unitField.onAction = handle { submitAction() }
     shelfLifeField.onAction = handle { submitAction() }
 
-  private val addButton = new Button("Add Item"):
-    styleClass = Seq("button", "button-primary")
-    onAction = handle { performAddItem() }
 
-  private val deleteButton = new Button("Delete Selected"):
-    styleClass = Seq("button", "button-danger")
-    onAction = handle { performDeleteSelected() }
-
-  private val exportCsvBtn = new Button("📄 Export CSV"):
-    styleClass = Seq("button", "button-secondary")
-    onAction = handle { performExportCsv() }
 
   private def performExportCsv(): Unit =
     val file = new java.io.File("inventory_backup.csv")
@@ -342,21 +347,19 @@ class InventoryView(
     styleClass = Seq("form-card", "card-color-inventory")
     children = Seq(
       new Label("➕ Add New Inventory Item") { styleClass = Seq("form-card-title") },
-      formGrid
+      formGrid,
+      new HBox {
+        spacing = 12
+        alignment = Pos.CenterLeft
+        children = Seq(addButton, statusLabel)
+      }
     )
-
-  // Layout assembly
-  private val buttonRow = new HBox:
-    spacing = 15
-    children = Seq(addButton, deleteButton, exportCsvBtn, statusLabel)
-    alignment = Pos.CenterLeft
 
   children = Seq(
     headerBlock,
     filterBar,
     tableWrapper,
-    formContainer,
-    buttonRow
+    formContainer
   )
 
   // Setup key listener actions for Form

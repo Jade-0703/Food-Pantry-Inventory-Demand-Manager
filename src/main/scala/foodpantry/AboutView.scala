@@ -19,9 +19,10 @@ class AboutView(
 
   // 1. Hero header
   private val titleArea = new VBox:
-    spacing = 6
+    spacing = 8
     alignment = Pos.Center
-    padding = Insets(6, 0, 6, 0)
+    padding = Insets(24)
+    styleClass = Seq("about-hero-card")
     children = Seq(
       new Label("Food Pantry Inventory & Demand Manager") { styleClass = Seq("about-hero-title") },
       new Label("Optimizing resource allocation and reducing food waste for local communities (SDG 1 & SDG 12)") {
@@ -99,7 +100,7 @@ class AboutView(
 
   private val darkAccentCard = new VBox:
     spacing = 12
-    padding = Insets(18)
+    padding = Insets(18, 18, 0, 18)
     styleClass = Seq("dark-accent-card")
     children = Seq(
       new Label("Work Smarter, Prevent Waste, Be More Efficient") { styleClass = Seq("dark-accent-title") },
@@ -129,7 +130,7 @@ class AboutView(
   }
   private val contactStatusLabel = new Label { styleClass = Seq("status-label") }
 
-  private val sendContactBtn = new Button("✉️ Send Message"):
+  private val sendContactBtn = new Button("📩 Send Message"):
     styleClass = Seq("button", "button-primary")
     minWidth = Region.USE_PREF_SIZE
     onAction = handle {
@@ -168,7 +169,7 @@ class AboutView(
 
   private val contactCard = new VBox:
     spacing = 14
-    padding = Insets(18)
+    padding = Insets(18, 18, 0, 18)
     styleClass = Seq("form-card", "card-color-feedback")
     children = Seq(
       new Label("📩 Contact Pantry Coordinator") { styleClass = Seq("form-card-title") },
@@ -194,7 +195,7 @@ class AboutView(
     spacing = 18
     children = Seq(
       createInfoTile("📞", "(+603) 7491-8622", "Pantry Coordinator Hotline"),
-      createInfoTile("✉️", "support@foodpantry.org", "Support & Inquiries"),
+      createInfoTile("📧", "support@foodpantry.org", "Support & Inquiries"),
       createInfoTile("📍", "Sunway University Hub", "Computing & Information Systems")
     )
 
