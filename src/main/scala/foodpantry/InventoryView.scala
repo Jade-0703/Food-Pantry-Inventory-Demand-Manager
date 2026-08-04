@@ -259,7 +259,7 @@ class InventoryView(
       try
         writer.println("id,name,category,quantity,unit,isPerishable,expiryDate,shelfLifeMonths")
         inventory.foreach { item =>
-          writer.println(FoodItemSerializer.serialize(item))
+          writer.println(FoodItem.serialize(item))
         }
       finally
         writer.close()

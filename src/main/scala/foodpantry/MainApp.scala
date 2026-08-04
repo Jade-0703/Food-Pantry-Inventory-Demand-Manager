@@ -18,8 +18,9 @@ object MainApp extends JFXApp3:
   private val inventoryFile = "./inventory.csv"
   private val demandFile = "./demand.csv"
 
-  private val inventoryRepo = FileRepository[FoodItem](inventoryFile, FoodItemSerializer)
-  private val demandRepo = FileRepository[FamilyRequest](demandFile, FamilyRequestSerializer)
+  private val inventoryRepo = FileRepository[FoodItem](inventoryFile, FoodItem.serialize, FoodItem.deserialize)
+  private val demandRepo = FileRepository[FamilyRequest](demandFile, FamilyRequest.serialize, FamilyRequest.deserialize)
+
 
   // Reactive state buffers
   private val inventoryItems: ObservableBuffer[FoodItem] = ObservableBuffer[FoodItem]()

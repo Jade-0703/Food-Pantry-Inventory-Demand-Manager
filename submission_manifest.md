@@ -27,7 +27,7 @@
 
 | Metric | Required | Your value |
 |---|---|---|
-| Number of classes / traits in src/main/scala | ≥ 5 | 15 |
+| Number of classes / traits in src/main/scala | ≥ 5 | 16 |
 | Number of `// ai-assisted: #N` tags in src/ | ≥ 3 | 3 |
 | Number of entries in ai/interaction_log.md | ≥ 10 | 15 |
 | Distinct dates in docs/dev_log.md | ≥ 5 | 6 |

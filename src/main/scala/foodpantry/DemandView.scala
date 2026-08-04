@@ -227,7 +227,7 @@ class DemandView(
       try
         writer.println("id,familyName,householdSize,dietaryRestriction,requestedCategory,status")
         requests.foreach { req =>
-          writer.println(FamilyRequestSerializer.serialize(req))
+          writer.println(FamilyRequest.serialize(req))
         }
       finally
         writer.close()

@@ -132,3 +132,53 @@ case class Allocation(
   allocatedQuantity: Double,
   unit: String
 )
+
+// ============================================================================
+// 4. DOMAIN SERIALIZERS (COMPANION OBJECTS)
+// ============================================================================
+
+object FoodItem:
+  import scala.util.Try
+
+  def serialize(value: FoodItem): String = value match
+    case PerishableItem(id, name, category, quantity, unit, expiryDate) =>
+      s"PERISHABLE,$id,$name,${category.toString},$quantity,$unit,${expiryDate.toString}"
+    case NonPerishableItem(id, name, category, quantity, unit, shelfLifeMonths) =>
+      s"NONPERISHABLE,$id,$name,${category.toString},$quantity,$unit,$shelfLifeMonths"
+
+  def deserialize(line: String): Try[FoodItem] = Try {
+    val parts = line.split(",")
+    val itemType = parts(0)
+    val id = parts(1)
+    val name = parts(2)
+    val category = FoodCategory.valueOf(parts(3))
+    val quantity = parts(4).toDouble
+    val unit = parts(5)
+    itemType match
+      case "PERISHABLE" =>
+        val expiryDate = java.time.LocalDate.parse(parts(6))
+        PerishableItem(id, name, category, quantity, unit, expiryDate)
+      case "NONPERISHABLE" =>
+        val shelfLifeMonths = parts(6).toInt
+        NonPerishableItem(id, name, category, quantity, unit, shelfLifeMonths)
+      case _ =>
+        throw new IllegalArgumentException(s"Unknown item type: $itemType")
+  }
+
+object FamilyRequest:
+  import scala.util.Try
+
+  def serialize(value: FamilyRequest): String =
+    s"${value.id},${value.familyName},${value.householdSize},${value.dietaryRestriction.toString},${value.requestedCategory.toString},${value.status.toString}"
+
+  def deserialize(line: String): Try[FamilyRequest] = Try {
+    val parts = line.split(",")
+    val id = parts(0)
+    val familyName = parts(1)
+    val householdSize = parts(2).toInt
+    val dietaryRestriction = DietaryRestriction.valueOf(parts(3))
+    val requestedCategory = FoodCategory.valueOf(parts(4))
+    val status = RequestStatus.valueOf(parts(5))
+    FamilyRequest(id, familyName, householdSize, dietaryRestriction, requestedCategory, status)
+  }
+
