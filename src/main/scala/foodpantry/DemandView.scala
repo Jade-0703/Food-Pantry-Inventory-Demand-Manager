@@ -83,7 +83,10 @@ class DemandView(
       }
 
     columns ++= Seq(idCol, nameCol, sizeCol, restrictionCol, categoryCol, statusCol)
-    columns.foreach(_.setReorderable(false))
+    columns.foreach { col =>
+      col.setReorderable(false)
+      col.setResizable(false)
+    }
     prefHeight <== scalafx.beans.binding.Bindings.createDoubleBinding(
       () => {
         val rowCount = items.value.size()

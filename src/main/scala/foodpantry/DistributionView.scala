@@ -54,7 +54,10 @@ class DistributionView(
       prefWidth = 140
 
     columns ++= Seq(idCol, familyCol, itemCol, categoryCol, qtyCol)
-    columns.foreach(_.setReorderable(false))
+    columns.foreach { col =>
+      col.setReorderable(false)
+      col.setResizable(false)
+    }
     prefHeight = 280
 
   private val tableWrapper = new StackPane:
