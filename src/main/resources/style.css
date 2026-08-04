@@ -1089,10 +1089,10 @@
 }
 
 .form-card.card-color-planner {
-    -fx-background-color: linear-gradient(to bottom right, #fffdf8, #e0e7ff);
-    -fx-border-color: #c7d2fe #e0e7ff #e0e7ff #4f46e5;
+    -fx-background-color: linear-gradient(to bottom right, #fffdf8, #f1f5f9);
+    -fx-border-color: #cbd5e1 #f1f5f9 #f1f5f9 #475569;
     -fx-border-width: 1px 1px 1px 5px;
-    -fx-effect: dropshadow(three-pass-box, rgba(79,70,229,0.07), 14, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, rgba(71,85,105,0.07), 14, 0, 0, 5);
 }
 
 .form-card.card-color-inventory:hover,
@@ -1104,25 +1104,25 @@
 
 /* ── 20. Content specific styles inside card-color-planner ────────────── */
 .form-card.card-color-planner .form-card-title {
-    -fx-text-fill: #4f46e5;
+    -fx-text-fill: #334155;
 }
 
 .form-card.card-color-planner .button-primary {
-    -fx-background-color: #4f46e5;
+    -fx-background-color: #334155;
 }
 .form-card.card-color-planner .button-primary:hover {
-    -fx-background-color: #4338ca;
+    -fx-background-color: #475569;
 }
 .form-card.card-color-planner .button-primary:pressed {
-    -fx-background-color: #3730a3;
+    -fx-background-color: #1e293b;
 }
 
 .form-card.card-color-planner .button-secondary {
     -fx-background-color: #fffdf8;
-    -fx-text-fill: #4f46e5;
-    -fx-border-color: #c7d2fe;
+    -fx-text-fill: #475569;
+    -fx-border-color: #cbd5e1;
 }
 .form-card.card-color-planner .button-secondary:hover {
-    -fx-background-color: #f5f3ff;
-    -fx-border-color: #4f46e5;
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #334155;
 }
