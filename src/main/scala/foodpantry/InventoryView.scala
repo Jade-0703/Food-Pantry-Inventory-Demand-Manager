@@ -113,6 +113,7 @@ class InventoryView(
       }
 
     columns ++= Seq(idCol, nameCol, categoryCol, qtyCol, perishableCol, detailCol)
+    columns.foreach(_.setReorderable(false))
     prefHeight <== scalafx.beans.binding.Bindings.createDoubleBinding(
       () => {
         val rowCount = items.value.size()
