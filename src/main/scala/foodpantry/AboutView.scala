@@ -98,8 +98,8 @@ class AboutView(
     }
 
   private val darkAccentCard = new VBox:
-    spacing = 12
-    padding = Insets(18)
+    spacing = 8
+    padding = Insets(14)
     styleClass = Seq("dark-accent-card")
     children = Seq(
       new Label("Work Smarter, Prevent Waste, Be More Efficient") { styleClass = Seq("dark-accent-title") },
@@ -110,8 +110,8 @@ class AboutView(
       new Label("• Automatic household size scaling for balanced package distribution") { styleClass = Seq("dark-accent-bullet") },
       new Label("• Strict dietary constraint enforcement (Halal, Vegetarian, Gluten-Free)") { styleClass = Seq("dark-accent-bullet") },
       new VBox {
-        spacing = 8
-        padding = Insets(8, 0, 0, 0)
+        spacing = 6
+        padding = Insets(4, 0, 0, 0)
         children = Seq(
           new HBox { spacing = 10; alignment = Pos.CenterLeft; children = Seq(invBadge, reqBadge) },
           seedDataBtn
@@ -171,8 +171,8 @@ class AboutView(
   javafx.scene.layout.VBox.setVgrow(contactSpacer, javafx.scene.layout.Priority.ALWAYS)
 
   private val contactCard = new VBox:
-    spacing = 14
-    padding = Insets(18)
+    spacing = 10
+    padding = Insets(14)
     styleClass = Seq("form-card", "card-color-feedback")
     children = Seq(
       new Label("📩 Contact Pantry Coordinator") { styleClass = Seq("form-card-title") },
