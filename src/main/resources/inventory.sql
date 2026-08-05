@@ -1,0 +1,15 @@
+INSERT INTO inventory VALUES ('inv-1', 'Organic Gala Apples', 'Vegetables', 25.5, 'kg', 1, '2026-07-28', 0);
+INSERT INTO inventory VALUES ('inv-2', 'Basmati White Rice', 'Grains', 120.0, 'kg', 0, '', 36);
+INSERT INTO inventory VALUES ('inv-3', 'Pasteurized Whole Milk', 'Dairy', 18.0, 'litres', 1, '2026-07-24', 0);
+INSERT INTO inventory VALUES ('inv-4', 'Canned Black Beans', 'Canned', 45.0, 'items', 0, '', 24);
+INSERT INTO inventory VALUES ('inv-5', 'Fresh Whole Chickens', 'Meat', 15.0, 'items', 1, '2026-07-23', 0);
+INSERT INTO inventory VALUES ('inv-6', 'Whole Wheat Pasta', 'Grains', 60.0, 'items', 0, '', 24);
+INSERT INTO inventory VALUES ('inv-7', 'Fresh Carrots & Broccolis', 'Vegetables', 12.0, 'kg', 1, '2026-07-26', 0);
+INSERT INTO inventory VALUES ('inv-8', 'Halal Canned Tuna Flakes', 'Canned', 50.0, 'items', 0, '', 18);
+INSERT INTO inventory VALUES ('inv-9', 'Cheddar Cheese Blocks', 'Dairy', 8.5, 'kg', 1, '2026-08-05', 0);
+INSERT INTO inventory VALUES ('inv-10', 'Gluten-Free Oats', 'Grains', 30.0, 'kg', 0, '', 12);
+INSERT INTO inventory VALUES ('inv-11', 'Fresh Eggs (30s tray)', 'Dairy', 20.0, 'items', 1, '2026-07-30', 0);
+INSERT INTO inventory VALUES ('inv-12', 'Multivitamin Cereal', 'Grains', 25.0, 'items', 0, '', 12);
+INSERT INTO inventory VALUES ('inv-13', 'Cooking Palm Oil (5L)', 'Other', 15.0, 'items', 0, '', 24);
+INSERT INTO inventory VALUES ('inv-14', 'Fresh Ground Beef', 'Meat', 10.0, 'kg', 1, '2026-07-22', 0);
+INSERT INTO inventory VALUES ('inv-15', 'Tomato Puree Cans', 'Canned', 40.0, 'items', 0, '', 30);

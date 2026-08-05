@@ -139,10 +139,10 @@ class DemandView(
     minWidth = 146
     onAction = handle { performArchiveFulfilled() }
 
-  private val exportCsvBtn = new Button("📄 Export CSV"):
+  private val exportSqlBtn = new Button("📄 Export SQL Dump"):
     styleClass = Seq("button", "button-secondary")
-    minWidth = 120
-    onAction = handle { performExportCsv() }
+    minWidth = 125
+    onAction = handle { performExportSql() }
 
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
@@ -179,7 +179,7 @@ class DemandView(
       tableActionSpacer,
       deleteButton,
       archiveButton,
-      exportCsvBtn
+      exportSqlBtn
     )
   }
 
@@ -220,20 +220,24 @@ class DemandView(
 
 
 
-  private def performExportCsv(): Unit =
-    val file = new java.io.File("demand_backup.csv")
+  private def performExportSql(): Unit =
+    val file = new java.io.File("demand_dump.sql")
     Try {
       val writer = new java.io.PrintWriter(file)
       try
-        writer.println("id,familyName,householdSize,dietaryRestriction,requestedCategory,status")
         requests.foreach { req =>
-          writer.println(FamilyRequest.serialize(req))
+          val params = FamilyRequest.familyRequestToSqlParams(req)
+          val formattedParams = params.map {
+            case s: String => s"'${s.replace("'", "''")}'"
+            case other    => other.toString
+          }.mkString(", ")
+          writer.println(s"INSERT INTO requests VALUES ($formattedParams);")
         }
       finally
         writer.close()
-      UIUtils.applyStatus(statusLabel, "success", s"✓ Requests backup exported to ${file.getAbsolutePath}!")
+      UIUtils.applyStatus(statusLabel, "success", s"✓ Requests SQL dump exported to ${file.getAbsolutePath}!")
     }.recover { case ex =>
-      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting CSV: ${ex.getMessage}")
+      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting SQL dump: ${ex.getMessage}")
     }
 
   private def performAddRequest(): Unit =

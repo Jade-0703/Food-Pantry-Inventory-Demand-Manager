@@ -1,0 +1,12 @@
+INSERT INTO requests VALUES ('req-1', 'Smith Family', 4, 'None', 'Vegetables', 'Pending');
+INSERT INTO requests VALUES ('req-2', 'Al-Fayed Family', 6, 'Halal', 'Grains', 'Pending');
+INSERT INTO requests VALUES ('req-3', 'Chen Family', 3, 'Vegetarian', 'Dairy', 'Pending');
+INSERT INTO requests VALUES ('req-4', 'Davis Family', 2, 'None', 'Canned', 'Pending');
+INSERT INTO requests VALUES ('req-5', 'Rahman Family', 5, 'Halal', 'Meat', 'Pending');
+INSERT INTO requests VALUES ('req-6', 'Gomez Family', 4, 'GlutenFree', 'Grains', 'Pending');
+INSERT INTO requests VALUES ('req-7', 'Tan Family', 3, 'Vegetarian', 'Vegetables', 'Pending');
+INSERT INTO requests VALUES ('req-8', 'Johnson Family', 7, 'None', 'Grains', 'Pending');
+INSERT INTO requests VALUES ('req-9', 'Patel Family', 5, 'Vegetarian', 'Dairy', 'Pending');
+INSERT INTO requests VALUES ('req-10', 'Ibrahim Family', 4, 'Halal', 'Canned', 'Pending');
+INSERT INTO requests VALUES ('req-11', 'Williams Family', 2, 'GlutenFree', 'Other', 'Pending');
+INSERT INTO requests VALUES ('req-12', 'Lee Family', 3, 'None', 'Meat', 'Pending');

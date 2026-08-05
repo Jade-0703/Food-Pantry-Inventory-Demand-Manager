@@ -7,8 +7,8 @@ This reflection evaluates the object-oriented design patterns, challenges, and a
 ### 1. OOP Applied
 The architecture employs core Object-Oriented Programming principles to create a maintainable and modular code base:
 * **Inheritance & Subtype Polymorphism**: A `sealed trait FoodItem` serves as the abstract parent for `PerishableItem` and `NonPerishableItem`. It extracts common fields (`id`, `name`, `category`, `quantity`, `unit`) to keep the code DRY. Subclasses provide distinct implementations for the abstract `getExpiryStatus` method, allowing the GUI to print customized details depending on whether the item is perishable or shelf-stable.
-* **Parametric Polymorphism**: A generic `Repository[T]` trait and `FileRepository[T]` class manage data persistence. Combined with the generic `Serializer[T]` typeclass, the application decouples data storage logic from specific domain models, allowing the same file access methods to work for both `FoodItem` and `FamilyRequest`.
-* **Encapsulation**: The file storage path is encapsulated as a `private val dataFilePath` inside the repository. This protects internal file references from external components, ensuring all disk accesses go strictly through public repository methods.
+* **Parametric Polymorphism**: A generic `Repository[T]` trait and `SqliteRepository[T]` class manage database persistence. By using generic ResultSet mapping functions, the application decouples database storage logic from specific domain models, allowing the same SQL access methods to work for both `FoodItem` and `FamilyRequest`.
+* **Encapsulation**: The database connection string is encapsulated as a `private val dbUrl` inside the repository. This protects internal database credentials and connection parameters from external components, ensuring all database access goes strictly through public repository methods.
 
 ---
 

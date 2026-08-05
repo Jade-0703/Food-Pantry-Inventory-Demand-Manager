@@ -176,28 +176,39 @@ object MainApp extends JFXApp3:
     val currentInv = inventoryRepo.loadAll().getOrElse(List.empty)
     if currentInv.isEmpty then
       Try {
-        val stream = getClass.getResourceAsStream("/inventory.csv")
+        val stream = getClass.getResourceAsStream("/inventory.sql")
         if stream != null then
           val source = scala.io.Source.fromInputStream(stream)
+          val conn = java.sql.DriverManager.getConnection(s"jdbc:sqlite:$dbFile")
           try
-            val items = source.getLines().filter(_.trim.nonEmpty).flatMap(line => FoodItem.deserialize(line).toOption).toList
-            if items.nonEmpty then inventoryRepo.saveAll(items)
+            val stmt = conn.createStatement()
+            try
+              source.getLines().filter(_.trim.nonEmpty).foreach(stmt.execute)
+            finally
+              stmt.close()
           finally
             source.close()
+            conn.close()
       }
 
     val currentReqs = demandRepo.loadAll().getOrElse(List.empty)
     if currentReqs.isEmpty then
       Try {
-        val stream = getClass.getResourceAsStream("/demand.csv")
+        val stream = getClass.getResourceAsStream("/demand.sql")
         if stream != null then
           val source = scala.io.Source.fromInputStream(stream)
+          val conn = java.sql.DriverManager.getConnection(s"jdbc:sqlite:$dbFile")
           try
-            val reqs = source.getLines().filter(_.trim.nonEmpty).flatMap(line => FamilyRequest.deserialize(line).toOption).toList
-            if reqs.nonEmpty then demandRepo.saveAll(reqs)
+            val stmt = conn.createStatement()
+            try
+              source.getLines().filter(_.trim.nonEmpty).foreach(stmt.execute)
+            finally
+              stmt.close()
           finally
             source.close()
+            conn.close()
       }
+
 
 
 object UIUtils:

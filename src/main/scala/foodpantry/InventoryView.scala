@@ -158,10 +158,10 @@ class InventoryView(
     minWidth = 132
     onAction = handle { performDeleteSelected() }
 
-  private val exportCsvBtn = new Button("📄 Export CSV"):
+  private val exportSqlBtn = new Button("📄 Export SQL Dump"):
     styleClass = Seq("button", "button-secondary")
-    minWidth = 120
-    onAction = handle { performExportCsv() }
+    minWidth = 125
+    onAction = handle { performExportSql() }
 
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
@@ -196,7 +196,7 @@ class InventoryView(
       new Label("Manage selected inventory item") { styleClass = Seq("table-actions-label") },
       tableActionSpacer,
       deleteButton,
-      exportCsvBtn
+      exportSqlBtn
     )
   }
 
@@ -252,20 +252,24 @@ class InventoryView(
 
 
 
-  private def performExportCsv(): Unit =
-    val file = new java.io.File("inventory_backup.csv")
+  private def performExportSql(): Unit =
+    val file = new java.io.File("inventory_dump.sql")
     Try {
       val writer = new java.io.PrintWriter(file)
       try
-        writer.println("id,name,category,quantity,unit,isPerishable,expiryDate,shelfLifeMonths")
         inventory.foreach { item =>
-          writer.println(FoodItem.serialize(item))
+          val params = FoodItem.foodItemToSqlParams(item)
+          val formattedParams = params.map {
+            case s: String => s"'${s.replace("'", "''")}'"
+            case other    => other.toString
+          }.mkString(", ")
+          writer.println(s"INSERT INTO inventory VALUES ($formattedParams);")
         }
       finally
         writer.close()
-      UIUtils.applyStatus(statusLabel, "success", s"✓ Inventory backup exported to ${file.getAbsolutePath}!")
+      UIUtils.applyStatus(statusLabel, "success", s"✓ Inventory SQL dump exported to ${file.getAbsolutePath}!")
     }.recover { case ex =>
-      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting CSV: ${ex.getMessage}")
+      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting SQL dump: ${ex.getMessage}")
     }
 
   private def performAddItem(): Unit =
