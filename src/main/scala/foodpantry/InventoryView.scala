@@ -158,10 +158,10 @@ class InventoryView(
     minWidth = 132
     onAction = handle { performDeleteSelected() }
 
-  private val exportSqlBtn = new Button("📄 Export SQL Dump"):
+  private val exportPdfBtn = new Button("📄 Export PDF Report"):
     styleClass = Seq("button", "button-secondary")
-    minWidth = 125
-    onAction = handle { performExportSql() }
+    minWidth = 135
+    onAction = handle { performExportPdf() }
 
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
@@ -196,7 +196,7 @@ class InventoryView(
       new Label("Manage selected inventory item") { styleClass = Seq("table-actions-label") },
       tableActionSpacer,
       deleteButton,
-      exportSqlBtn
+      exportPdfBtn
     )
   }
 
@@ -250,26 +250,78 @@ class InventoryView(
     unitField.onAction = handle { submitAction() }
     shelfLifeField.onAction = handle { submitAction() }
 
-
-
-  private def performExportSql(): Unit =
-    val file = new java.io.File("inventory_dump.sql")
+  private def performExportPdf(): Unit =
     Try {
-      val writer = new java.io.PrintWriter(file)
+      val doc = new org.apache.pdfbox.pdmodel.PDDocument()
       try
-        inventory.foreach { item =>
-          val params = FoodItem.foodItemToSqlParams(item)
-          val formattedParams = params.map {
-            case s: String => s"'${s.replace("'", "''")}'"
-            case other    => other.toString
-          }.mkString(", ")
-          writer.println(s"INSERT INTO inventory VALUES ($formattedParams);")
+        val page = new org.apache.pdfbox.pdmodel.PDPage(org.apache.pdfbox.pdmodel.common.PDRectangle.A4)
+        doc.addPage(page)
+        
+        val content = new org.apache.pdfbox.pdmodel.PDPageContentStream(doc, page)
+        
+        // Header
+        content.beginText()
+        content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD, 16)
+        content.newLineAtOffset(50, 780)
+        content.showText("Food Pantry — Inventory Stock Report")
+        content.endText()
+        
+        content.beginText()
+        content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA, 10)
+        content.newLineAtOffset(50, 762)
+        content.showText(s"Generated on: ${LocalDate.now().toString} | Total Items: ${inventory.size}")
+        content.endText()
+        
+        // Table Column Headers
+        val headerY = 730f
+        content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD, 10)
+        content.beginText()
+        content.newLineAtOffset(50, headerY)
+        content.showText("ID")
+        content.newLineAtOffset(80, 0)
+        content.showText("Item Name")
+        content.newLineAtOffset(160, 0)
+        content.showText("Category")
+        content.newLineAtOffset(100, 0)
+        content.showText("Quantity")
+        content.newLineAtOffset(100, 0)
+        content.showText("Status")
+        content.endText()
+        
+        // Divider line
+        content.setLineWidth(1f)
+        content.moveTo(50, headerY - 5)
+        content.lineTo(545, headerY - 5)
+        content.stroke()
+        
+        // Draw Rows
+        content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA, 9)
+        inventory.zipWithIndex.foreach { (item, idx) =>
+          val rowY = headerY - 22f - (idx * 18f)
+          if rowY > 50f then
+            content.beginText()
+            content.newLineAtOffset(50, rowY)
+            content.showText(item.id)
+            content.newLineAtOffset(80, 0)
+            val nameText = if item.name.length > 22 then item.name.substring(0, 22) + "..." else item.name
+            content.showText(nameText)
+            content.newLineAtOffset(160, 0)
+            content.showText(item.category.toString)
+            content.newLineAtOffset(100, 0)
+            content.showText(s"${item.quantity} ${item.unit}")
+            content.newLineAtOffset(100, 0)
+            content.showText(item.getExpiryStatus(LocalDate.now()))
+            content.endText()
         }
+        
+        content.close()
+        val file = new java.io.File("inventory_report.pdf")
+        doc.save(file)
+        UIUtils.applyStatus(statusLabel, "success", s"✓ PDF Report successfully exported to ${file.getAbsolutePath}!")
       finally
-        writer.close()
-      UIUtils.applyStatus(statusLabel, "success", s"✓ Inventory SQL dump exported to ${file.getAbsolutePath}!")
+        doc.close()
     }.recover { case ex =>
-      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting SQL dump: ${ex.getMessage}")
+      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting PDF: ${ex.getMessage}")
     }
 
   private def performAddItem(): Unit =

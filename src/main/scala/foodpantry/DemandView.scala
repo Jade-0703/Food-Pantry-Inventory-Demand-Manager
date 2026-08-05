@@ -7,6 +7,7 @@ import scalafx.collections.transformation.{FilteredBuffer, SortedBuffer}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import scala.util.Try
+import java.time.LocalDate
 
 @annotation.nowarn("cat=deprecation")
 class DemandView(
@@ -139,10 +140,10 @@ class DemandView(
     minWidth = 146
     onAction = handle { performArchiveFulfilled() }
 
-  private val exportSqlBtn = new Button("📄 Export SQL Dump"):
+  private val exportPdfBtn = new Button("📄 Export PDF Report"):
     styleClass = Seq("button", "button-secondary")
-    minWidth = 125
-    onAction = handle { performExportSql() }
+    minWidth = 135
+    onAction = handle { performExportPdf() }
 
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
@@ -179,7 +180,7 @@ class DemandView(
       tableActionSpacer,
       deleteButton,
       archiveButton,
-      exportSqlBtn
+      exportPdfBtn
     )
   }
 
@@ -218,26 +219,82 @@ class DemandView(
     familyNameField.onAction = handle { submitAction() }
     sizeField.onAction = handle { submitAction() }
 
-
-
-  private def performExportSql(): Unit =
-    val file = new java.io.File("demand_dump.sql")
+  private def performExportPdf(): Unit =
     Try {
-      val writer = new java.io.PrintWriter(file)
+      val doc = new org.apache.pdfbox.pdmodel.PDDocument()
       try
-        requests.foreach { req =>
-          val params = FamilyRequest.familyRequestToSqlParams(req)
-          val formattedParams = params.map {
-            case s: String => s"'${s.replace("'", "''")}'"
-            case other    => other.toString
-          }.mkString(", ")
-          writer.println(s"INSERT INTO requests VALUES ($formattedParams);")
+        val page = new org.apache.pdfbox.pdmodel.PDPage(org.apache.pdfbox.pdmodel.common.PDRectangle.A4)
+        doc.addPage(page)
+        
+        val content = new org.apache.pdfbox.pdmodel.PDPageContentStream(doc, page)
+        
+        // Header
+        content.beginText()
+        content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD, 16)
+        content.newLineAtOffset(50, 780)
+        content.showText("Food Pantry — Recipient Demand Report")
+        content.endText()
+        
+        content.beginText()
+        content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA, 10)
+        content.newLineAtOffset(50, 762)
+        content.showText(s"Generated on: ${LocalDate.now().toString} | Total Requests: ${requests.size}")
+        content.endText()
+        
+        // Table Column Headers
+        val headerY = 730f
+        content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD, 10)
+        content.beginText()
+        content.newLineAtOffset(50, headerY)
+        content.showText("ID")
+        content.newLineAtOffset(70, 0)
+        content.showText("Family Name")
+        content.newLineAtOffset(150, 0)
+        content.showText("Size")
+        content.newLineAtOffset(50, 0)
+        content.showText("Dietary Need")
+        content.newLineAtOffset(110, 0)
+        content.showText("Category")
+        content.newLineAtOffset(110, 0)
+        content.showText("Status")
+        content.endText()
+        
+        // Divider line
+        content.setLineWidth(1f)
+        content.moveTo(50, headerY - 5)
+        content.lineTo(545, headerY - 5)
+        content.stroke()
+        
+        // Draw Rows
+        content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA, 9)
+        requests.zipWithIndex.foreach { (req, idx) =>
+          val rowY = headerY - 22f - (idx * 18f)
+          if rowY > 50f then
+            content.beginText()
+            content.newLineAtOffset(50, rowY)
+            content.showText(req.id)
+            content.newLineAtOffset(70, 0)
+            val nameText = if req.familyName.length > 20 then req.familyName.substring(0, 20) + "..." else req.familyName
+            content.showText(nameText)
+            content.newLineAtOffset(150, 0)
+            content.showText(s"${req.householdSize} pax")
+            content.newLineAtOffset(50, 0)
+            content.showText(req.dietaryRestriction.toString)
+            content.newLineAtOffset(110, 0)
+            content.showText(req.requestedCategory.toString)
+            content.newLineAtOffset(110, 0)
+            content.showText(req.status.toString)
+            content.endText()
         }
+        
+        content.close()
+        val file = new java.io.File("demand_report.pdf")
+        doc.save(file)
+        UIUtils.applyStatus(statusLabel, "success", s"✓ PDF Report successfully exported to ${file.getAbsolutePath}!")
       finally
-        writer.close()
-      UIUtils.applyStatus(statusLabel, "success", s"✓ Requests SQL dump exported to ${file.getAbsolutePath}!")
+        doc.close()
     }.recover { case ex =>
-      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting SQL dump: ${ex.getMessage}")
+      UIUtils.applyStatus(statusLabel, "error", s"✗ Error exporting PDF: ${ex.getMessage}")
     }
 
   private def performAddRequest(): Unit =
