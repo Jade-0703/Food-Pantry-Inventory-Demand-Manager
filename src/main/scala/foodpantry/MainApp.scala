@@ -8,18 +8,29 @@ import scalafx.scene.control._
 import scalafx.collections.ObservableBuffer
 import scalafx.beans.property.ObjectProperty
 import scalafx.Includes._
-import java.io.File
 import scala.util.Try
 
 // ai-assisted: #6
 // why: Assisted with setting up dynamic scene-swapping layout in MainApp.
 object MainApp extends JFXApp3:
   
-  private val inventoryFile = "./inventory.csv"
-  private val demandFile = "./demand.csv"
+  private val dbFile = "./pantry.db"
 
-  private val inventoryRepo = FileRepository[FoodItem](inventoryFile, FoodItem.serialize, FoodItem.deserialize)
-  private val demandRepo = FileRepository[FamilyRequest](demandFile, FamilyRequest.serialize, FamilyRequest.deserialize)
+  private val inventoryRepo = SqliteRepository[FoodItem](
+    dbFile,
+    "inventory",
+    FoodItem.createTableSql,
+    FoodItem.sqlRowToFoodItem,
+    FoodItem.foodItemToSqlParams
+  )
+
+  private val demandRepo = SqliteRepository[FamilyRequest](
+    dbFile,
+    "requests",
+    FamilyRequest.createTableSql,
+    FamilyRequest.sqlRowToFamilyRequest,
+    FamilyRequest.familyRequestToSqlParams
+  )
 
 
   // Reactive state buffers
@@ -162,34 +173,32 @@ object MainApp extends JFXApp3:
     }
 
   private def seedInitialData(): Unit =
-    // If local inventory.csv doesn't exist, try to seed from resources
-    val localInv = new File(inventoryFile)
-    if !localInv.exists() then
+    val currentInv = inventoryRepo.loadAll().getOrElse(List.empty)
+    if currentInv.isEmpty then
       Try {
         val stream = getClass.getResourceAsStream("/inventory.csv")
         if stream != null then
           val source = scala.io.Source.fromInputStream(stream)
-          val writer = new java.io.PrintWriter(localInv)
           try
-            source.getLines().foreach(writer.println)
+            val items = source.getLines().filter(_.trim.nonEmpty).flatMap(line => FoodItem.deserialize(line).toOption).toList
+            if items.nonEmpty then inventoryRepo.saveAll(items)
           finally
             source.close()
-            writer.close()
       }
 
-    val localDem = new File(demandFile)
-    if !localDem.exists() then
+    val currentReqs = demandRepo.loadAll().getOrElse(List.empty)
+    if currentReqs.isEmpty then
       Try {
         val stream = getClass.getResourceAsStream("/demand.csv")
         if stream != null then
           val source = scala.io.Source.fromInputStream(stream)
-          val writer = new java.io.PrintWriter(localDem)
           try
-            source.getLines().foreach(writer.println)
+            val reqs = source.getLines().filter(_.trim.nonEmpty).flatMap(line => FamilyRequest.deserialize(line).toOption).toList
+            if reqs.nonEmpty then demandRepo.saveAll(reqs)
           finally
             source.close()
-            writer.close()
       }
+
 
 object UIUtils:
   import scalafx.beans.property.ObjectProperty

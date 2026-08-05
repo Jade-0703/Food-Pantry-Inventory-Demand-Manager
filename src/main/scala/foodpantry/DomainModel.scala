@@ -140,6 +140,38 @@ case class Allocation(
 object FoodItem:
   import scala.util.Try
 
+  val createTableSql: String =
+    """CREATE TABLE IF NOT EXISTS inventory (
+      |  id TEXT PRIMARY KEY,
+      |  name TEXT NOT NULL,
+      |  category TEXT NOT NULL,
+      |  quantity REAL NOT NULL,
+      |  unit TEXT NOT NULL,
+      |  isPerishable INTEGER NOT NULL,
+      |  expiryDate TEXT,
+      |  shelfLifeMonths INTEGER
+      |)""".stripMargin
+
+  def sqlRowToFoodItem(rs: java.sql.ResultSet): FoodItem =
+    val id = rs.getString("id")
+    val name = rs.getString("name")
+    val category = FoodCategory.valueOf(rs.getString("category"))
+    val quantity = rs.getDouble("quantity")
+    val unit = rs.getString("unit")
+    val isPerishable = rs.getInt("isPerishable") == 1
+    if isPerishable then
+      val expiryDate = java.time.LocalDate.parse(rs.getString("expiryDate"))
+      PerishableItem(id, name, category, quantity, unit, expiryDate)
+    else
+      val shelfLifeMonths = rs.getInt("shelfLifeMonths")
+      NonPerishableItem(id, name, category, quantity, unit, shelfLifeMonths)
+
+  def foodItemToSqlParams(item: FoodItem): Seq[AnyRef] = item match
+    case PerishableItem(id, name, category, quantity, unit, expiryDate) =>
+      Seq(id, name, category.toString, java.lang.Double.valueOf(quantity), unit, java.lang.Integer.valueOf(1), expiryDate.toString, java.lang.Integer.valueOf(0))
+    case NonPerishableItem(id, name, category, quantity, unit, shelfLifeMonths) =>
+      Seq(id, name, category.toString, java.lang.Double.valueOf(quantity), unit, java.lang.Integer.valueOf(0), "", java.lang.Integer.valueOf(shelfLifeMonths))
+
   def serialize(value: FoodItem): String = value match
     case PerishableItem(id, name, category, quantity, unit, expiryDate) =>
       s"PERISHABLE,$id,$name,${category.toString},$quantity,$unit,${expiryDate.toString}"
@@ -168,6 +200,28 @@ object FoodItem:
 object FamilyRequest:
   import scala.util.Try
 
+  val createTableSql: String =
+    """CREATE TABLE IF NOT EXISTS requests (
+      |  id TEXT PRIMARY KEY,
+      |  familyName TEXT NOT NULL,
+      |  householdSize INTEGER NOT NULL,
+      |  dietaryRestriction TEXT NOT NULL,
+      |  requestedCategory TEXT NOT NULL,
+      |  status TEXT NOT NULL
+      |)""".stripMargin
+
+  def sqlRowToFamilyRequest(rs: java.sql.ResultSet): FamilyRequest =
+    val id = rs.getString("id")
+    val familyName = rs.getString("familyName")
+    val householdSize = rs.getInt("householdSize")
+    val dietaryRestriction = DietaryRestriction.valueOf(rs.getString("dietaryRestriction"))
+    val requestedCategory = FoodCategory.valueOf(rs.getString("requestedCategory"))
+    val status = RequestStatus.valueOf(rs.getString("status"))
+    FamilyRequest(id, familyName, householdSize, dietaryRestriction, requestedCategory, status)
+
+  def familyRequestToSqlParams(req: FamilyRequest): Seq[AnyRef] =
+    Seq(req.id, req.familyName, java.lang.Integer.valueOf(req.householdSize), req.dietaryRestriction.toString, req.requestedCategory.toString, req.status.toString)
+
   def serialize(value: FamilyRequest): String =
     s"${value.id},${value.familyName},${value.householdSize},${value.dietaryRestriction.toString},${value.requestedCategory.toString},${value.status.toString}"
 
@@ -181,4 +235,5 @@ object FamilyRequest:
     val status = RequestStatus.valueOf(parts(5))
     FamilyRequest(id, familyName, householdSize, dietaryRestriction, requestedCategory, status)
   }
+
 
