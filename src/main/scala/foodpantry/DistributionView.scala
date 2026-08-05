@@ -8,7 +8,6 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.Includes._
 import java.time.LocalDate
 
-@annotation.nowarn("cat=deprecation")
 class DistributionView(
   inventory: ObservableBuffer[FoodItem],
   requests: ObservableBuffer[FamilyRequest],
@@ -80,7 +79,7 @@ class DistributionView(
     prefWidth = 210
     maxWidth = 210
     minHeight = 42
-    onAction = handle { performGeneratePlan() }
+    onAction = _ => performGeneratePlan()
 
   private val dispatchButton = new Button("Confirm & Dispatch Plan"):
     styleClass = Seq("button", "button-success")
@@ -89,7 +88,7 @@ class DistributionView(
     minHeight = 42
     opacity = 0.5
     disable = true
-    onAction = handle { performDispatch() }
+    onAction = _ => performDispatch()
 
   private val exportButton = new Button("📄 Export PDF Report"):
     styleClass = Seq("button", "button-secondary")
@@ -98,7 +97,7 @@ class DistributionView(
     minHeight = 42
     opacity = 0.5
     disable = true
-    onAction = handle { performExport() }
+    onAction = _ => performExport()
 
   private def performGeneratePlan(): Unit =
     statusLabel.text = ""

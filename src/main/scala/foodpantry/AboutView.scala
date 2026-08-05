@@ -5,9 +5,7 @@ import scalafx.scene.control.{Label, Button, TextField, TextArea}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.collections.ObservableBuffer
 import scalafx.Includes._
-import scala.annotation.nowarn
 
-@nowarn("cat=deprecation")
 class AboutView(
   inventory: ObservableBuffer[FoodItem],
   requests: ObservableBuffer[FamilyRequest],
@@ -92,7 +90,7 @@ class AboutView(
   private val seedDataBtn = new Button("🌱 Reset & Seed Sample Data"):
     styleClass = Seq("button", "button-secondary")
     minWidth = Region.USE_PREF_SIZE
-    onAction = handle {
+    onAction = _ => {
       if UIUtils.showConfirmation("Confirm System Reset", "Reset Sample Data", "Are you sure you want to reset all inventory items and family requests to initial demo sample data?") then
         onResetSampleData()
         UIUtils.showToast("Re-seeded demo sample data", "info")
@@ -133,7 +131,7 @@ class AboutView(
   private val sendContactBtn = new Button("📩 Send Message"):
     styleClass = Seq("button", "button-primary")
     minWidth = Region.USE_PREF_SIZE
-    onAction = handle {
+    onAction = _ => {
       val email = contactEmailField.text.value.trim
       val msg = contactMessageField.text.value.trim
       val emailRegex = """^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$""".r

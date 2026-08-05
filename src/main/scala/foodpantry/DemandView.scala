@@ -9,7 +9,6 @@ import scalafx.Includes._
 import scala.util.Try
 import java.time.LocalDate
 
-@annotation.nowarn("cat=deprecation")
 class DemandView(
   requests: ObservableBuffer[FamilyRequest],
   onSave: () => Unit
@@ -128,27 +127,27 @@ class DemandView(
 
   private val addButton = new Button("Add Request"):
     styleClass = Seq("button", "button-primary")
-    onAction = handle { performAddRequest() }
+    onAction = _ => performAddRequest()
 
   private val deleteButton = new Button("Delete Selected"):
     styleClass = Seq("button", "button-danger")
     minWidth = 138
-    onAction = handle { performDeleteSelected() }
+    onAction = _ => performDeleteSelected()
 
   private val archiveButton = new Button("Archive Fulfilled"):
     styleClass = Seq("button", "button-secondary")
     minWidth = 146
-    onAction = handle { performArchiveFulfilled() }
+    onAction = _ => performArchiveFulfilled()
 
   private val exportPdfBtn = new Button("📄 Export PDF Report"):
     styleClass = Seq("button", "button-secondary")
     minWidth = 135
-    onAction = handle { performExportPdf() }
+    onAction = _ => performExportPdf()
 
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
     minWidth = 90
-    onAction = handle {
+    onAction = _ => {
       searchField.text = ""
       categoryFilterCombo.value = "All Categories"
       dietaryFilterCombo.value = "All Dietary Needs"
@@ -216,8 +215,8 @@ class DemandView(
 
   // Keyboard navigation Setup
   private def setupFormActions(submitAction: () => Unit): Unit =
-    familyNameField.onAction = handle { submitAction() }
-    sizeField.onAction = handle { submitAction() }
+    familyNameField.onAction = _ => submitAction()
+    sizeField.onAction = _ => submitAction()
 
   private def performExportPdf(): Unit =
     Try {

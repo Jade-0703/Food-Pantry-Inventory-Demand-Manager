@@ -151,22 +151,22 @@ class InventoryView(
 
   private val addButton = new Button("Add Item"):
     styleClass = Seq("button", "button-primary")
-    onAction = handle { performAddItem() }
+    onAction = _ => performAddItem()
 
   private val deleteButton = new Button("Delete Selected"):
     styleClass = Seq("button", "button-danger")
     minWidth = 132
-    onAction = handle { performDeleteSelected() }
+    onAction = _ => performDeleteSelected()
 
   private val exportPdfBtn = new Button("📄 Export PDF Report"):
     styleClass = Seq("button", "button-secondary")
     minWidth = 135
-    onAction = handle { performExportPdf() }
+    onAction = _ => performExportPdf()
 
   private val resetFilterBtn = new Button("🔄 Reset"):
     styleClass = Seq("filter-reset-btn")
     minWidth = 90
-    onAction = handle {
+    onAction = _ => {
       searchField.text = ""
       categoryFilterCombo.value = "All Categories"
     }
@@ -235,7 +235,7 @@ class InventoryView(
   private val statusLabel = new Label { styleClass = Seq("status-label", "status-error") }
 
   // Toggle input visibility based on perishable selection
-  itemTypeCombo.onAction = handle {
+  itemTypeCombo.onAction = _ => {
     val isPerishable = itemTypeCombo.value.value == "Perishable"
     expiryDatePicker.visible = isPerishable
     expiryLabel.visible = isPerishable
@@ -245,10 +245,10 @@ class InventoryView(
 
   // Keyboard navigation & submission setup
   private def setupFormActions(submitAction: () => Unit): Unit =
-    nameField.onAction = handle { submitAction() }
-    qtyField.onAction = handle { submitAction() }
-    unitField.onAction = handle { submitAction() }
-    shelfLifeField.onAction = handle { submitAction() }
+    nameField.onAction = _ => submitAction()
+    qtyField.onAction = _ => submitAction()
+    unitField.onAction = _ => submitAction()
+    shelfLifeField.onAction = _ => submitAction()
 
   private def performExportPdf(): Unit =
     Try {

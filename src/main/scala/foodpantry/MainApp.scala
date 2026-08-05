@@ -103,11 +103,10 @@ object MainApp extends JFXApp3:
               val navSectionLabel: Label = new Label("NAVIGATION"):
                 styleClass = Seq("sidebar-section-label")
               
-              @annotation.nowarn("cat=deprecation")
               def createNavButton(text: String, view: scalafx.scene.Node): Button = 
                 new Button(text):
                   styleClass = Seq("sidebar-btn")
-                  onAction = handle {
+                  onAction = _ => {
                     activeView.value = view
                   }
 
