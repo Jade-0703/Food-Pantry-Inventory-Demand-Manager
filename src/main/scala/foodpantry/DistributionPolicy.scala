@@ -75,6 +75,7 @@ object WasteMinimizingPolicy extends DistributionPolicy:
     /**
      * Tail-recursive matching loop over family request objects.
      */
+    @scala.annotation.tailrec
     def distributeRecursive(
       inv: List[FoodItem],
       reqs: List[FamilyRequest],

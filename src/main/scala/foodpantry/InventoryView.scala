@@ -9,7 +9,6 @@ import scalafx.Includes._
 import java.time.LocalDate
 import scala.util.Try
 
-@annotation.nowarn("cat=deprecation")
 class InventoryView(
   inventory: ObservableBuffer[FoodItem],
   onSave: () => Unit
