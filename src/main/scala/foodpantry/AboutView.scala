@@ -143,7 +143,7 @@ class AboutView(
         add(new Label("Sunway University — Faculty of Engineering and Technology"), 1, 4)
 
         add(new Label("Academic Policy:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 5)
-        add(new Label("Tier C (AI-Integrated Policy — Template 2 & 3 Signed)"), 1, 5)
+        add(new Label("Tier C (AI-Integrated Policy — see ai/interaction_log.md)"), 1, 5)
 
         add(new Label("Copyright Notice:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 6)
         add(new Label("© 2026 Jade Wenxi. All Rights Reserved."), 1, 6)
