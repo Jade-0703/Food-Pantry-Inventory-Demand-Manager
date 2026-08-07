@@ -57,3 +57,11 @@ This log tracks the chronological planning and implementation progress of the fi
   - **Pie Chart Colors**: Fixed `Other` category color from teal (`#14b8a6`) which clashed with `Vegetables` to a distinct orange (`#f97316`). All 6 category colors are now maximally distinct.
   - **Reset Button**: Centred the "Reset" wording inside the filter-reset-btn using `-fx-alignment: center` and `-fx-text-alignment: center`.
   - **Build.sbt Classloader**: Added `Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat` to permanently resolve an intermittent `NoClassDefFoundError` in `sbt test` caused by ScalaFX classloader isolation.
+
+## 2026-08-08: Final Alignment & Tooltip Refinement
+- **Goal**: Align ID styling with seed SQL files, eliminate ID duplicates on item deletions, and eliminate tooltip delay.
+- **Progress**:
+  - **SQL ID Format Alignment**: Adjusted the ID format from uppercase padded `INV-001` and `REQ-001` back to `inv-N` and `req-N` to match the exact schema of `inventory.sql` and `demand.sql`.
+  - **ID Deletion Safety**: Refactored the ID generation to look up the maximum integer ID in existing records (`maxId + 1`) rather than using list size (`size + 1`). This prevents duplicate IDs when items are deleted.
+  - **Instant Hover Tooltips**: Refactored chart tooltip logic using instant event triggers (`setOnMouseEntered`, `setOnMouseMoved`, `setOnMouseExited`) to display tooltips immediately without the standard 1-second delay.
+  - **Academic Policy & Log Reference**: Updated `AboutView.scala` academic policy field to point to `ai/interaction_log.md` and verified student metadata consistency.
