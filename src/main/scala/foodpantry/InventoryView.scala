@@ -202,16 +202,28 @@ class InventoryView(
   private val shelfLifeLabel = UIUtils.createFormFieldLabel("Shelf Life (Mo.):")
   shelfLifeLabel.visible = false
 
+  expiryDatePicker.managed <== expiryDatePicker.visible
+  expiryLabel.managed <== expiryLabel.visible
+  shelfLifeField.managed <== shelfLifeField.visible
+  shelfLifeLabel.managed <== shelfLifeLabel.visible
+
   private val statusLabel = new Label():
     styleClass = Seq("status-label", "status-error")
 
-  // Toggle input visibility based on perishable selection
-  itemTypeCombo.onAction = _ =>
-    val isPerishable = itemTypeCombo.value.value == "Perishable"
+  private def updateTypeVisibility(typeVal: String): Unit =
+    val isPerishable = typeVal == "Perishable"
     expiryDatePicker.visible = isPerishable
     expiryLabel.visible = isPerishable
     shelfLifeField.visible = !isPerishable
     shelfLifeLabel.visible = !isPerishable
+
+  // Toggle input visibility based on perishable selection
+  itemTypeCombo.value.onChange { (_, _, newType) =>
+    if newType != null then updateTypeVisibility(newType)
+  }
+  itemTypeCombo.onAction = _ =>
+    val current = itemTypeCombo.value.value
+    if current != null then updateTypeVisibility(current)
 
   // Keyboard navigation & submission setup
   private def setupFormActions(submitAction: () => Unit): Unit =
