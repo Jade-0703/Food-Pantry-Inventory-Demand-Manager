@@ -134,7 +134,7 @@ class AboutView(
         add(new Label("v1.0.0 (Release Build)"), 1, 1)
         
         add(new Label("Author / Student:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 2)
-        add(new Label("Tan Wen xi (Student ID: 23093495)"), 1, 2)
+        add(new Label("Tan Wen Xi (Student ID: 23093495)"), 1, 2)
 
         add(new Label("Course & Module:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 3)
         add(new Label("PRG2104: Object-Oriented Programming (Year 2, Semester 3)"), 1, 3)
