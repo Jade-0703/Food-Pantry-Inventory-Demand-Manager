@@ -275,13 +275,23 @@ class DashboardView(
       PieChart.Data(s"$name", total)
     }.toSeq
     pieChart.data = ObservableBuffer.from(chartData)
-    // Install tooltips on each pie slice after data is set
+    // Double-nested runLater: outer queues after data bind, inner runs after layout creates nodes
     scalafx.application.Platform.runLater {
-      pieChart.data.value.forEach { sliceData =>
-        val tip = new javafx.scene.control.Tooltip(f"${sliceData.getName}: ${sliceData.getPieValue}%.1f units")
-        javafx.scene.control.Tooltip.install(sliceData.getNode, tip)
-        sliceData.getNode.setOnMouseEntered(_ => sliceData.getNode.setStyle("-fx-opacity: 0.75;"))
-        sliceData.getNode.setOnMouseExited(_ => sliceData.getNode.setStyle("-fx-opacity: 1.0;"))
+      scalafx.application.Platform.runLater {
+        pieChart.data.value.forEach { sliceData =>
+          if sliceData.getNode != null then
+            val tip = new javafx.scene.control.Tooltip(
+              f"${sliceData.getName}: ${sliceData.getPieValue}%.1f units"
+            )
+            tip.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;")
+            javafx.scene.control.Tooltip.install(sliceData.getNode, tip)
+            sliceData.getNode.setOnMouseEntered(_ =>
+              sliceData.getNode.setStyle("-fx-opacity: 0.7; -fx-cursor: hand;")
+            )
+            sliceData.getNode.setOnMouseExited(_ =>
+              sliceData.getNode.setStyle("-fx-opacity: 1.0;")
+            )
+        }
       }
     }
 
@@ -294,14 +304,23 @@ class DashboardView(
       XYChart.Data[String, Number](restrictionName, count: java.lang.Number)
     }
     barSeries.data = ObservableBuffer.from(newData)
-    // Install tooltips on each bar after data is set
+    // Double-nested runLater: outer queues after data bind, inner runs after layout creates bar nodes
     scalafx.application.Platform.runLater {
-      barSeries.data.value.forEach { barData =>
-        val tip = new javafx.scene.control.Tooltip(s"${barData.getXValue}: ${barData.getYValue.intValue()} families")
-        if barData.getNode != null then
-          javafx.scene.control.Tooltip.install(barData.getNode, tip)
-          barData.getNode.setOnMouseEntered(_ => barData.getNode.setStyle("-fx-opacity: 0.75;"))
-          barData.getNode.setOnMouseExited(_ => barData.getNode.setStyle("-fx-opacity: 1.0;"))
+      scalafx.application.Platform.runLater {
+        barSeries.data.value.forEach { barData =>
+          if barData.getNode != null then
+            val tip = new javafx.scene.control.Tooltip(
+              s"${barData.getXValue}: ${barData.getYValue.intValue()} families"
+            )
+            tip.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;")
+            javafx.scene.control.Tooltip.install(barData.getNode, tip)
+            barData.getNode.setOnMouseEntered(_ =>
+              barData.getNode.setStyle("-fx-opacity: 0.7; -fx-cursor: hand;")
+            )
+            barData.getNode.setOnMouseExited(_ =>
+              barData.getNode.setStyle("-fx-opacity: 1.0;")
+            )
+        }
       }
     }
 

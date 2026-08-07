@@ -1183,12 +1183,13 @@
 }
 
 /* Vibrant Curated Palette for ScalaFX PieChart Slices */
-.default-color0.chart-pie { -fx-pie-color: #10b981; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
-.default-color1.chart-pie { -fx-pie-color: #f59e0b; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
-.default-color2.chart-pie { -fx-pie-color: #0284c7; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
-.default-color3.chart-pie { -fx-pie-color: #8b5cf6; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
-.default-color4.chart-pie { -fx-pie-color: #f43f5e; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
-.default-color5.chart-pie { -fx-pie-color: #14b8a6; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
+/* Order: Grains, Vegetables, Dairy, Canned, Meat, Other */
+.default-color0.chart-pie { -fx-pie-color: #f59e0b; -fx-border-color: #ffffff; -fx-border-width: 1.5px; } /* Grains   — amber        */
+.default-color1.chart-pie { -fx-pie-color: #22c55e; -fx-border-color: #ffffff; -fx-border-width: 1.5px; } /* Veggies  — green        */
+.default-color2.chart-pie { -fx-pie-color: #3b82f6; -fx-border-color: #ffffff; -fx-border-width: 1.5px; } /* Dairy    — blue         */
+.default-color3.chart-pie { -fx-pie-color: #a855f7; -fx-border-color: #ffffff; -fx-border-width: 1.5px; } /* Canned   — purple       */
+.default-color4.chart-pie { -fx-pie-color: #ef4444; -fx-border-color: #ffffff; -fx-border-width: 1.5px; } /* Meat     — red          */
+.default-color5.chart-pie { -fx-pie-color: #f97316; -fx-border-color: #ffffff; -fx-border-width: 1.5px; } /* Other    — orange       */
 
 /* Vibrant Colors for Individual ScalaFX BarChart Bars */
 .data0.chart-bar { -fx-bar-fill: #0284c7; }
