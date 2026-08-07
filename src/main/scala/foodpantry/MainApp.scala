@@ -66,6 +66,8 @@ object MainApp extends JFXApp3:
     })
 
     val aboutView = new AboutView(inventoryItems, familyRequests, () => {
+      inventoryRepo.saveAll(List.empty)
+      demandRepo.saveAll(List.empty)
       seedInitialData()
       loadAllData()
     })
@@ -101,6 +103,8 @@ object MainApp extends JFXApp3:
                     new MenuItem("🌱 Reset to Sample Data"):
                       onAction = _ => {
                         if UIUtils.showConfirmation("Confirm Reset", "Reset Sample Data", "Reset all inventory and request data to sample defaults?") then
+                          inventoryRepo.saveAll(List.empty)
+                          demandRepo.saveAll(List.empty)
                           seedInitialData()
                           loadAllData()
                           UIUtils.showToast("Re-seeded initial sample data", "info")
