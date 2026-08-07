@@ -9,7 +9,7 @@
 Pantry coordinators can log donated food items (both perishable with dates, and non-perishable), record household demands/dietary restrictions, and automatically generate optimal daily distribution plans. The system utilizes a specialized **Waste-Minimizing Expiry-First** matching algorithm that prioritizes distributing food close to expiration to eliminate food waste, while automatically ensuring dietary constraints are fully respected.
 
 ### Key Features
-1. **Analytics Dashboard & KPI Cards**: Provides immediate insight into total inventory count, pending requests, helped families, and lists perishables expiring in less than 3 days. Includes an interactive `PieChart` visualizer representing stock categories.
+1. **Analytics Dashboard & KPI Cards**: Provides immediate insight into total inventory count, pending requests, helped families, and lists perishables expiring in less than 3 days. Includes a `PieChart` visualizing stock distribution by category and a `BarChart` showing demand requests by dietary restriction — both with hover tooltips displaying exact values.
 2. **Interactive Inventory Logger**: Add, view, filter, delete, and export food items. Dynamically switches inputs between perishable and non-perishable variants.
 3. **Interactive Request Logger**: Log and manage recipient family requests, capturing household sizes, specific food preferences, and dietary restrictions.
 4. **Daily Distribution Planner**: Implements the core distribution policy, matching compatible stock to families, logging potential food waste prevented, and executing final inventory write-offs dynamically.
