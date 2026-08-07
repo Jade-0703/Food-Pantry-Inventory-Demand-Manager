@@ -86,11 +86,11 @@ case class PerishableItem(
   override def getExpiryStatus(today: LocalDate): String =
     val daysUntilExpiry = ChronoUnit.DAYS.between(today, expiryDate)
     if daysUntilExpiry < 0 then
-      s"EXPIRED (${Math.abs(daysUntilExpiry)} days ago)"
+      s"EXPIRED (${Math.abs(daysUntilExpiry)} days ago on $expiryDate)"
     else if daysUntilExpiry == 0 then
-      "Expires TODAY!"
+      s"Expires TODAY! ($expiryDate)"
     else
-      s"Expires in $daysUntilExpiry days"
+      s"Expires in $daysUntilExpiry days ($expiryDate)"
 
   override def withQuantity(newQuantity: Double): FoodItem =
     this.copy(quantity = newQuantity)

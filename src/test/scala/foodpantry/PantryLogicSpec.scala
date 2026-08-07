@@ -11,9 +11,9 @@ class PantryLogicSpec extends AnyFunSuite:
     val item2 = PerishableItem("inv-2", "Milk", FoodCategory.Dairy, 2.0, "litres", LocalDate.of(2026, 7, 19))
     val item3 = PerishableItem("inv-3", "Meat", FoodCategory.Meat, 5.0, "kg", LocalDate.of(2026, 7, 17))
     
-    assert(item1.getExpiryStatus(today) == "Expires in 3 days")
-    assert(item2.getExpiryStatus(today) == "Expires TODAY!")
-    assert(item3.getExpiryStatus(today) == "EXPIRED (2 days ago)")
+    assert(item1.getExpiryStatus(today) == "Expires in 3 days (2026-07-22)")
+    assert(item2.getExpiryStatus(today) == "Expires TODAY! (2026-07-19)")
+    assert(item3.getExpiryStatus(today) == "EXPIRED (2 days ago on 2026-07-17)")
   }
 
   test("NonPerishableItem shows shelf stable status") {
