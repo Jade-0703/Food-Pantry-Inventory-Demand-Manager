@@ -181,6 +181,8 @@
     -fx-border-color: #e2e8f0;
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
 }
 .filter-reset-btn:hover {
     -fx-background-color: #e2e8f0;
@@ -939,6 +941,8 @@
     -fx-padding: 7px 12px;
     -fx-text-fill: #475569;
     -fx-font-weight: 700;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
 }
 .filter-reset-btn:hover {
     -fx-background-color: #e8f4fd;
