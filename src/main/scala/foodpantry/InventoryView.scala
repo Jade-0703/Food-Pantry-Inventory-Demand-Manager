@@ -344,7 +344,7 @@ class InventoryView(
               clearForm()
             else
               // Create perishable item
-              val nextId = s"inv-${inventory.size + 1}"
+              val nextId = f"INV-${inventory.size + 1}%03d"
               val newItem = PerishableItem(nextId, name, category, quantity, unit, expiryVal)
               inventory.add(newItem)
               onSave()
@@ -360,7 +360,7 @@ class InventoryView(
               case Some(months) if months <= 0 =>
                 UIUtils.applyStatus(statusLabel, "error", "Error: Shelf Life must be a positive number of months (> 0)!")
               case Some(months) =>
-                val nextId = s"inv-${inventory.size + 1}"
+                val nextId = f"INV-${inventory.size + 1}%03d"
                 val newItem = NonPerishableItem(nextId, name, category, quantity, unit, months)
                 inventory.add(newItem)
                 onSave()

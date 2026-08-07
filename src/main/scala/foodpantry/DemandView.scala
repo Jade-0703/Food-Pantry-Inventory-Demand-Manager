@@ -281,7 +281,7 @@ class DemandView(
           clearForm()
         case Some(size) =>
           val newRequest = FamilyRequest(
-            id = s"req-${System.currentTimeMillis()}",
+            id = f"REQ-${requests.size + 1}%03d",
             familyName = familyName,
             householdSize = size,
             dietaryRestriction = diet,
