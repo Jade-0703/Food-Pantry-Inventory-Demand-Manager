@@ -26,3 +26,6 @@ libraryDependencies ++= Seq("base", "controls", "fxml", "graphics", "media", "sw
 scalacOptions ++= Seq(
   "-Wunused:all"
 )
+
+// Fix classloader isolation issue between ScalaFX and test runner
+Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat

@@ -425,13 +425,13 @@ class InventoryView(
 
       val result = dialog.showAndWait()
       if result.contains(saveButtonType) then
-        val name = editNameField.text.value.trim
-        val qtyOpt = Try(editQtyField.text.value.trim.toDouble).toOption
-        val unit = editUnitField.text.value.trim
-        val cat = editCategoryCombo.value.value
-        val itemType = editTypeCombo.value.value
+        val name     = editNameField.text.value.trim
+        val qtyOpt   = Try(editQtyField.text.value.trim.toDouble).toOption
+        val unit     = editUnitField.text.value.trim
+        val cat      = editCategoryCombo.delegate.getValue
+        val itemType = editTypeCombo.delegate.getValue
 
-        if name.nonEmpty && cat != null && qtyOpt.exists(_ > 0) && unit.nonEmpty then
+        if name.nonEmpty && cat != null && itemType != null && qtyOpt.exists(_ > 0) && unit.nonEmpty then
           val updatedItem: FoodItem = if itemType == "Perishable" then
             val exp = if editDatePicker.delegate.getValue != null then editDatePicker.delegate.getValue else LocalDate.now().plusDays(7)
             PerishableItem(selectedItem.id, name, cat, qtyOpt.get, unit, exp)
@@ -447,6 +447,7 @@ class InventoryView(
             UIUtils.showToast(s"Updated item '$name' in inventory")
         else
           UIUtils.applyStatus(statusLabel, "error", "Error: Invalid inputs for item edit.")
+
     else
       UIUtils.applyStatus(statusLabel, "error", "Warning: Select an item in the table to edit.")
 
