@@ -345,10 +345,9 @@ class InventoryView(
             else
               // Create perishable item
               val maxId = inventory.map(_.id).collect {
-                case id if id.startsWith("INV-") => scala.util.Try(id.stripPrefix("INV-").toInt).getOrElse(0)
                 case id if id.startsWith("inv-") => scala.util.Try(id.stripPrefix("inv-").toInt).getOrElse(0)
               }.maxOption.getOrElse(0)
-              val nextId = f"INV-${maxId + 1}%03d"
+              val nextId = s"inv-${maxId + 1}"
               val newItem = PerishableItem(nextId, name, category, quantity, unit, expiryVal)
               inventory.add(newItem)
               onSave()
@@ -365,10 +364,9 @@ class InventoryView(
                 UIUtils.applyStatus(statusLabel, "error", "Error: Shelf Life must be a positive number of months (> 0)!")
               case Some(months) =>
                 val maxId = inventory.map(_.id).collect {
-                  case id if id.startsWith("INV-") => scala.util.Try(id.stripPrefix("INV-").toInt).getOrElse(0)
                   case id if id.startsWith("inv-") => scala.util.Try(id.stripPrefix("inv-").toInt).getOrElse(0)
                 }.maxOption.getOrElse(0)
-                val nextId = f"INV-${maxId + 1}%03d"
+                val nextId = s"inv-${maxId + 1}"
                 val newItem = NonPerishableItem(nextId, name, category, quantity, unit, months)
                 inventory.add(newItem)
                 onSave()

@@ -281,11 +281,10 @@ class DemandView(
           clearForm()
         case Some(size) =>
           val maxId = requests.map(_.id).collect {
-            case id if id.startsWith("REQ-") => scala.util.Try(id.stripPrefix("REQ-").toInt).getOrElse(0)
             case id if id.startsWith("req-") => scala.util.Try(id.stripPrefix("req-").toInt).getOrElse(0)
           }.maxOption.getOrElse(0)
           val newRequest = FamilyRequest(
-            id = f"REQ-${maxId + 1}%03d",
+            id = s"req-${maxId + 1}",
             familyName = familyName,
             householdSize = size,
             dietaryRestriction = diet,
