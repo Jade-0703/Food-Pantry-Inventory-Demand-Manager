@@ -337,13 +337,16 @@ class DemandView(
       if result.contains(saveButtonType) then
         val name = editNameField.text.value.trim
         val sizeOpt = Try(editSizeField.text.value.trim.toInt).toOption
-        if name.nonEmpty && sizeOpt.exists(_ > 0) then
+        val diet = editDietCombo.delegate.getValue
+        val cat  = editCatCombo.delegate.getValue
+        val stat = editStatusCombo.delegate.getValue
+        if name.nonEmpty && sizeOpt.exists(_ > 0) && diet != null && cat != null && stat != null then
           val updated = selectedItem.copy(
-            familyName = name,
-            householdSize = sizeOpt.get,
-            dietaryRestriction = editDietCombo.value.value,
-            requestedCategory = editCatCombo.value.value,
-            status = editStatusCombo.value.value
+            familyName         = name,
+            householdSize      = sizeOpt.get,
+            dietaryRestriction = diet,
+            requestedCategory  = cat,
+            status             = stat
           )
           val idx = requests.indexOf(selectedItem)
           if idx >= 0 then
@@ -353,6 +356,7 @@ class DemandView(
             UIUtils.showToast(s"Updated request for '$name'")
         else
           UIUtils.applyStatus(statusLabel, "error", "Error: Invalid inputs for edit.")
+
     else
       UIUtils.applyStatus(statusLabel, "error", "Warning: Select a request in the table to edit.")
 
