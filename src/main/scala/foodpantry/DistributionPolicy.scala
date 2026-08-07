@@ -61,7 +61,7 @@ object WasteMinimizingPolicy extends DistributionPolicy:
     /** Checks whether an item category is compatible with a dietary restriction. */
     def isCompatible(item: FoodItem, diet: DietaryRestriction): Boolean =
       diet match
-        case DietaryRestriction.None => true
+        case DietaryRestriction.Standard => true
         case DietaryRestriction.Vegetarian => 
           item.category != FoodCategory.Meat
         case DietaryRestriction.Halal => 
@@ -110,6 +110,7 @@ object WasteMinimizingPolicy extends DistributionPolicy:
           }
 
           /** Recursive worker allocating portions from sorted candidates to a single family. */
+          @scala.annotation.tailrec
           def allocateForRequest(
             currentInv: List[FoodItem],
             candidates: List[FoodItem],

@@ -26,7 +26,19 @@ enum FoodCategory:
 
 /** Represent dietary guidelines requested by recipient families. */
 enum DietaryRestriction:
-  case None, Vegetarian, Halal, GlutenFree
+  case Standard, Vegetarian, Halal, GlutenFree
+  def displayName: String = this match
+    case Standard => "Standard"
+    case GlutenFree => "Gluten-Free"
+    case other => other.toString
+
+object DietaryRestriction:
+  def fromString(str: String): DietaryRestriction = str match
+    case "None" | "Standard" => Standard
+    case "GlutenFree" | "Gluten-Free" => GlutenFree
+    case "Vegetarian" => Vegetarian
+    case "Halal" => Halal
+    case other => scala.util.Try(DietaryRestriction.valueOf(other)).getOrElse(Standard)
 
 /** Represent the processing status of a logged family request. */
 enum RequestStatus:
@@ -214,7 +226,7 @@ object FamilyRequest:
     val id = rs.getString("id")
     val familyName = rs.getString("familyName")
     val householdSize = rs.getInt("householdSize")
-    val dietaryRestriction = DietaryRestriction.valueOf(rs.getString("dietaryRestriction"))
+    val dietaryRestriction = DietaryRestriction.fromString(rs.getString("dietaryRestriction"))
     val requestedCategory = FoodCategory.valueOf(rs.getString("requestedCategory"))
     val status = RequestStatus.valueOf(rs.getString("status"))
     FamilyRequest(id, familyName, householdSize, dietaryRestriction, requestedCategory, status)
@@ -230,7 +242,7 @@ object FamilyRequest:
     val id = parts(0)
     val familyName = parts(1)
     val householdSize = parts(2).toInt
-    val dietaryRestriction = DietaryRestriction.valueOf(parts(3))
+    val dietaryRestriction = DietaryRestriction.fromString(parts(3))
     val requestedCategory = FoodCategory.valueOf(parts(4))
     val status = RequestStatus.valueOf(parts(5))
     FamilyRequest(id, familyName, householdSize, dietaryRestriction, requestedCategory, status)

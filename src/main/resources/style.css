@@ -1126,3 +1126,68 @@
     -fx-background-color: #ebf8ff;
     -fx-border-color: #2b6cb0;
 }
+
+/* ── 21. Stunning ScalaFX Chart Aesthetics ───────────────────────── */
+.chart {
+    -fx-padding: 10px;
+}
+.chart-title {
+    -fx-text-fill: #0f172a;
+    -fx-font-family: "Inter", sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+.chart-legend {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px 12px;
+}
+.chart-legend-item {
+    -fx-text-fill: #334155;
+    -fx-font-family: "Inter", sans-serif;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+.chart-pie-label {
+    -fx-fill: #334155;
+    -fx-font-family: "Inter", sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+.chart-pie-label-line {
+    -fx-stroke: #94a3b8;
+    -fx-stroke-width: 1.5px;
+}
+.axis-label {
+    -fx-text-fill: #475569;
+    -fx-font-family: "Inter", sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+.axis {
+    -fx-tick-label-fill: #64748b;
+    -fx-tick-label-font-size: 10px;
+    -fx-tick-mark-stroke: #cbd5e1;
+}
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: #f1f5f9;
+    -fx-stroke-dash-array: 4 4;
+}
+
+/* Vibrant Curated Palette for ScalaFX PieChart Slices */
+.default-color0.chart-pie { -fx-pie-color: #10b981; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
+.default-color1.chart-pie { -fx-pie-color: #f59e0b; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
+.default-color2.chart-pie { -fx-pie-color: #0284c7; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
+.default-color3.chart-pie { -fx-pie-color: #8b5cf6; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
+.default-color4.chart-pie { -fx-pie-color: #f43f5e; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
+.default-color5.chart-pie { -fx-pie-color: #14b8a6; -fx-border-color: #ffffff; -fx-border-width: 1.5px; }
+
+/* Vibrant Colors for Individual ScalaFX BarChart Bars */
+.data0.chart-bar { -fx-bar-fill: #0284c7; }
+.data1.chart-bar { -fx-bar-fill: #10b981; }
+.data2.chart-bar { -fx-bar-fill: #e11d48; }
+.data3.chart-bar { -fx-bar-fill: #f59e0b; }

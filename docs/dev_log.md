@@ -23,7 +23,7 @@ This log tracks the chronological planning and implementation progress of the fi
 - **Progress**:
   - Created `Repository[T]` and `FileRepository[T]` demonstrating parametric polymorphism and encapsulation.
   - Wrapped all file systems and parsing pipelines in `scala.util.Try` block handlers.
-  - Handled invalid CSV lines gracefully to avoid any uncaught parser exceptions during loading.
+  - Handled invalid SQL queries and database connections gracefully inside `scala.util.Try` to avoid any uncaught JDBC exceptions during loading.
 
 ## 2026-07-16: Distribution Policy Implementation
 - **Goal**: Create the daily plan matching algorithm.

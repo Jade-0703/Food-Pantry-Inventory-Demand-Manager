@@ -117,7 +117,40 @@ class AboutView(
       }
     )
 
-  // 5. Contact Coordinator Form Card
+  // 5. System Metadata, Versioning, Author & Copyright Card (Dr. Chin Teck Min's About Specs)
+  private val systemMetadataCard = new VBox:
+    spacing = 10
+    padding = Insets(18)
+    styleClass = Seq("form-card")
+    children = Seq(
+      new Label("ℹ️ System Metadata & Author Information") { styleClass = Seq("form-card-title") },
+      new GridPane {
+        hgap = 16
+        vgap = 8
+        add(new Label("Application Name:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 0)
+        add(new Label("Food Pantry Inventory & Demand Manager"), 1, 0)
+        
+        add(new Label("Software Version:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 1)
+        add(new Label("v1.0.0 (Release Build)"), 1, 1)
+        
+        add(new Label("Author / Student:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 2)
+        add(new Label("Tan Wen xi (Student ID: 23093495)"), 1, 2)
+
+        add(new Label("Course & Module:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 3)
+        add(new Label("PRG2104: Object-Oriented Programming (Year 2, Semester 3)"), 1, 3)
+
+        add(new Label("Institution:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 4)
+        add(new Label("Sunway University — Faculty of Engineering and Technology"), 1, 4)
+
+        add(new Label("Academic Policy:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 5)
+        add(new Label("Tier C (AI-Integrated Policy — Template 2 & 3 Signed)"), 1, 5)
+
+        add(new Label("Copyright Notice:") { style = "-fx-font-weight: bold; -fx-text-fill: #475569;" }, 0, 6)
+        add(new Label("© 2026 Jade Wenxi. All Rights Reserved."), 1, 6)
+      }
+    )
+
+  // 6. Contact Coordinator Form Card
   private val contactEmailField = new TextField { promptText = "Your Email (e.g. staff@sunway.edu.my)"; maxWidth = Double.MaxValue }
   private val contactMessageField = new TextArea {
     promptText = "Enter your message or inquiry..."
@@ -188,7 +221,7 @@ class AboutView(
     javafx.scene.layout.GridPane.setFillHeight(darkAccentCard.delegate, true)
     javafx.scene.layout.GridPane.setFillHeight(contactCard.delegate, true)
 
-  // 6. Contact tiles + footer
+  // 7. Contact tiles + footer
   private val section3Row = new HBox:
     spacing = 18
     children = Seq(
@@ -207,7 +240,7 @@ class AboutView(
       }
     )
 
-  children = Seq(titleArea, tickerBar, featuresSection, cardsRow, section3Row, footerBanner)
+  children = Seq(titleArea, tickerBar, systemMetadataCard, featuresSection, cardsRow, section3Row, footerBanner)
 
   // --- Helpers ---
 

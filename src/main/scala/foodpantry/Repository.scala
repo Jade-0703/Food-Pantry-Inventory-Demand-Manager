@@ -62,10 +62,11 @@ class SqliteRepository[T](
       conn.close()
   }
 
-  /** Recursively reads JDBC result sets into an immutable List with zero vars. */
-  private def readRows(rs: ResultSet): List[T] =
-    if !rs.next() then List.empty[T]
-    else rowToItem(rs) :: readRows(rs)
+  /** Tail-recursively reads JDBC result sets into an immutable List with zero vars. */
+  @scala.annotation.tailrec
+  private def readRows(rs: ResultSet, acc: List[T] = Nil): List[T] =
+    if !rs.next() then acc.reverse
+    else readRows(rs, rowToItem(rs) :: acc)
 
   /**
    * S1-12 Exception Handling.

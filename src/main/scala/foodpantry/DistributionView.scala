@@ -24,13 +24,9 @@ class DistributionView(
   )
 
   // Allocation Table
-  private val allocationsTable = new TableView[Allocation]:
-    val selfTable: TableView[Allocation] = this
+  private val allocationsTable: TableView[Allocation] = new TableView[Allocation]():
     columnResizePolicy = TableView.ConstrainedResizePolicy
     placeholder = new Label("No distribution plan generated. Click 'Generate' below.") { style = "-fx-text-fill: #64748b;" }
-
-    // S1-14 / Entry 14 clip layout to prevent row background bleed
-    clip = UIUtils.createRoundedClip(selfTable)
 
     private val idCol: TableColumn[Allocation, String] = new TableColumn[Allocation, String]("ID"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "id", cellData.value.id) }
@@ -55,6 +51,8 @@ class DistributionView(
     columns ++= Seq(idCol, familyCol, itemCol, categoryCol, qtyCol)
     columns.foreach(_.setReorderable(false))
     prefHeight = 280
+
+  allocationsTable.clip = UIUtils.createRoundedClip(allocationsTable)
 
   private val tableWrapper = new StackPane:
     styleClass = Seq("table-wrapper")
@@ -99,6 +97,15 @@ class DistributionView(
     disable = true
     onAction = _ => performExport()
 
+  private def resetPlanState(): Unit =
+    proposedAllocations.clear()
+    proposedInventory.value = Nil
+    proposedRequests.value = Nil
+    dispatchButton.disable = true
+    dispatchButton.opacity = 0.5
+    exportButton.disable = true
+    exportButton.opacity = 0.5
+
   private def performGeneratePlan(): Unit =
     statusLabel.text = ""
     val today = LocalDate.now()
@@ -107,13 +114,7 @@ class DistributionView(
     val pendingCount = requests.count(_.status == RequestStatus.Pending)
     if pendingCount == 0 then
       UIUtils.applyStatus(statusLabel, "error", "Error: There are no pending family requests to satisfy!")
-      proposedAllocations.clear()
-      proposedInventory.value = Nil
-      proposedRequests.value = Nil
-      dispatchButton.disable = true
-      dispatchButton.opacity = 0.5
-      exportButton.disable = true
-      exportButton.opacity = 0.5
+      resetPlanState()
       statsLabel.text = ""
     else
       // Execute the pure waste minimizing policy
@@ -125,13 +126,7 @@ class DistributionView(
 
       if allocations.isEmpty then
         UIUtils.applyStatus(statusLabel, "warning", "Notice: Generated plan matches 0 items (insufficient or incompatible stock).")
-        proposedAllocations.clear()
-        proposedInventory.value = Nil
-        proposedRequests.value = Nil
-        dispatchButton.disable = true
-        dispatchButton.opacity = 0.5
-        exportButton.disable = true
-        exportButton.opacity = 0.5
+        resetPlanState()
         UIUtils.applyStatus(statsLabel, "info", "No active plan. Click 'Generate Plan' to calculate daily distribution layout.")
       else
         proposedAllocations.clear()
@@ -167,17 +162,11 @@ class DistributionView(
         onDispatch(filteredInventory, proposedRequests.value)
         
         // Clear local state
-        proposedAllocations.clear()
-        proposedInventory.value = Nil
-        proposedRequests.value = Nil
+        resetPlanState()
         
         statsLabel.styleClass = Seq("banner-info-text")
         statsLabel.text = "ℹ️ No active plan. Click 'Generate Plan' to calculate daily distribution layout."
         UIUtils.applyStatus(statusLabel, "success", "Success: Daily plan dispatched! Inventory and request log updated and saved.")
-        dispatchButton.disable = true
-        dispatchButton.opacity = 0.5
-        exportButton.disable = true
-        exportButton.opacity = 0.5
         UIUtils.showToast("Daily distribution plan dispatched to families", "success")
 
   private def performExport(): Unit =
@@ -188,59 +177,61 @@ class DistributionView(
         import org.apache.pdfbox.pdmodel.PDPageContentStream
         import org.apache.pdfbox.pdmodel.font.PDType1Font
 
+        import org.apache.pdfbox.pdmodel.common.PDRectangle
+
         val doc = new PDDocument()
-        val page = new PDPage()
+        val page = new PDPage(new PDRectangle(PDRectangle.A4.getHeight, PDRectangle.A4.getWidth))
         doc.addPage(page)
         
         val content = new PDPageContentStream(doc, page)
         
-        // Title
+        // Title Header
         content.beginText()
         content.setFont(PDType1Font.HELVETICA_BOLD, 16)
-        content.newLineAtOffset(50, 750)
-        content.showText("DAILY FOOD DISTRIBUTION REPORT")
+        content.newLineAtOffset(40, 545)
+        content.showText("FOOD PANTRY — DAILY FOOD DISTRIBUTION REPORT")
         content.endText()
         
-        // Date info
+        // Date & Student Metadata info
         content.beginText()
         content.setFont(PDType1Font.HELVETICA, 10)
-        content.newLineAtOffset(50, 730)
-        content.showText(s"Generated on: ${LocalDate.now()}")
+        content.newLineAtOffset(40, 528)
+        content.showText(s"Generated on: ${LocalDate.now()} | Author: Jade Wenxi (ID: 23093495) | PRG2104 Final Project")
         content.endText()
         
         // Draw Table Header
-        val headerY = 680f
+        val headerY = 490f
         content.beginText()
         content.setFont(PDType1Font.HELVETICA_BOLD, 10)
-        content.newLineAtOffset(50, headerY)
+        content.newLineAtOffset(40, headerY)
         content.showText("Allocation ID")
-        content.newLineAtOffset(100, 0)
+        content.newLineAtOffset(110, 0)
         content.showText("Family Name")
-        content.newLineAtOffset(150, 0)
+        content.newLineAtOffset(180, 0)
         content.showText("Allocated Item")
-        content.newLineAtOffset(150, 0)
+        content.newLineAtOffset(340, 0)
         content.showText("Quantity")
         content.endText()
         
         // Divider line
         content.setLineWidth(1.0f)
-        content.moveTo(50, headerY - 5f)
-        content.lineTo(550, headerY - 5f)
+        content.moveTo(40, headerY - 6f)
+        content.lineTo(800, headerY - 6f)
         content.stroke()
         
         // Draw Rows
-        content.setFont(PDType1Font.HELVETICA, 9)
+        content.setFont(PDType1Font.HELVETICA, 9.5f)
         proposedAllocations.zipWithIndex.foreach { (alloc, idx) =>
-          val rowY = headerY - 25f - (idx * 20f)
-          if rowY > 50f then
+          val rowY = headerY - 22f - (idx * 20f)
+          if rowY > 40f then
             content.beginText()
-            content.newLineAtOffset(50, rowY)
+            content.newLineAtOffset(40, rowY)
             content.showText(alloc.id)
-            content.newLineAtOffset(100, 0)
+            content.newLineAtOffset(110, 0)
             content.showText(alloc.familyName)
-            content.newLineAtOffset(150, 0)
+            content.newLineAtOffset(180, 0)
             content.showText(s"${alloc.itemName} (${alloc.category})")
-            content.newLineAtOffset(150, 0)
+            content.newLineAtOffset(340, 0)
             content.showText(s"${alloc.allocatedQuantity} ${alloc.unit}")
             content.endText()
         }

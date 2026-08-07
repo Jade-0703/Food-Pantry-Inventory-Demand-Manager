@@ -19,7 +19,7 @@
 - [x] docs/ai_reflection.md — AI reflection (300–500 words)
 - [x] docs/dev_log.md — ≥5 dated entries
 - [x] docs/citations.md — third-party citations
-- [ ] docs/demo.mp4 — ≤5 min walkthrough
+- [x] docs/demo.mp4 — ≤5 min walkthrough
 - [x] ai/interaction_log.md — Template 2 (≥10 entries)
 - [x] ai/declaration.md — Template 3 (signed)
 
@@ -31,8 +31,8 @@
 | Number of `// ai-assisted: #N` tags in src/ | ≥ 3 | 3 |
 | Number of entries in ai/interaction_log.md | ≥ 10 | 15 |
 | Distinct dates in docs/dev_log.md | ≥ 5 | 6 |
-| Word count of docs/reflection.md | 350–700 | 459 |
-| Word count of docs/ai_reflection.md | 300–500 | 369 |
+| Word count of docs/reflection.md | 350–700 | 462 |
+| Word count of docs/ai_reflection.md | 300–500 | 371 |
 | sbt -Wunused clean compile passes? | Yes | Yes |
 | All four required features work end-to-end? | Yes | Yes |
 

@@ -91,6 +91,63 @@ object MainApp extends JFXApp3:
 
           val mainBorderPane = new BorderPane:
             val borderPaneRef: BorderPane = this
+
+            // Top Application MenuBar (as requested by Dr. Chin Teck Min)
+            val appMenuBar = new MenuBar:
+              useSystemMenuBar = false
+              menus = Seq(
+                new Menu("File"):
+                  items = Seq(
+                    new MenuItem("🌱 Reset to Sample Data"):
+                      onAction = _ => {
+                        if UIUtils.showConfirmation("Confirm Reset", "Reset Sample Data", "Reset all inventory and request data to sample defaults?") then
+                          seedInitialData()
+                          loadAllData()
+                          UIUtils.showToast("Re-seeded initial sample data", "info")
+                      },
+                    new SeparatorMenuItem(),
+                    new MenuItem("❌ Exit Application"):
+                      onAction = _ => {
+                        sys.exit(0)
+                      }
+                  ),
+                new Menu("Navigation"):
+                  items = Seq(
+                    new MenuItem("📊 Dashboard"):
+                      onAction = _ => { activeView.value = dashboardView },
+                    new MenuItem("📦 Inventory Stock"):
+                      onAction = _ => { activeView.value = inventoryView },
+                    new MenuItem("👪 Family Requests"):
+                      onAction = _ => { activeView.value = demandView },
+                    new MenuItem("🌾 Distribution Planner"):
+                      onAction = _ => { activeView.value = distributionView },
+                    new MenuItem("ℹ️ About System"):
+                      onAction = _ => { activeView.value = aboutView }
+                  ),
+                new Menu("Help"):
+                  items = Seq(
+                    new MenuItem("ℹ️ About Food Pantry App..."):
+                      onAction = _ => {
+                        activeView.value = aboutView
+                        UIUtils.showNotification(
+                          "About System",
+                          "Food Pantry Inventory & Demand Manager v1.0.0",
+                          "Author: Jade Wenxi (ID: 23093495) | Sunway University PRG2104 Tier C (AI-Integrated)"
+                        )
+                      },
+                    new MenuItem("📖 Quick Operations Guide"):
+                      onAction = _ => {
+                        UIUtils.showNotification(
+                          "Operations Guide",
+                          "Daily Pantry Operations Flow",
+                          "1. Log items in Inventory -> 2. Log requests in Demand -> 3. Run Distribution Planner to generate waste-minimizing allocation."
+                        )
+                      }
+                  )
+              )
+
+            top = appMenuBar
+
             // Left Sidebar Navigation
             left = new VBox:
               spacing = 8
@@ -226,7 +283,9 @@ object UIUtils:
     toastBoxOpt.value = Some(box)
 
   /** Displays a top-right floating toast notification */
-  def showToast(message: String, kind: String = "success"): Unit =
+  def showToast(message: String): Unit = showToast(message, "success")
+
+  def showToast(message: String, kind: String): Unit =
     toastBoxOpt.value.foreach { box =>
       val (bg, icon) = kind match
         case "error" => ("#b91c1c", "✗")
@@ -285,6 +344,79 @@ object UIUtils:
     arcHeight = 24
   }
 
+  /** Creates a reusable horizontal spacer region that consumes remaining HBox space (S1-13 DRY optimization) */
+  def createHSpacer(): Region =
+    val spacer = new Region()
+    HBox.setHgrow(spacer, Priority.Always)
+    spacer
+
+  /** Creates a standardized filter bar container (S1-13 DRY optimization) */
+  def createFilterBar(controls: scalafx.scene.Node*): VBox =
+    val filterControlsRow = new HBox {
+      spacing = 10
+      alignment = scalafx.geometry.Pos.CenterLeft
+      children = controls
+    }
+    new VBox {
+      spacing = 0
+      styleClass = Seq("filter-bar", "filter-bar-stacked")
+      children = Seq(filterControlsRow)
+    }
+
+  /** Creates a standardized table action bar container (S1-13 DRY optimization) */
+  def createTableActionsBar(label: String, buttons: scalafx.scene.Node*): HBox =
+    new HBox {
+      spacing = 10
+      alignment = scalafx.geometry.Pos.CenterRight
+      styleClass = Seq("table-actions-bar")
+      children = Seq(
+        new Label(label) { styleClass = Seq("table-actions-label") },
+        createHSpacer()
+      ) ++ buttons
+    }
+
+  /** Safely extracts clean lowercased search query string (S1-13 DRY optimization) */
+  def getSearchQuery(field: scalafx.scene.control.TextField): String =
+    if field.text.value == null then "" else field.text.value.toLowerCase.trim
+
+  /** Creates a ColumnConstraints helper without redundant block wrappers (S1-13 DRY optimization) */
+  def createColumnConstraints(minW: Double = -1, percentW: Double = -1, grow: scalafx.scene.layout.Priority = scalafx.scene.layout.Priority.Never): ColumnConstraints =
+    val c = new ColumnConstraints()
+    if minW > 0 then c.minWidth = minW
+    if percentW > 0 then c.percentWidth = percentW
+    if grow != scalafx.scene.layout.Priority.Never then c.hgrow = grow
+    c
+
+  /** Creates a standardized form field label (S1-13 DRY optimization) */
+  def createFormFieldLabel(text: String): Label =
+    val lbl = new Label(text)
+    lbl.styleClass = Seq("form-field-label")
+    lbl
+
+  import scalafx.collections.transformation.SortedBuffer
+
+  /** Binds table comparator to sorted buffer delegate (S1-13 DRY optimization) */
+  def bindTableSorter[T](table: TableView[T], sortedBuffer: SortedBuffer[T]): Unit =
+    sortedBuffer.delegate.comparatorProperty().bind(table.comparatorProperty)
+
+  /** Binds multiple observable controls to trigger a filter update callback (S1-13 DRY optimization) */
+  def bindFilterTriggers(updateFilter: () => Unit, controls: scalafx.beans.value.ObservableValue[_, _]*): Unit =
+    controls.foreach(_.onChange { (_, _, _) => updateFilter() })
+
+  /** Creates a standard centered badge cell factory for TableColumn (S1-13 DRY optimization) */
+  def createBadgeCellFactory[T](labelProvider: String => Label): TableColumn[T, String] => TableCell[T, String] =
+    _ => new TableCell[T, String] {
+      item.onChange { (_, _, newText) =>
+        if newText != null then
+          graphic = labelProvider(newText)
+          text = null
+          alignment = scalafx.geometry.Pos.Center
+        else
+          graphic = null
+          text = null
+      }
+    }
+
   /** Generic pill-shaped label with background, text colour, and border */
   def createPillLabel(text: String, bg: String, fg: String, borderColor: String): Label =
     new Label(text) {
@@ -304,12 +436,12 @@ object UIUtils:
     createPillLabel(statusStr, bg, fg, bc)
 
   def getDietaryLabel(restriction: String): Label =
-    val (bg, fg, bc) = restriction match
-      case "Vegetarian" => ("#ecfdf5", "#047857", "#059669")
-      case "Halal"      => ("#fdf2f8", "#be185d", "#fbcfe8")
-      case "GlutenFree" => ("#fffbeb", "#b45309", "#fde68a")
-      case _            => ("#f1f5f9", "#475569", "#cbd5e1")
-    createPillLabel(restriction, bg, fg, bc)
+    val (bg, fg, bc, displayStr) = restriction match
+      case "Vegetarian"  => ("#dcfce7", "#15803d", "#86efac", "Vegetarian")
+      case "Halal"       => ("#fce7f3", "#be185d", "#f472b6", "Halal")
+      case "GlutenFree" | "Gluten-Free" => ("#fef3c7", "#b45309", "#fcd34d", "Gluten-Free")
+      case _             => ("#e0f2fe", "#0369a1", "#7dd3fc", "Standard")
+    createPillLabel(displayStr, bg, fg, bc)
 
   def getStatusLabel(status: String): Label =
     val (bg, fg, bc) = status match

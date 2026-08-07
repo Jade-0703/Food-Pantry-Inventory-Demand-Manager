@@ -5,6 +5,7 @@ import scalafx.scene.control._
 import scalafx.scene.chart._
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Insets, Pos}
+import scalafx.Includes._
 import java.time.LocalDate
 
 class DashboardView(
@@ -107,30 +108,29 @@ class DashboardView(
     title = "Inventory Categories"
     styleClass = Seq("chart-card")
     legendVisible = true
-    labelsVisible = true
-    labelLineLength = 8
-    prefWidth = 480
-    minWidth = 420
-    prefHeight = 350
+    labelsVisible = false
+    prefWidth = 560
+    minWidth = 460
+    prefHeight = 420
 
   private val xAxis = new CategoryAxis { label = "Restriction Category" }
   private val yAxis = new NumberAxis { label = "Families" }
+  private val barSeries = new XYChart.Series[String, Number]()
+  barSeries.name = "Families"
+
   private val barChart = new BarChart[String, Number](xAxis, yAxis):
     title = "Family Dietary Needs"
     styleClass = Seq("chart-card")
     legendVisible = false
-    prefWidth = 480
-    minWidth = 420
-    prefHeight = 350
+    prefWidth = 560
+    minWidth = 460
+    prefHeight = 420
+    data = barSeries
 
   // Critical items Table (perishables expiring within 3 days)
-  private val criticalTable = new TableView[FoodItem]:
-    val selfTable: TableView[FoodItem] = this
+  private val criticalTable: TableView[FoodItem] = new TableView[FoodItem]():
     columnResizePolicy = TableView.ConstrainedResizePolicy
     placeholder = new Label("No critical expiring items.") { style = "-fx-text-fill: #64748b;" }
-
-    // S1-14 / Entry 14 clip layout to prevent row background bleed
-    clip = UIUtils.createRoundedClip(selfTable)
     
     private val nameCol: TableColumn[FoodItem, String] = new TableColumn[FoodItem, String]("Name"):
       cellValueFactory = { cellData => new scalafx.beans.property.StringProperty(this, "name", cellData.value.name) }
@@ -158,19 +158,7 @@ class DashboardView(
         new scalafx.beans.property.StringProperty(this, "status", statusStr)
       }
       prefWidth = 180
-      cellFactory = { (col: TableColumn[FoodItem, String]) =>
-        new TableCell[FoodItem, String] {
-          item.onChange { (_, _, newText) =>
-            if newText != null then
-              graphic = UIUtils.getExpiryLabel(newText)
-              text = null
-              alignment = scalafx.geometry.Pos.Center
-            else
-              graphic = null
-              text = null
-          }
-        }
-      }
+      cellFactory = UIUtils.createBadgeCellFactory(UIUtils.getExpiryLabel)
 
     columns ++= Seq(nameCol, categoryCol, qtyCol, statusCol)
     columns.foreach(_.setReorderable(false))
@@ -182,6 +170,8 @@ class DashboardView(
       },
       items
     )
+
+  criticalTable.clip = UIUtils.createRoundedClip(criticalTable)
 
   private val criticalTableWrapper = new StackPane:
     styleClass = Seq("table-wrapper")
@@ -287,18 +277,14 @@ class DashboardView(
     pieChart.data = ObservableBuffer.from(chartData)
 
     // 4. Update Bar Chart (Dietary Restrictions)
-    val restrictionCounts = requests.groupBy(_.dietaryRestriction).map { case (restr, reqs) =>
-      (restr.toString, reqs.length)
+    val restrictionCounts = DietaryRestriction.values.map { restriction =>
+      val count = requests.count(_.dietaryRestriction == restriction)
+      (restriction.displayName, count)
     }
-    val series = new XYChart.Series[String, Number] {
-      name = "Families"
-      data = ObservableBuffer.from(
-        restrictionCounts.map { case (restr, count) =>
-          XYChart.Data[String, Number](restr, count)
-        }.toSeq
-      )
+    val newData = restrictionCounts.map { case (restrictionName, count) =>
+      XYChart.Data[String, Number](restrictionName, count: java.lang.Number)
     }
-    barChart.data = series
+    barSeries.data = ObservableBuffer.from(newData)
 
     // 5. Update Shortage Alerts
     alertsBox.children.clear()
