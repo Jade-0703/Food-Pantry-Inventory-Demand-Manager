@@ -297,7 +297,8 @@ class DemandView(
   private def performEditSelected(): Unit =
     val selectedItem = requestsTable.selectionModel.value.getSelectedItem
     if selectedItem != null then
-      val dialog = new Dialog[Unit]():
+      val saveButtonType = new ButtonType("Save Changes", ButtonBar.ButtonData.OKDone)
+      val dialog = new Dialog[ButtonType]():
         title = "Edit Family Request"
         headerText = s"Edit Demand Request: ${selectedItem.familyName} (${selectedItem.id})"
       dialog.initOwner(MainApp.stage)
@@ -330,8 +331,8 @@ class DemandView(
         add(editStatusCombo, 1, 4)
 
       dialog.dialogPane().content = grid
-      val saveButtonType = new ButtonType("Save Changes", ButtonBar.ButtonData.OKDone)
       dialog.dialogPane().buttonTypes = Seq(saveButtonType, ButtonType.Cancel)
+      dialog.resultConverter = btn => btn
 
       val result = dialog.showAndWait()
       if result.contains(saveButtonType) then

@@ -371,7 +371,8 @@ class InventoryView(
   private def performEditSelected(): Unit =
     val selectedItem = inventoryTable.selectionModel.value.getSelectedItem
     if selectedItem != null then
-      val dialog = new Dialog[Unit]():
+      val saveButtonType = new ButtonType("Save Changes", ButtonBar.ButtonData.OKDone)
+      val dialog = new Dialog[ButtonType]():
         title = "Edit Inventory Item"
         headerText = s"Edit Item: ${selectedItem.name} (${selectedItem.id})"
       dialog.initOwner(MainApp.stage)
@@ -420,8 +421,8 @@ class InventoryView(
         add(editShelfLifeField, 1, 6)
 
       dialog.dialogPane().content = grid
-      val saveButtonType = new ButtonType("Save Changes", ButtonBar.ButtonData.OKDone)
       dialog.dialogPane().buttonTypes = Seq(saveButtonType, ButtonType.Cancel)
+      dialog.resultConverter = btn => btn
 
       val result = dialog.showAndWait()
       if result.contains(saveButtonType) then
