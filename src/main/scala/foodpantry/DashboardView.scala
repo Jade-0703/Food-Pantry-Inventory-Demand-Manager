@@ -283,14 +283,19 @@ class DashboardView(
             val tip = new javafx.scene.control.Tooltip(
               f"${sliceData.getName}: ${sliceData.getPieValue}%.1f units"
             )
-            tip.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;")
-            javafx.scene.control.Tooltip.install(sliceData.getNode, tip)
-            sliceData.getNode.setOnMouseEntered(_ =>
+            tip.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #0f172a; -fx-text-fill: #ffffff; -fx-padding: 6px 12px; -fx-background-radius: 4px; -fx-opacity: 0.95;")
+            sliceData.getNode.setOnMouseEntered { event =>
               sliceData.getNode.setStyle("-fx-opacity: 0.7; -fx-cursor: hand;")
-            )
-            sliceData.getNode.setOnMouseExited(_ =>
+              tip.show(sliceData.getNode, event.getScreenX + 10, event.getScreenY + 10)
+            }
+            sliceData.getNode.setOnMouseMoved { event =>
+              tip.setAnchorX(event.getScreenX + 10)
+              tip.setAnchorY(event.getScreenY + 10)
+            }
+            sliceData.getNode.setOnMouseExited { _ =>
               sliceData.getNode.setStyle("-fx-opacity: 1.0;")
-            )
+              tip.hide()
+            }
         }
       }
     }
@@ -312,14 +317,19 @@ class DashboardView(
             val tip = new javafx.scene.control.Tooltip(
               s"${barData.getXValue}: ${barData.getYValue.intValue()} families"
             )
-            tip.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;")
-            javafx.scene.control.Tooltip.install(barData.getNode, tip)
-            barData.getNode.setOnMouseEntered(_ =>
+            tip.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #0f172a; -fx-text-fill: #ffffff; -fx-padding: 6px 12px; -fx-background-radius: 4px; -fx-opacity: 0.95;")
+            barData.getNode.setOnMouseEntered { event =>
               barData.getNode.setStyle("-fx-opacity: 0.7; -fx-cursor: hand;")
-            )
-            barData.getNode.setOnMouseExited(_ =>
+              tip.show(barData.getNode, event.getScreenX + 10, event.getScreenY + 10)
+            }
+            barData.getNode.setOnMouseMoved { event =>
+              tip.setAnchorX(event.getScreenX + 10)
+              tip.setAnchorY(event.getScreenY + 10)
+            }
+            barData.getNode.setOnMouseExited { _ =>
               barData.getNode.setStyle("-fx-opacity: 1.0;")
-            )
+              tip.hide()
+            }
         }
       }
     }
