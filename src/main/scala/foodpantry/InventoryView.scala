@@ -338,7 +338,7 @@ class InventoryView(
           clearForm()
         case Some(quantity) =>
           if itemType == "Perishable" then
-            val expiryVal = expiryDatePicker.value.value
+            val expiryVal = expiryDatePicker.delegate.getValue
             if expiryVal == null then
               UIUtils.applyStatus(statusLabel, "error", "Error: Please select an Expiry Date!")
               clearForm()
@@ -433,7 +433,7 @@ class InventoryView(
 
         if name.nonEmpty && cat != null && qtyOpt.exists(_ > 0) && unit.nonEmpty then
           val updatedItem: FoodItem = if itemType == "Perishable" then
-            val exp = if editDatePicker.value.value != null then editDatePicker.value.value else LocalDate.now().plusDays(7)
+            val exp = if editDatePicker.delegate.getValue != null then editDatePicker.delegate.getValue else LocalDate.now().plusDays(7)
             PerishableItem(selectedItem.id, name, cat, qtyOpt.get, unit, exp)
           else
             val sl = Try(editShelfLifeField.text.value.trim.toInt).getOrElse(12)
