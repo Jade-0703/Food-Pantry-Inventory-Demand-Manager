@@ -320,6 +320,7 @@ object UIUtils:
       headerText = headerTextMsg
       contentText = contentTextMsg
     }
+    alert.initOwner(MainApp.stage)
     val res = alert.showAndWait()
     res.contains(ButtonType.OK)
 

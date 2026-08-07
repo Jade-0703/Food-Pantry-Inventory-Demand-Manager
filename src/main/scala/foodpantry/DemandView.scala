@@ -300,6 +300,7 @@ class DemandView(
       val dialog = new Dialog[Unit]():
         title = "Edit Family Request"
         headerText = s"Edit Demand Request: ${selectedItem.familyName} (${selectedItem.id})"
+      dialog.initOwner(MainApp.stage)
 
       val editNameField = new TextField():
         text = selectedItem.familyName

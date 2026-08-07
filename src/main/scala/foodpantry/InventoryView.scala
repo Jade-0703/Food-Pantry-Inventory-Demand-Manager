@@ -362,6 +362,7 @@ class InventoryView(
       val dialog = new Dialog[Unit]():
         title = "Edit Inventory Item"
         headerText = s"Edit Item: ${selectedItem.name} (${selectedItem.id})"
+      dialog.initOwner(MainApp.stage)
 
       val editNameField = new TextField():
         text = selectedItem.name
