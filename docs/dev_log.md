@@ -47,12 +47,13 @@ This log tracks the chronological planning and implementation progress of the fi
   - Tested edge cases including empty inputs, invalid numbers, and out-of-range dates in forms, displaying clean red warnings.
   - Populated citations, interaction logs, and self-reported manifest metrics.
 
-## 2026-08-07: Final UI Interactivity, Dialog Handling & Build Stability
-- **Goal**: Polish dialog submission handling, chart hover tooltips, DatePicker delegates, and CSS alignments.
+## 2026-08-07: Critical Bug Fixes & UI Polish
+- **Goal**: Resolve runtime bugs found during final demo walkthrough and polish UI details.
 - **Progress**:
-  - Refactored `Dialog[Unit]` implementations in `InventoryView` and `DemandView` to `Dialog[ButtonType]` with explicit `resultConverter` functions, ensuring form edits persist reliably.
-  - Upgraded `DatePicker` value reading to query JavaFX `.delegate.getValue` directly, capturing calendar popup date selections accurately.
-  - Added double-nested `Platform.runLater` blocks to bind interactive tooltips and hover opacity effects to `PieChart` and `BarChart` nodes after layout pass completion.
-  - Centered text alignment for `.filter-reset-btn` in `style.css` and added `ClassLoaderLayeringStrategy.Flat` in `build.sbt`.
-  - Verified 100% clean compilation (`sbt clean compile`) and 100% unit test success (`sbt test`).
-
+  - **Edit Dialog Fix**: Discovered `Dialog[Unit].showAndWait()` always returns `None`, causing both the Inventory and Demand edit dialogs to silently do nothing when "Save Changes" was clicked. Fixed by changing both to `Dialog[ButtonType]` and adding `resultConverter = btn => btn` so the result can be matched against the save button type.
+  - **DatePicker Fix**: `expiryDatePicker.value.value` (ScalaFX wrapper) did not reflect the user's calendar popup selection. Fixed by reading `expiryDatePicker.delegate.getValue` (JavaFX delegate) directly in both the add and edit flows.
+  - **ComboBox Fix**: Applied the same `.delegate.getValue` pattern to all edit-dialog combo boxes in `InventoryView` and `DemandView` to ensure user dropdown selections are always captured.
+  - **Chart Hover Tooltips**: Added interactive hover tooltips on PieChart slices and BarChart bars using double-nested `Platform.runLater` so tooltips are installed after the JavaFX layout pass creates the node objects.
+  - **Pie Chart Colors**: Fixed `Other` category color from teal (`#14b8a6`) which clashed with `Vegetables` to a distinct orange (`#f97316`). All 6 category colors are now maximally distinct.
+  - **Reset Button**: Centred the "Reset" wording inside the filter-reset-btn using `-fx-alignment: center` and `-fx-text-alignment: center`.
+  - **Build.sbt Classloader**: Added `Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat` to permanently resolve an intermittent `NoClassDefFoundError` in `sbt test` caused by ScalaFX classloader isolation.

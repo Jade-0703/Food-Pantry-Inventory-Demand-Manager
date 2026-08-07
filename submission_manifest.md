@@ -4,7 +4,7 @@
 **Student ID:** 23093495  
 **Project title:** Food Pantry SDG-1 Application  
 **Theme:** SDG 1 — No Poverty / sub-domain: Food Pantry Inventory & Demand  
-**Date submitted:** 2026-07-19  
+**Date submitted:** 2026-08-07  
 
 ## File checklist (tick every box)
 
@@ -29,7 +29,7 @@
 |---|---|---|
 | Number of classes / traits in src/main/scala | ≥ 5 | 16 |
 | Number of `// ai-assisted: #N` tags in src/ | ≥ 3 | 3 |
-| Number of entries in ai/interaction_log.md | ≥ 10 | 15 |
+| Number of entries in ai/interaction_log.md | ≥ 10 | 18 |
 | Distinct dates in docs/dev_log.md | ≥ 5 | 7 |
 | Word count of docs/reflection.md | 350–700 | 462 |
 | Word count of docs/ai_reflection.md | 300–500 | 371 |
@@ -42,4 +42,4 @@ I confirm the above is accurate and that the contents of this folder
 are entirely my own work, prepared under the Tier C AI-Integrated
 policy.
 
-Signed: Jade Wenxi  Date: 2026-07-19  
+Signed: Jade Wenxi  Date: 2026-08-07  
