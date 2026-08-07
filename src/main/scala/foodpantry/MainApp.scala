@@ -220,12 +220,23 @@ object MainApp extends JFXApp3:
 
   private def loadAllData(): Unit =
     inventoryRepo.loadAll().foreach { items =>
+      val normalized = items.zipWithIndex.map { (item, idx) =>
+        val newId = f"INV-${idx + 1}%03d"
+        item match
+          case p: PerishableItem    => p.copy(id = newId)
+          case np: NonPerishableItem => np.copy(id = newId)
+      }
       inventoryItems.clear()
-      inventoryItems.addAll(items)
+      inventoryItems.addAll(normalized)
+      inventoryRepo.saveAll(normalized.toList)
     }
     demandRepo.loadAll().foreach { reqs =>
+      val normalized = reqs.zipWithIndex.map { (req, idx) =>
+        req.copy(id = f"REQ-${idx + 1}%03d")
+      }
       familyRequests.clear()
-      familyRequests.addAll(reqs)
+      familyRequests.addAll(normalized)
+      demandRepo.saveAll(normalized.toList)
     }
 
   private def seedInitialData(): Unit =
