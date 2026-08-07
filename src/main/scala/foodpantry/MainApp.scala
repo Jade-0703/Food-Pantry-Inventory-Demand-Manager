@@ -386,11 +386,11 @@ object UIUtils:
 
   /** Creates a ColumnConstraints helper without redundant block wrappers (S1-13 DRY optimization) */
   def createColumnConstraints(minW: Double = -1, percentW: Double = -1, grow: scalafx.scene.layout.Priority = scalafx.scene.layout.Priority.Never): ColumnConstraints =
-    val c = new ColumnConstraints()
-    if minW > 0 then c.minWidth = minW
-    if percentW > 0 then c.percentWidth = percentW
-    if grow != scalafx.scene.layout.Priority.Never then c.hgrow = grow
-    c
+    val colConstraints = new ColumnConstraints()
+    if minW > 0 then colConstraints.minWidth = minW
+    if percentW > 0 then colConstraints.percentWidth = percentW
+    if grow != scalafx.scene.layout.Priority.Never then colConstraints.hgrow = grow
+    colConstraints
 
   /** Creates a standardized form field label (S1-13 DRY optimization) */
   def createFormFieldLabel(text: String): Label =
