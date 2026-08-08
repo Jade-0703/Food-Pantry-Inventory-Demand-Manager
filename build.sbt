@@ -29,3 +29,4 @@ scalacOptions ++= Seq(
 
 // Fix classloader isolation issue between ScalaFX and test runner
 Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
+

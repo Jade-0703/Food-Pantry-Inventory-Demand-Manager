@@ -32,9 +32,9 @@ Pantry coordinators can log donated food items (both perishable with dates, and 
 - **sbt** (Scala Build Tool) version 1.9+ installed.
 
 ### Compile
-To compile the codebase with unused import warning checkers enabled:
+To compile the codebase (which automatically has the `-Wunused:all` compiler option enabled in [build.sbt](file:///Users/jadewenxi/Documents/Project_23093495/build.sbt)):
 ```bash
-sbt -Wunused clean compile
+sbt clean compile
 ```
 
 ### Run Tests
