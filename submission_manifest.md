@@ -2,7 +2,7 @@
 
 **Student name:** Jade Wenxi  
 **Student ID:** 23093495  
-**Project title:** Food Pantry SDG-1 Application  
+**Project title:** Food Pantry Inventory & Demand Manager  
 **Theme:** SDG 1 — No Poverty / sub-domain: Food Pantry Inventory & Demand  
 **Date submitted:** 2026-08-08  
 
