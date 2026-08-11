@@ -1,6 +1,6 @@
 # Submission Manifest — Project_23093495
 
-**Student name:** Jade Wenxi  
+**Student name:** Tan Wen Xi  
 **Student ID:** 23093495  
 **Project title:** Food Pantry Inventory & Demand Manager  
 **Theme:** SDG 1 — No Poverty / sub-domain: Food Pantry Inventory & Demand  
@@ -31,8 +31,8 @@
 | Number of `// ai-assisted: #N` tags in src/ | ≥ 3 | 3 |
 | Number of entries in ai/interaction_log.md | ≥ 10 | 18 |
 | Distinct dates in docs/dev_log.md | ≥ 5 | 8 |
-| Word count of docs/reflection.md | 350–700 | 462 |
-| Word count of docs/ai_reflection.md | 300–500 | 371 |
+| Word count of docs/reflection.md | 350–700 | 543 |
+| Word count of docs/ai_reflection.md | 300–500 | 494 |
 | sbt -Wunused clean compile passes? | Yes | Yes |
 | All four required features work end-to-end? | Yes | Yes |
 
@@ -42,4 +42,4 @@ I confirm the above is accurate and that the contents of this folder
 are entirely my own work, prepared under the Tier C AI-Integrated
 policy.
 
-Signed: Jade Wenxi  Date: 2026-08-08  
+Signed: Tan Wen Xi  Date: 2026-08-08  

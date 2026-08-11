@@ -11,7 +11,7 @@ I, the student named on the cover page, declare that:
 - Gemini
 - Antigravity
 
-**Student Name:** Jade Wenxi  
+**Student Name:** Tan Wen Xi  
 **Student ID:** 23093495  
 **Date:** 2026-08-08  
-**Signature (Typed):** Jade Wenxi  
+**Signature (Typed):** Tan Wen Xi  
